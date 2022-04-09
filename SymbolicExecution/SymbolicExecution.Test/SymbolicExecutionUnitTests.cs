@@ -71,6 +71,28 @@ class TestClass
 	}
 
 	[Fact]
+	public async Task TestIfTrueCondition()
+	{
+		var test = @"using System;
+
+class SymbolicallyAnalyzeAttribute : Attribute { }
+
+class TestClass
+{
+	[SymbolicallyAnalyze]
+	void SayHello()
+	{
+		if (true)
+		{
+			throw new InvalidOperationException();
+		}
+	}
+}";
+		var expected = VerifyCS.Diagnostic(diagnosticId: "SymbolicExecution").WithLocation(12, 4);
+		await VerifyCS.VerifyAnalyzerAsync(test, expected);
+	}
+
+	[Fact]
 	public async Task TestInaccessibleCodeDoesNotCreateDiagnostic()
 	{
 		var test = @"using System;
