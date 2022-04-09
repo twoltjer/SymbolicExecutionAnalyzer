@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -81,22 +82,37 @@ namespace SymbolicExecution
 				AnalyzeCodeBlock(context);
 		}
 
-		private void AnalyzeNode(SyntaxNode node)
+		private void AnalyzeNode(SyntaxNode node, SymbolicAnalysisContext context)
 		{
-			if (node is StatementSyntax statement)
-				AnalyzeStatement(statement);
+			switch (node)
+			{
+				case StatementSyntax statement:
+					AnalyzeStatement(statement, context);
+					break;
+				// Ignore all other nodes
+				case AttributeListSyntax _:
+				case PredefinedTypeSyntax _:
+				case ParameterListSyntax _:
+					break;
+				default:
+					Debug.Fail($"Unexpected node type: {node.GetType()}");
+					break;
+			}
 		}
 
-		private void AnalyzeStatement(StatementSyntax statement)
+		private void AnalyzeStatement(StatementSyntax statement, SymbolicAnalysisContext context)
 		{
 			switch (statement)
 			{
 				case BlockSyntax block:
 					foreach (var child in block.ChildNodes())
-						AnalyzeNode(child);
+						AnalyzeNode(child, context);
 					break;
 				case ThrowStatementSyntax throwStatement:
 					throw new ExceptionStatementException(throwStatement);
+					break;
+				case IfStatementSyntax ifStatement:
+					AnalyzeIfStatement(ifStatement, context);
 					break;
 				default:
 					Debug.Fail("Unhandled node type: " + statement.GetType().Name);
@@ -104,11 +120,31 @@ namespace SymbolicExecution
 			}
 		}
 
+		private void AnalyzeIfStatement(IfStatementSyntax ifStatement, SymbolicAnalysisContext symbolicAnalysisContext)
+		{
+			var condition = ifStatement.Condition;
+			var trueContext = symbolicAnalysisContext.WithCondition(condition);
+			if (trueContext.CanBeTrue())
+				AnalyzeStatement(ifStatement.Statement, trueContext);
+			if (ifStatement.Else != null)
+			{
+				var falseContext = symbolicAnalysisContext.WithCondition(NegateCondition(condition));
+				if (falseContext.CanBeTrue())
+					AnalyzeStatement(ifStatement.Else.Statement, falseContext);
+			}
+		}
+
+		private ExpressionSyntax NegateCondition(ExpressionSyntax condition)
+		{
+			Debug.Fail("Not implemented");
+			throw new NotImplementedException();
+		}
+
 		private void AnalyzeCodeBlock(CodeBlockAnalysisContext context)
 		{
 			try
 			{
-				foreach (var node in context.CodeBlock.ChildNodes()) AnalyzeNode(node);
+				foreach (var node in context.CodeBlock.ChildNodes()) AnalyzeNode(node, SymbolicAnalysisContext.Empty);
 			}
 			catch (ExceptionStatementException ex)
 			{
@@ -121,6 +157,44 @@ namespace SymbolicExecution
 
 	internal class SymbolicAnalysisContext
 	{
+		private SymbolicAnalysisContext(ImmutableArray<ExpressionSyntax> conditions)
+		{
+			Conditions = conditions;
+		}
+
+		public SymbolicAnalysisContext WithCondition(ExpressionSyntax condition)
+		{
+			return new SymbolicAnalysisContext(Conditions.Append(condition).ToImmutableArray());
+		}
+
+		private ImmutableArray<ExpressionSyntax> Conditions { get; }
+		public static SymbolicAnalysisContext Empty { get; } = new SymbolicAnalysisContext(ImmutableArray<ExpressionSyntax>.Empty);
+
+		public bool CanBeTrue()
+		{
+			foreach (var condition in Conditions)
+			{
+				switch (condition)
+				{
+					case LiteralExpressionSyntax literal:
+						switch (literal.Token.ValueText)
+						{
+							case "true":
+								return true;
+							case "false":
+								return false;
+							default:
+								Debug.Fail("Unexpected literal value: " + literal.Token.ValueText);
+								return true;
+						}
+					default:
+						Debug.Fail("Unhandled condition type");
+						break;
+				}
+			}
+
+			return true;
+		}
 	}
 
 	internal class ExceptionStatementException : Exception
