@@ -1,8 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Xunit;
-using VerifyCS = SymbolicExecution.Test.CSharpCodeFixVerifier<
-	SymbolicExecution.SymbolicExecutionAnalyzer,
-	SymbolicExecution.SymbolicExecutionCodeFixProvider>;
+using VerifyCS = SymbolicExecution.Test.CSharpAnalyzerVerifier<SymbolicExecution.SymbolicExecutionAnalyzer>;
 
 namespace SymbolicExecution.Test;
 
@@ -66,7 +64,9 @@ class TestClass
 		throw new InvalidOperationException();
 	}
 }";
-		var expected = VerifyCS.Diagnostic(diagnosticId: "SymbolicExecution").WithLocation(10, 3);
+		var expected = VerifyCS.Diagnostic(diagnosticId: "SE0001")
+			.WithLocation(10, 3)
+			.WithMessage("The statement 'throw new InvalidOperationException();' may throw unhandled exceptions");
 		await VerifyCS.VerifyAnalyzerAsync(test, expected);
 	}
 
@@ -88,7 +88,9 @@ class TestClass
 		}
 	}
 }";
-		var expected = VerifyCS.Diagnostic(diagnosticId: "SymbolicExecution").WithLocation(12, 4);
+		var expected = VerifyCS.Diagnostic(diagnosticId: "SE0001")
+			.WithLocation(12, 4)
+			.WithMessage("The statement 'throw new InvalidOperationException();' may throw unhandled exceptions");
 		await VerifyCS.VerifyAnalyzerAsync(test, expected);
 	}
 
@@ -133,7 +135,9 @@ class TestClass
 		}
 	}
 }";
-		var expected = VerifyCS.Diagnostic(diagnosticId: "SymbolicExecution").WithLocation(13, 4);
+		var expected = VerifyCS.Diagnostic(diagnosticId: "SE0001")
+			.WithLocation(13, 4)
+			.WithMessage("The statement 'throw new InvalidOperationException();' may throw unhandled exceptions");
 		await VerifyCS.VerifyAnalyzerAsync(test, expected);
 	}
 
@@ -158,41 +162,41 @@ class TestClass
 		await VerifyCS.VerifyAnalyzerAsync(test);
 	}
 
-	//Diagnostic and CodeFix both triggered and checked for
-	[Fact(Skip = "Not testing code fixes")]
-	public async Task TestCodeFix()
-	{
-		var test = @"
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Text;
-	using System.Threading.Tasks;
-	using System.Diagnostics;
-
-	namespace ConsoleApplication1
-	{
-		class {|#0:TypeName|}
-		{   
-		}
-	}";
-
-		var fixtest = @"
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Text;
-	using System.Threading.Tasks;
-	using System.Diagnostics;
-
-	namespace ConsoleApplication1
-	{
-		class TYPENAME
-		{   
-		}
-	}";
-
-		var expected = VerifyCS.Diagnostic(diagnosticId: "BraceAnalyzer").WithLocation(0).WithArguments("TypeName");
-		await VerifyCS.VerifyCodeFixAsync(test, expected, fixtest);
-	}
+// 	//Diagnostic and CodeFix both triggered and checked for
+// 	[Fact(Skip = "Not testing code fixes")]
+// 	public async Task TestCodeFix()
+// 	{
+// 		var test = @"
+// 	using System;
+// 	using System.Collections.Generic;
+// 	using System.Linq;
+// 	using System.Text;
+// 	using System.Threading.Tasks;
+// 	using System.Diagnostics;
+//
+// 	namespace ConsoleApplication1
+// 	{
+// 		class {|#0:TypeName|}
+// 		{   
+// 		}
+// 	}";
+//
+// 		var fixtest = @"
+// 	using System;
+// 	using System.Collections.Generic;
+// 	using System.Linq;
+// 	using System.Text;
+// 	using System.Threading.Tasks;
+// 	using System.Diagnostics;
+//
+// 	namespace ConsoleApplication1
+// 	{
+// 		class TYPENAME
+// 		{   
+// 		}
+// 	}";
+//
+// 		var expected = VerifyCS.Diagnostic(diagnosticId: "BraceAnalyzer").WithLocation(0).WithArguments("TypeName");
+// 		await VerifyCS.VerifyCodeFixAsync(test, expected, fixtest);
+// 	}
 }

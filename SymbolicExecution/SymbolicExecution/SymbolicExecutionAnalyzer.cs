@@ -15,7 +15,7 @@ namespace SymbolicExecution
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]
 	public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 	{
-		public const string DiagnosticId = "SymbolicExecution";
+		public const string DiagnosticId = "SE0001";
 		private const string Category = "Naming";
 
 		// You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
@@ -208,7 +208,7 @@ namespace SymbolicExecution
 			catch (ExceptionStatementException ex)
 			{
 				var statement = ex.ThrowStatement;
-				var diagnostic = Diagnostic.Create(Rule, statement.GetLocation());
+				var diagnostic = Diagnostic.Create(Rule, statement.GetLocation(), statement.ToString());
 				codeBlockContext.ReportDiagnostic(diagnostic);
 			}
 		}
