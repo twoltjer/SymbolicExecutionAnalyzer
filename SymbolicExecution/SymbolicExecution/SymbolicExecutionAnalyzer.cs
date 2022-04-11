@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -118,11 +119,10 @@ namespace SymbolicExecution
 			{
 				case BlockSyntax block:
 					foreach (var child in block.ChildNodes())
-						AnalyzeNode(child, context, codeBlockAnalysisContext, out mutatedContext);
+						AnalyzeNode(child, mutatedContext, codeBlockAnalysisContext, out mutatedContext);
 					break;
 				case ThrowStatementSyntax throwStatement:
 					throw new ExceptionStatementException(throwStatement);
-					break;
 				case IfStatementSyntax ifStatement:
 					AnalyzeIfStatement(ifStatement, context, codeBlockAnalysisContext);
 					break;
@@ -146,9 +146,25 @@ namespace SymbolicExecution
 			foreach (var variable in localDeclarationStatement.Declaration.Variables)
 			{
 				var variableName = variable.Identifier.Text;
-				var variableSymbol = codeBlockAnalysisContext.SemanticModel.GetDeclaredSymbol(variable);
-				SourceLocalSymbol.LocalWithInitializer localWithInitializer = variableSymbol as SourceLocalSymbol.LocalWithInitializer;
-				mutatedContext = mutatedContext.WithDeclaration(localDeclarationStatement);
+				var variableSymbol = ModelExtensions.GetDeclaredSymbol(codeBlockAnalysisContext.SemanticModel, variable) as ILocalSymbol;
+				var type = variableSymbol?.Type;
+				var specialType = type?.SpecialType;
+				var initializer = variable.Initializer;
+				var initializerValue = initializer?.Value;
+				var initializedValue = initializerValue?.ToString();
+				switch (specialType)
+				{
+					case SpecialType.System_Int32:
+						var valueScope = initializedValue != null
+							? new ConcreteValueScope<int>(int.Parse(initializedValue))
+							: (IValueScope) UninitializedValueScope.Instance;
+						mutatedContext = mutatedContext.WithDeclaration(new VariableInfo(variableName, specialType.Value, valueScope));
+						break;
+					default:
+						Debug.Fail($"Unexpected type: {type}");
+						break;
+				}
+				
 			}
 		}
 
@@ -234,6 +250,8 @@ namespace SymbolicExecution
 								Debug.Fail("Unexpected literal value: " + literal.Token.ValueText);
 								return true;
 						}
+					case BinaryExpressionSyntax binaryExpression:
+						return BinaryExpressionCanBeTrue(binaryExpression);
 					default:
 						Debug.Fail("Unhandled condition type");
 						break;
@@ -243,18 +261,205 @@ namespace SymbolicExecution
 			return true;
 		}
 
-		public SymbolicAnalysisContext WithDeclaration(LocalDeclarationStatementSyntax declaration)
+		private bool BinaryExpressionCanBeTrue(BinaryExpressionSyntax binaryExpression)
 		{
-			return new SymbolicAnalysisContext(Conditions, Variables);
+			var left = binaryExpression.Left;
+			var right = binaryExpression.Right;
+			switch (binaryExpression.Kind())
+			{
+				case SyntaxKind.EqualsExpression:
+					return CanBeEqual(left, right);
+				case SyntaxKind.NotEqualsExpression:
+					return CanBeNotEqual(left, right);
+				case SyntaxKind.GreaterThanExpression:
+				case SyntaxKind.GreaterThanOrEqualExpression:
+				case SyntaxKind.LessThanExpression:
+				case SyntaxKind.LessThanOrEqualExpression:
+				default:
+					Debug.Fail("Unexpected binary expression: " + binaryExpression.Kind());
+					return true;
+			}
+		}
+
+		private bool CanBeNotEqual(ExpressionSyntax left, ExpressionSyntax right)
+		{
+			var leftValueScope = GetValueScope(left);
+			var rightValueScope = GetValueScope(right);
+			if (leftValueScope is null || rightValueScope is null)
+			{
+				Debug.Fail("Unexpected null value scope");
+				return true;
+			}
+
+			var union = leftValueScope.Union(rightValueScope);
+			
+			return !(union.Equals(leftValueScope) && union.Equals(rightValueScope));
+		}
+
+
+		private IValueScope GetValueScope(ExpressionSyntax expressionSyntax)
+		{
+			switch (expressionSyntax)
+			{
+				case IdentifierNameSyntax identifierName:
+					return GetVariableValueScope(identifierName.Identifier.ValueText);
+				case LiteralExpressionSyntax literal:
+					if (int.TryParse(literal.Token.ValueText, out var intValue))
+					{
+						return new ConcreteValueScope<int>(intValue);
+					}
+					else
+					{
+						Debug.Fail("Unexpected literal value: " + literal.Token.ValueText);
+						return new ConcreteValueScope<int>(0);
+					}
+				default:
+					Debug.Fail("Unexpected expression type: " + expressionSyntax.Kind());
+					return null;
+			}
+		}
+
+		private IValueScope GetLiteralValueScope(string valueText)
+		{
+			throw new NotImplementedException();
+		}
+
+		private IValueScope GetVariableValueScope(string identifierValueText)
+		{
+			var matchingVariables = Variables.Where(v => v.Name == identifierValueText).ToList();
+			if (matchingVariables.Count == 1)
+			{
+				return matchingVariables.First().ValueScope;
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		private bool CanBeEqual(ExpressionSyntax left, ExpressionSyntax right)
+		{
+			var leftValueScope = GetValueScope(left);
+			var rightValueScope = GetValueScope(right);
+			if (leftValueScope is null || rightValueScope is null)
+			{
+				Debug.Fail("Unexpected null value scope");
+				return true;
+			}
+
+			var intersection = leftValueScope.Intersection(rightValueScope);
+
+			return !(intersection.Equals(EmptyValueScope.Instance));
+		}
+
+		public SymbolicAnalysisContext WithDeclaration(VariableInfo variable)
+		{
+			return new SymbolicAnalysisContext(Conditions, Variables.Append(variable).ToImmutableArray());
 		}
 
 		public ImmutableArray<VariableInfo> Variables { get; }
 	}
 
+	internal sealed class EmptyValueScope : IValueScope
+	{
+		internal static readonly EmptyValueScope Instance = new EmptyValueScope();
+		
+		private EmptyValueScope()
+		{
+		}
+
+		public IValueScope Union(IValueScope other) => this;
+		
+		public IValueScope Intersection(IValueScope other) => other;
+		
+		public bool Equals(IValueScope other) => other is EmptyValueScope;
+	}
+
 	internal struct VariableInfo
 	{
+		public VariableInfo(string name, SpecialType type, IValueScope valueScope)
+		{
+			Name = name;
+			Type = type;
+			ValueScope = valueScope;
+		}
+
 		public string Name { get; }
-		public TypeSyntax Type { get; }
+		public SpecialType Type { get; }
+		public IValueScope ValueScope { get; }
+	}
+
+	public interface IValueScope : IEquatable<IValueScope>
+	{
+		IValueScope Union(IValueScope other);
+		IValueScope Intersection(IValueScope other);
+	}
+	
+	public sealed class UninitializedValueScope : IValueScope
+	{
+		public static UninitializedValueScope Instance { get; } = new UninitializedValueScope();
+		public IValueScope Union(IValueScope other)
+		{
+			Debug.Fail("Unexpected call to Union on UninitializedValueScope");
+			return this;
+		}
+		
+		public IValueScope Intersection(IValueScope other)
+		{
+			Debug.Fail("Unexpected call to Intersection on UninitializedValueScope");
+			return this;
+		}
+		
+		public bool Equals(IValueScope other)
+		{
+			return other is UninitializedValueScope;
+		}
+	}
+	
+	public interface IConcreteValueScope : IValueScope
+	{
+	}
+	
+	public sealed class ConcreteValueScope<T> : IConcreteValueScope where T : unmanaged
+	{
+		public ConcreteValueScope(T value)
+		{
+			Value = value;
+		}
+
+		public T Value { get; }
+		public IValueScope Union(IValueScope other)
+		{
+			if (other is ConcreteValueScope<T> otherConcreteValueScope)
+			{
+				if (Value.Equals(otherConcreteValueScope.Value))
+					return this;
+
+				return EmptyValueScope.Instance;
+			}
+
+			Debug.Fail("Unexpected value scope type");
+			return null;
+		}
+		
+		public IValueScope Intersection(IValueScope other)
+		{
+			if (other is ConcreteValueScope<T> otherConcreteValueScope)
+			{
+				if (Value.Equals(otherConcreteValueScope.Value))
+					return this;
+
+				return EmptyValueScope.Instance;
+			}
+
+			Debug.Fail("Unexpected value scope type");
+			return null;
+		}
+
+		public bool Equals(IValueScope other)
+		{
+			return other is ConcreteValueScope<T> otherConcreteValueScope && Value.Equals(otherConcreteValueScope.Value);
+		}
 	}
 
 	internal class ExceptionStatementException : Exception

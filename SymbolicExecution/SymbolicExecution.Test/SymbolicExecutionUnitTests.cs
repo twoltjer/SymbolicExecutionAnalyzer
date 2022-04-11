@@ -93,7 +93,7 @@ class TestClass
 	}
 
 	[Fact]
-	public async Task TestIntConditionStopsAnalysis()
+	public async Task TestNotTrueIntConditionStopsAnalysis()
 	{
 		var test = @"using System;
 
@@ -112,6 +112,29 @@ class TestClass
 	}
 }";
 		await VerifyCS.VerifyAnalyzerAsync(test);
+	}
+	
+	[Fact]
+	public async Task TestSurelyTrueConditionContinuesAnalysis()
+	{
+		var test = @"using System;
+
+class SymbolicallyAnalyzeAttribute : Attribute { }
+
+class TestClass
+{
+	[SymbolicallyAnalyze]
+	void SayHello()
+	{
+		int x = 0;
+		if (x == 0)
+		{
+			throw new InvalidOperationException();
+		}
+	}
+}";
+		var expected = VerifyCS.Diagnostic(diagnosticId: "SymbolicExecution").WithLocation(13, 4);
+		await VerifyCS.VerifyAnalyzerAsync(test, expected);
 	}
 
 	[Fact]
