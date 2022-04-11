@@ -93,6 +93,28 @@ class TestClass
 	}
 
 	[Fact]
+	public async Task TestIntConditionStopsAnalysis()
+	{
+		var test = @"using System;
+
+class SymbolicallyAnalyzeAttribute : Attribute { }
+
+class TestClass
+{
+	[SymbolicallyAnalyze]
+	void SayHello()
+	{
+		int x = 0;
+		if (x != 0)
+		{
+			throw new InvalidOperationException();
+		}
+	}
+}";
+		await VerifyCS.VerifyAnalyzerAsync(test);
+	}
+
+	[Fact]
 	public async Task TestInaccessibleCodeDoesNotCreateDiagnostic()
 	{
 		var test = @"using System;
