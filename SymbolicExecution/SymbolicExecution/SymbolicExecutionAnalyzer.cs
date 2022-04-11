@@ -63,14 +63,14 @@ namespace SymbolicExecution
 
 		private void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
 		{
-			using (var logger = new FileLogger(startContext.Compilation.AssemblyName))
-			{
+			//using (var logger = new FileLogger(startContext.Compilation.AssemblyName))
+			//{
 				var optionsProvider = startContext.Options.AnalyzerConfigOptionsProvider;
 				startContext.RegisterCodeBlockAction(
 					actionContext =>
 						AnalyzeCodeBlock(actionContext, optionsProvider)
 					);
-			}
+			//}
 		}
 
 		private void AnalyzeCodeBlock(
