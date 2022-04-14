@@ -34,7 +34,8 @@ namespace SymbolicExecution.Analysis.NodeHandling
 			new LocalDeclarationStatementSyntaxHandler(),
 			new AttributeListSyntaxHandler(),
 			new PredefinedTypeSyntaxHandler(),
-			new ParameterListSyntaxHandler()
+			new ParameterListSyntaxHandler(),
+			new TupleTypeSyntaxHandler()
 			);
 	}
 }
