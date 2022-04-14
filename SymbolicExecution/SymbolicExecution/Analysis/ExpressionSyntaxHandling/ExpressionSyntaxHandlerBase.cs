@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace SymbolicExecution.Analysis.ExpressionSyntaxHandling;
 
-public abstract class ExpressionSyntaxHandlerBase<T> : IExpressionSyntaxHandler where T : ExpressionSyntax
+public abstract class ExpressionSyntaxHandlerBase<T> : IHandler<ExpressionSyntax> where T : ExpressionSyntax
 {
 	public bool CanHandle(ExpressionSyntax expressionSyntax) => expressionSyntax is T;
 

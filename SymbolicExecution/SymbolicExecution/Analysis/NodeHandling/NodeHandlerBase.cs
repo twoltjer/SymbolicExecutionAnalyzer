@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace SymbolicExecution.Analysis.NodeHandling
 {
-	public abstract class NodeHandlerBase<T> : INodeHandler where T : SyntaxNode
+	public abstract class NodeHandlerBase<T> : IHandler<SyntaxNode> where T : SyntaxNode
 	{
 		public bool CanHandle(SyntaxNode node) => node is T;
 

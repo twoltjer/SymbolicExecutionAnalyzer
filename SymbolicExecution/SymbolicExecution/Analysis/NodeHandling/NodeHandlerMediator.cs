@@ -5,26 +5,10 @@ using SymbolicExecution.Analysis.NodeHandling.NodeHandlers;
 
 namespace SymbolicExecution.Analysis.NodeHandling
 {
-	public class NodeHandlerMediator
+	public sealed class NodeHandlerMediator : HandlerMediatorBase<SyntaxNode>
 	{
-		public INodeHandler[] Handlers { get; }
-
-		private NodeHandlerMediator(params INodeHandler[] handlers)
+		private NodeHandlerMediator(params IHandler<SyntaxNode>[] blockSyntaxHandler) : base(blockSyntaxHandler)
 		{
-			Handlers = handlers;
-		}
-
-		public SymbolicAnalysisContext Handle(SyntaxNode node, SymbolicAnalysisContext analysisContext, CodeBlockAnalysisContext codeBlockContext)
-		{
-			foreach (var handler in Handlers)
-			{
-				if (!handler.CanHandle(node))
-					continue;
-
-				return handler.Handle(node, analysisContext, codeBlockContext);
-			}
-			Debug.Fail("No handler found for node " + node.GetType().Name);
-			return analysisContext;
 		}
 
 		public static NodeHandlerMediator Instance { get; } = new NodeHandlerMediator(

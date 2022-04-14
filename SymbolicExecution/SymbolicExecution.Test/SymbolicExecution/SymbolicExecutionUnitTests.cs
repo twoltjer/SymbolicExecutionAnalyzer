@@ -187,4 +187,31 @@ class TestClass
 			);
 	}
 
+	[Fact]
+	public async Task TestAnalyzeGetMinMax()
+	{
+		var test = @"using System;
+
+class SymbolicallyAnalyzeAttribute : Attribute { }
+
+class TestClass
+{
+	[SymbolicallyAnalyze]
+	public static (float min, float max) GetMinMax(IEnumerable<float> data)
+	{
+		var (min, max) = (float.MaxValue, float.MinValue);
+		foreach (var item in data)
+		{
+			if (Math.Abs(item) > MaxRange)
+				continue;
+
+			min = Math.Min(min, item);
+			max = Math.Max(max, item);
+		}
+
+		return (min, max);
+	}
+}";
+		await VerifyCS.VerifyAnalyzerAsync(test);
+	}
 }
