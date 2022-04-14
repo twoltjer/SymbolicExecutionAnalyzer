@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using SymbolicExecution.Analysis.Context;
 
 namespace SymbolicExecution.Analysis.NodeHandling
 {

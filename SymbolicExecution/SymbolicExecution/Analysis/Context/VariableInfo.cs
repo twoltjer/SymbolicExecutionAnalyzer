@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace SymbolicExecution
+namespace SymbolicExecution.Analysis.Context
 {
 	public struct VariableInfo
 	{

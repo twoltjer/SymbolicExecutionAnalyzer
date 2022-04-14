@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 
-namespace SymbolicExecution.Test;
+namespace SymbolicExecution.Test.Verifiers;
 
 public static partial class CSharpCodeRefactoringVerifier<TCodeRefactoring>
 	where TCodeRefactoring : CodeRefactoringProvider, new()

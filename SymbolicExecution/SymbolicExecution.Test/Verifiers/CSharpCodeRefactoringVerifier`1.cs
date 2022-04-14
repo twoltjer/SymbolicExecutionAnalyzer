@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.Testing;
 
-namespace SymbolicExecution.Test;
+namespace SymbolicExecution.Test.Verifiers;
 
 public static partial class CSharpCodeRefactoringVerifier<TCodeRefactoring>
 	where TCodeRefactoring : CodeRefactoringProvider, new()

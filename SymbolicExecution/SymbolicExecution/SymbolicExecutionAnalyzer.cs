@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using SymbolicExecution.Analysis.Context;
 using SymbolicExecution.Analysis.NodeHandling;
 
 namespace SymbolicExecution
@@ -18,35 +18,35 @@ namespace SymbolicExecution
 
 		// You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
 		// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Localizing%20Analyzers.md for more on localization
-		private static readonly LocalizableString Title = new LocalizableResourceString(
+		private static readonly LocalizableString _title = new LocalizableResourceString(
 			nameof(SymbolicExecutionStrings.AnalyzerTitle),
 			SymbolicExecutionStrings.ResourceManager,
 			typeof(SymbolicExecutionStrings)
 			);
 
-		private static readonly LocalizableString MessageFormat = new LocalizableResourceString(
+		private static readonly LocalizableString _messageFormat = new LocalizableResourceString(
 			nameof(SymbolicExecutionStrings.AnalyzerMessageFormat),
 			SymbolicExecutionStrings.ResourceManager,
 			typeof(SymbolicExecutionStrings)
 			);
 
-		private static readonly LocalizableString Description = new LocalizableResourceString(
+		private static readonly LocalizableString _description = new LocalizableResourceString(
 			nameof(SymbolicExecutionStrings.AnalyzerDescription),
 			SymbolicExecutionStrings.ResourceManager,
 			typeof(SymbolicExecutionStrings)
 			);
 
-		private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
+		private static readonly DiagnosticDescriptor _rule = new DiagnosticDescriptor(
 			DiagnosticId,
-			Title,
-			MessageFormat,
+			_title,
+			_messageFormat,
 			Category,
 			DiagnosticSeverity.Warning,
 			true,
-			Description
+			_description
 			);
 
-		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(_rule);
 
 		public override void Initialize(AnalysisContext context)
 		{
@@ -102,7 +102,7 @@ namespace SymbolicExecution
 			catch (ExceptionStatementException ex)
 			{
 				var statement = ex.ThrowStatement;
-				var diagnostic = Diagnostic.Create(Rule, statement.GetLocation(), statement.ToString());
+				var diagnostic = Diagnostic.Create(_rule, statement.GetLocation(), statement.ToString());
 				codeBlockContext.ReportDiagnostic(diagnostic);
 			}
 		}
@@ -111,24 +111,24 @@ namespace SymbolicExecution
 	internal sealed class EmptyValueScope : IValueScope
 	{
 		internal static readonly EmptyValueScope Instance = new EmptyValueScope();
-		
+
 		private EmptyValueScope()
 		{
 		}
 
 		public IValueScope Union(IValueScope other) => this;
-		
+
 		public IValueScope Intersection(IValueScope other) => other;
-		
+
 		public bool Equals(IValueScope other) => other is EmptyValueScope;
 	}
 
 	public interface IValueScope : IEquatable<IValueScope>
 	{
-		IValueScope Union(IValueScope other);
-		IValueScope Intersection(IValueScope other);
+		IValueScope? Union(IValueScope other);
+		IValueScope? Intersection(IValueScope other);
 	}
-	
+
 	public sealed class UninitializedValueScope : IValueScope
 	{
 		public static UninitializedValueScope Instance { get; } = new UninitializedValueScope();
@@ -137,23 +137,23 @@ namespace SymbolicExecution
 			Debug.Fail("Unexpected call to Union on UninitializedValueScope");
 			return this;
 		}
-		
+
 		public IValueScope Intersection(IValueScope other)
 		{
 			Debug.Fail("Unexpected call to Intersection on UninitializedValueScope");
 			return this;
 		}
-		
+
 		public bool Equals(IValueScope other)
 		{
 			return other is UninitializedValueScope;
 		}
 	}
-	
+
 	public interface IConcreteValueScope : IValueScope
 	{
 	}
-	
+
 	public sealed class ConcreteValueScope<T> : IConcreteValueScope where T : unmanaged
 	{
 		public ConcreteValueScope(T value)
@@ -162,7 +162,7 @@ namespace SymbolicExecution
 		}
 
 		public T Value { get; }
-		public IValueScope Union(IValueScope other)
+		public IValueScope? Union(IValueScope other)
 		{
 			if (other is ConcreteValueScope<T> otherConcreteValueScope)
 			{
@@ -175,8 +175,8 @@ namespace SymbolicExecution
 			Debug.Fail("Unexpected value scope type");
 			return null;
 		}
-		
-		public IValueScope Intersection(IValueScope other)
+
+		public IValueScope? Intersection(IValueScope other)
 		{
 			if (other is ConcreteValueScope<T> otherConcreteValueScope)
 			{

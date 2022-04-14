@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.CodeAnalysis.Diagnostics;
+using SymbolicExecution.Analysis.Context;
 
 namespace SymbolicExecution.Analysis;
 

@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
-using VerifyCS = SymbolicExecution.Test.CSharpAnalyzerVerifier<SymbolicExecution.SymbolicExecutionAnalyzer>;
+using VerifyCS = SymbolicExecution.Test.Verifiers.CSharpAnalyzerVerifier<SymbolicExecution.SymbolicExecutionAnalyzer>;
 
-namespace SymbolicExecution.Test;
+namespace SymbolicExecution.Test.SymbolicExecution;
 
 public class SymbolicExecutionAnalyzerTests
 {
@@ -116,7 +116,7 @@ class TestClass
 }";
 		await VerifyCS.VerifyAnalyzerAsync(test);
 	}
-	
+
 	[Fact]
 	public async Task TestSurelyTrueConditionContinuesAnalysis()
 	{

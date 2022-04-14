@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace SymbolicExecution.Test;
+namespace SymbolicExecution.Test.Verifiers;
 
 internal static class CSharpVerifierHelper
 {

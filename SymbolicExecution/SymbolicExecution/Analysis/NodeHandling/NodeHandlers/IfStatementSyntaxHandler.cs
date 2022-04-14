@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using SymbolicExecution.Analysis.Context;
 
 namespace SymbolicExecution.Analysis.NodeHandling.NodeHandlers
 {
@@ -33,6 +35,7 @@ namespace SymbolicExecution.Analysis.NodeHandling.NodeHandlers
 			return analysisContext;
 		}
 
+		[SuppressMessage("ReSharper", "UnusedParameter.Local")]
 		private ExpressionSyntax NegateCondition(ExpressionSyntax condition)
 		{
 			Debug.Fail("Not implemented");

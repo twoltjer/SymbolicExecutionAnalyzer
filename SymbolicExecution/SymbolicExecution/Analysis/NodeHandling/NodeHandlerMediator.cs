@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
+﻿using Microsoft.CodeAnalysis;
 using SymbolicExecution.Analysis.NodeHandling.NodeHandlers;
 
 namespace SymbolicExecution.Analysis.NodeHandling
