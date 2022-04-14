@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 using VerifyCS = SymbolicExecution.Test.CSharpAnalyzerVerifier<SymbolicExecution.SymbolicExecutionAnalyzer>;
 
@@ -161,4 +162,29 @@ class TestClass
 }";
 		await VerifyCS.VerifyAnalyzerAsync(test);
 	}
+
+	[Fact]
+	public async Task TestAnalyzeMethodThatDoesNotCompile()
+	{
+		var test = @"using System;
+
+class SymbolicallyAnalyzeAttribute : Attribute { }
+
+class TestClass
+{
+	[SymbolicallyAnalyze]
+	void SayHello()
+	{
+		row new InvalidOperationException();th
+	}
+}";
+		await VerifyCS.VerifyAnalyzerAsync(
+			test,
+			DiagnosticResult.CompilerError("CS0103").WithLocation(10, 3).WithMessage("The name 'row' does not exist in the current context"),
+			DiagnosticResult.CompilerError("CS1002").WithLocation(10, 7).WithMessage("; expected"),
+			DiagnosticResult.CompilerError("CS0103").WithLocation(10, 39).WithMessage("The name 'th' does not exist in the current context"),
+			DiagnosticResult.CompilerError("CS1002").WithLocation(10, 41).WithMessage("; expected")
+			);
+	}
+
 }

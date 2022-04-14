@@ -55,25 +55,25 @@ namespace SymbolicExecution
 
 			// TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
 			// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
-			context.RegisterCompilationStartAction(RegisterCompilationStart);
+			// context.RegisterCompilationStartAction(RegisterCompilationStart);
+			context.RegisterCodeBlockAction(RegisterAnalyzeCodeBlock);
 			//context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
 		}
 
-		private void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
-		{
-			using (var logger = new FileLogger(startContext.Compilation.AssemblyName))
-			{
-				var optionsProvider = startContext.Options.AnalyzerConfigOptionsProvider;
-				startContext.RegisterCodeBlockAction(
-					actionContext =>
-						AnalyzeCodeBlock(actionContext, optionsProvider)
-					);
-			}
-		}
+		// private void RegisterCompilationStart(CompilationStartAnalysisContext startContext)
+		// {
+		// 	using (var logger = new FileLogger(startContext.Compilation.AssemblyName))
+		// 	{
+		// 		var optionsProvider = startContext.Options.AnalyzerConfigOptionsProvider;
+		// 		startContext.RegisterCodeBlockAction(
+		// 			actionContext =>
+		// 				AnalyzeCodeBlock(actionContext, optionsProvider)
+		// 			);
+		// 	}
+		// }
 
-		private void AnalyzeCodeBlock(
-			CodeBlockAnalysisContext codeBlockContext,
-			AnalyzerConfigOptionsProvider optionsProvider
+		private void RegisterAnalyzeCodeBlock(
+			CodeBlockAnalysisContext codeBlockContext
 			)
 		{
 			if (codeBlockContext.OwningSymbol is IMethodSymbol methodSymbol && methodSymbol.GetAttributes()
@@ -83,6 +83,14 @@ namespace SymbolicExecution
 
 		private void AnalyzeCodeBlock(CodeBlockAnalysisContext codeBlockContext)
 		{
+			if (codeBlockContext.CodeBlock is not MethodDeclarationSyntax methodDeclaration)
+			{
+				Debug.Fail("Code block is not a method declaration");
+				return;
+			}
+
+			if (methodDeclaration.GetDiagnostics().Any(x => x.Severity == DiagnosticSeverity.Error))
+				return;
 			try
 			{
 				var analysisContext = SymbolicAnalysisContext.Empty;
