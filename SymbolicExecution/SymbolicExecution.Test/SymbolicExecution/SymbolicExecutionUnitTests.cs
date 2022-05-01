@@ -187,7 +187,7 @@ class TestClass
 			);
 	}
 
-	[Fact]
+	[Fact(Skip="Unimplemented features")]
 	public async Task TestAnalyzeGetMinMax()
 	{
 		var test = @"using System;
