@@ -1,6 +1,6 @@
 # Symbolic Execution Analyzer
 
-![https://ci.appveyor.com/project/twtduck/symbolicexecution/branch/master?svg=true](https://ci.appveyor.com/project/twtduck/symbolicexecution/branch/master?svg=true)
+![https://ci.appveyor.com/api/projects/status/o84y0eyuft11jkxu/branch/master?svg=true](https://ci.appveyor.com/api/projects/status/o84y0eyuft11jkxu/branch/master?svg=true)
 
 A C# analyzer which performs symbolic execution on users' code and determines if it will throw unhandled exceptions. 
 
