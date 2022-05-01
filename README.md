@@ -34,6 +34,10 @@ class MyClass
 }
 ```
 
+## Releases
+- [Version 0.1](milestones/0.1.md) (In progress)
+
+
 ## Contributing
 
 ### Requirements
