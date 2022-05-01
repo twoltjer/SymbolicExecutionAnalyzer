@@ -3,5 +3,8 @@ image: Visual Studio 2022
 build_script:
 - ps: .\build.ps1
 
+test_script:
+- ps: .\test.ps1
+
 on_success:
 - ps: Get-ChildItem artifacts\* | % { Push-AppveyorArtifact $_.FullName }
