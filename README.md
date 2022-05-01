@@ -1,6 +1,6 @@
 # Symbolic Execution Analyzer
 
-![https://ci.appveyor.com/api/projects/status/o84y0eyuft11jkxu/branch/master?svg=true](https://ci.appveyor.com/project/twtduck/symbolicexecution) [![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graph/badge.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution) [![CodeFactor](https://www.codefactor.io/repository/github/twtduck/symbolicexecution/badge)](https://www.codefactor.io/repository/github/twtduck/symbolicexecution)
+![https://ci.appveyor.com/api/projects/status/o84y0eyuft11jkxu/branch/master?svg=true](https://ci.appveyor.com/api/projects/status/o84y0eyuft11jkxu/branch/master?svg=true) [![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graph/badge.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution) [![CodeFactor](https://www.codefactor.io/repository/github/twtduck/symbolicexecution/badge)](https://www.codefactor.io/repository/github/twtduck/symbolicexecution)
 
 A C# analyzer which performs symbolic execution on users' code and determines if it will throw unhandled exceptions. 
 
