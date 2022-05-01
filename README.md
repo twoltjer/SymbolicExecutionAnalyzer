@@ -38,15 +38,15 @@ class MyClass
 
 Sunburst:
 
-[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graph/badge.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/sunbrust.svg)
+[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/sunbrust.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/sunbrust.svg)
 
 Icicle:
 
-[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graph/badge.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/icicle.svg)
+[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/icicle.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/icicle.svg)
 
 Tree:
 
-[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graph/badge.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/tree.svg)
+[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/tree.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/tree.svg)
 
 ## Contributing
 
