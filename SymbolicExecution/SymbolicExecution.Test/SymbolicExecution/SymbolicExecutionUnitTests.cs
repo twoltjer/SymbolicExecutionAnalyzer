@@ -215,10 +215,4 @@ class TestClass
 }";
 		await VerifyCS.VerifyAnalyzerAsync(test);
 	}
-
-	[Fact]
-	public void FailTest()
-	{
-		false.Should().BeTrue();
-	}
 }
