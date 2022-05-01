@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 using VerifyCS = SymbolicExecution.Test.Verifiers.CSharpAnalyzerVerifier<SymbolicExecution.SymbolicExecutionAnalyzer>;
@@ -213,5 +214,11 @@ class TestClass
 	}
 }";
 		await VerifyCS.VerifyAnalyzerAsync(test);
+	}
+
+	[Fact]
+	public void FailTest()
+	{
+		false.Should().BeTrue();
 	}
 }
