@@ -1,6 +1,6 @@
 # Symbolic Execution Analyzer
 
-![https://ci.appveyor.com/api/projects/status/o84y0eyuft11jkxu/branch/master?svg=true](https://ci.appveyor.com/api/projects/status/o84y0eyuft11jkxu/branch/master?svg=true)[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graph/badge.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution)
+![https://ci.appveyor.com/api/projects/status/o84y0eyuft11jkxu/branch/master?svg=true](https://ci.appveyor.com/api/projects/status/o84y0eyuft11jkxu/branch/master?svg=true) [![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graph/badge.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution)
 
 A C# analyzer which performs symbolic execution on users' code and determines if it will throw unhandled exceptions. 
 
@@ -33,20 +33,6 @@ class MyClass
 	}
 }
 ```
-
-## Test coverage
-
-Sunburst:
-
-[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/sunbrust.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/sunbrust.svg)
-
-Icicle:
-
-[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/icicle.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/icicle.svg)
-
-Tree:
-
-[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/tree.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/tree.svg)
 
 ## Contributing
 
