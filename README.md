@@ -34,6 +34,20 @@ class MyClass
 }
 ```
 
+## Test coverage
+
+Sunburst:
+
+[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graph/badge.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/sunbrust.svg)
+
+Icicle:
+
+[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graph/badge.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/icicle.svg)
+
+Tree:
+
+[![codecov](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graph/badge.svg?token=79TJNF06KB)](https://codecov.io/gh/twtduck/symbolicexecution/branch/master/graphs/tree.svg)
+
 ## Contributing
 
 ### Requirements
