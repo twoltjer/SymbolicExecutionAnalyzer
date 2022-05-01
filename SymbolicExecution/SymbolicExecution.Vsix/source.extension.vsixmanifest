@@ -3,7 +3,7 @@
   <Metadata>
     <Identity Id="SymbolicExecution.f02133b4-24e0-4cb6-805d-59719bc82bfa" Version="1.0" Language="en-US" Publisher="Thomas.Woltjer"/>
     <DisplayName>SymbolicExecution</DisplayName>
-    <Description xml:space="preserve">This is a sample diagnostic extension for the .NET Compiler Platform ("Roslyn").</Description>
+    <Description xml:space="preserve">SymbolicExecution</Description>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0,)" />

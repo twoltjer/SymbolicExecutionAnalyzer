@@ -11,8 +11,11 @@ dir
 
 $msbuild = Join-Path $visualStudioInstallation 'MSBuild\Current\Bin\MSBuild.exe'
 & $msbuild /t:Build /restore /v:minimal /p:Configuration=$configuration
-& $msbuild SymbolicExecution /t:Pack /p:NoBuild=true /p:PackageOutputPath="$artifactsDir" /v:minimal /p:Configuration=$configuration
+& Write-Output "BETWEEN"
+& Get-Location
+& Get-ChildItem
+& $msbuild 'SymbolicExecution\SymbolicExecution.Package' /t:Pack /p:NoBuild=true /p:PackageOutputPath="$artifactsDir" /v:minimal /p:Configuration=$configuration
 
 echo "Copy-Item"
 
-Copy-Item SymbolicExecution.Vsix\bin\$configuration\SymbolicExecution.vsix $artifactsDir
+Copy-Item SymbolicExecution\SymbolicExecution.Vsix\bin\$configuration\SymbolicExecution.vsix $artifactsDir
