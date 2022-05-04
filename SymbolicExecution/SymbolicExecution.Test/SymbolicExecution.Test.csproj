@@ -33,7 +33,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SymbolicExecution.CodeFixes\SymbolicExecution.CodeFixes.csproj" />
         <ProjectReference Include="..\SymbolicExecution\SymbolicExecution.csproj" />
     </ItemGroup>
 
