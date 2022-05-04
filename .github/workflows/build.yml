@@ -55,18 +55,7 @@ jobs:
           dotnet build SymbolicExecution/SymbolicExecution.Test
           dotnet test
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-  coverage:
-    name: Coverage
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Setup .NET 6
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
-      - name: Build
+      - name: Build for coverage
         run: |
           dotnet build SymbolicExecution/SymbolicExecution.Test --configuration Debug
       - name: Run tests gathering coverage
@@ -75,7 +64,7 @@ jobs:
       - name: Upload coverage data
         uses: codecov/codecov-action@v2
         with:
-          token: ${{ secrest.CODECOV }}
+          token: ${{ secrets.CODECOV }}
           files: ./coverage.xml
           flags: unittests,integrationtests
           verbose: true
