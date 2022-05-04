@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
       - name: Setup .NET 6
         uses: actions/setup-dotnet@v2
         with:
@@ -55,3 +55,30 @@ jobs:
           dotnet build SymbolicExecution/SymbolicExecution.Test
           dotnet test
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+  coverage:
+    name: Coverage
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Build
+        run: |
+          dotnet build SymbolicExecution/SymbolicExecution.Test --configuration Debug
+      - name: Run tests gathering coverage
+        run: |
+          ./coverage.ps1
+      - name: Upload coverage data
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrest.CODECOV }}
+          files: ./coverage.xml
+          flags: unittests,integrationtests
+          verbose: true
+          fail_ci_if_error: true
+
+        
