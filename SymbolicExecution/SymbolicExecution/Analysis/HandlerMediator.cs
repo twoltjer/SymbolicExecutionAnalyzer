@@ -22,7 +22,7 @@ public abstract class HandlerMediatorBase<T> where T : notnull
 
 			return handler.Handle(value, analysisContext, codeBlockContext);
 		}
-		Debug.Fail("No handler found for value " + value.GetType().Name);
-		return analysisContext;
+
+		throw new UnhandledSyntaxException();
 	}
 }
