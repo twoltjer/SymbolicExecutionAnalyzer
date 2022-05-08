@@ -1,4 +1,4 @@
-name: Run tests and SonarScanner analysis
+name: Build, test, and analyze
 on:
   push:
     branches:
@@ -55,3 +55,7 @@ jobs:
           dotnet build SymbolicExecution/SymbolicExecution.Test
           dotnet test
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+      - name: Coverage
+        shell: powershell
+        run: |
+          .\coverage.ps1

@@ -73,8 +73,7 @@ namespace SymbolicExecution
 		{
 			if (codeBlockContext.CodeBlock is not MethodDeclarationSyntax methodDeclaration)
 			{
-				Debug.Fail("Code block is not a method declaration");
-				return;
+				throw new UnhandledSyntaxException();
 			}
 
 			if (methodDeclaration.GetDiagnostics().Any(x => x.Severity == DiagnosticSeverity.Error))
@@ -120,22 +119,14 @@ namespace SymbolicExecution
 	public sealed class UninitializedValueScope : IValueScope
 	{
 		public static UninitializedValueScope Instance { get; } = new UninitializedValueScope();
-		public IValueScope Union(IValueScope other)
-		{
-			Debug.Fail("Unexpected call to Union on UninitializedValueScope");
-			return this;
-		}
 
-		public IValueScope Intersection(IValueScope other)
-		{
-			Debug.Fail("Unexpected call to Intersection on UninitializedValueScope");
-			return this;
-		}
+		public IValueScope Union(IValueScope other) =>
+			throw new ValidationFailedException("UninitializedValueScope cannot be unioned");
 
-		public bool Equals(IValueScope other)
-		{
-			return other is UninitializedValueScope;
-		}
+		public IValueScope Intersection(IValueScope other) =>
+			throw new ValidationFailedException("UninitializedValueScope cannot be intersected");
+
+		public bool Equals(IValueScope other) => other is UninitializedValueScope;
 	}
 
 	public interface IConcreteValueScope : IValueScope
@@ -160,8 +151,7 @@ namespace SymbolicExecution
 				return EmptyValueScope.Instance;
 			}
 
-			Debug.Fail("Unexpected value scope type");
-			return null;
+			throw new UnexpectedValueException();
 		}
 
 		public IValueScope? Intersection(IValueScope other)
@@ -174,8 +164,7 @@ namespace SymbolicExecution
 				return EmptyValueScope.Instance;
 			}
 
-			Debug.Fail("Unexpected value scope type");
-			return null;
+			throw new UnexpectedValueException();
 		}
 
 		public bool Equals(IValueScope other)
@@ -192,5 +181,20 @@ namespace SymbolicExecution
 		}
 
 		public ThrowStatementSyntax ThrowStatement { get; }
+	}
+
+	internal class UnhandledSyntaxException : Exception
+	{
+	}
+
+	internal class UnexpectedValueException : Exception
+	{
+	}
+
+	internal class ValidationFailedException : Exception
+	{
+		public ValidationFailedException(string message) : base(message)
+		{
+		}
 	}
 }
