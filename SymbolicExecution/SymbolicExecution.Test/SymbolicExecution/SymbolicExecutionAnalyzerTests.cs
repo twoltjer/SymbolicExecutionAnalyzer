@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 using VerifyCS = SymbolicExecution.Test.Verifiers.CSharpAnalyzerVerifier<SymbolicExecution.SymbolicExecutionAnalyzer>;

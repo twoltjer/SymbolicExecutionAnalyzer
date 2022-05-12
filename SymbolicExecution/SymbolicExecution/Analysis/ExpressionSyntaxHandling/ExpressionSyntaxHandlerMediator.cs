@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace SymbolicExecution.Analysis.ExpressionSyntaxHandling;
+﻿namespace SymbolicExecution.Analysis.ExpressionSyntaxHandling;
 
 public class ExpressionSyntaxHandlerMediator : HandlerMediatorBase<ExpressionSyntax>
 {

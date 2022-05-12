@@ -1,8 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿namespace SymbolicExecution.Analysis.NodeHandling.NodeHandlers;
 
-namespace SymbolicExecution.Analysis.NodeHandling.NodeHandlers
+public class AttributeListSyntaxHandler : NoopNodeHandlerBase<AttributeListSyntax>
 {
-	public class AttributeListSyntaxHandler : NoopNodeHandlerBase<AttributeListSyntax>
-	{
-	}
 }
