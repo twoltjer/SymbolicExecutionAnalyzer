@@ -6,8 +6,5 @@ build_script:
 test_script:
 - ps: .\test.ps1
 
-after_test:
-- ps: .\coverage.ps1
-
 on_success:
 - ps: Get-ChildItem artifacts\* | % { Push-AppveyorArtifact $_.FullName }
