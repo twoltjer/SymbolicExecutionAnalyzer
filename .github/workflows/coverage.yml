@@ -1,0 +1,39 @@
+name: Coverage analysis
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  coverage:
+    name: Coverage
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Setup .NET 5
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '5.0'
+      - name: Build tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
+        run: |
+          dotnet build SymbolicExecution/SymbolicExecution.Test
+          dotnet test
+      - name: Run tests with coverage analysis
+        shell: powershell
+        run: |
+          $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe
+          & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]* -[SymbolicExecution.Test*]*"
+          $ProgressPreference = 'SilentlyContinue'
+          Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
+          .\codecov.exe -f "coverage.xml"
