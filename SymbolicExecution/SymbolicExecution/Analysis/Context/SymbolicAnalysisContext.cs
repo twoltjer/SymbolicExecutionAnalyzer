@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -85,15 +84,9 @@ namespace SymbolicExecution.Analysis.Context
 				case IdentifierNameSyntax identifierName:
 					return GetVariableValueScope(identifierName.Identifier.ValueText);
 				case LiteralExpressionSyntax literal:
-					if (literal.Token.Value.GetType() == typeof(Int32))
-					{
-						if (int.TryParse(literal.Token.ValueText, out var intValue))
-							return new ConcreteValueScope<int>(intValue);
-						else
-							throw new UnexpectedValueException();
-					}
-					else
-						throw new UnhandledSyntaxException();
+					if (literal.Token.Value is int intValue)
+						return new ConcreteValueScope<int>(intValue);
+					throw new UnhandledSyntaxException();
 				default:
 					throw new UnhandledSyntaxException();
 			}

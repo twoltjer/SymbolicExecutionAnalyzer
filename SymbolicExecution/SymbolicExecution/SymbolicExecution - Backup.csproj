@@ -27,7 +27,7 @@
       <Compile Update="DiagnosticProviders\UncaughtExceptionDiagnosticProvider\UncaughtExceptionDiagnosticProviderStrings.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
-        <DependentUpon>UncaughtExceptionDiagnosticProviderStrings.resx</DependentUpon>
+        <DependentUpon>SymbolicExecutionStrings.resx</DependentUpon>
       </Compile>
     </ItemGroup>
 

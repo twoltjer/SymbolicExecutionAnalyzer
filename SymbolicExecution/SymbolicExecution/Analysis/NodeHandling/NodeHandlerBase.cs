@@ -1,8 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
-using SymbolicExecution.Analysis.Context;
-
-namespace SymbolicExecution.Analysis.NodeHandling
+﻿namespace SymbolicExecution.Analysis.NodeHandling
 {
 	public abstract class NodeHandlerBase<T> : IHandler<SyntaxNode> where T : SyntaxNode
 	{

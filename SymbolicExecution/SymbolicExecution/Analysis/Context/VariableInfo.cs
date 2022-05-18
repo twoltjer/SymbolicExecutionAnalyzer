@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis;
-
 namespace SymbolicExecution.Analysis.Context
 {
 	public struct VariableInfo

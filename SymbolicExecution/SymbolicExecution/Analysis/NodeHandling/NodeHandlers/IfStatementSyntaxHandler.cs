@@ -1,9 +1,5 @@
-﻿using System;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
-using SymbolicExecution.Analysis.Context;
 
 namespace SymbolicExecution.Analysis.NodeHandling.NodeHandlers
 {

@@ -1,7 +1,4 @@
-﻿using Microsoft.CodeAnalysis.Diagnostics;
-using SymbolicExecution.Analysis.Context;
-
-namespace SymbolicExecution.Analysis;
+﻿namespace SymbolicExecution.Architecture;
 
 public interface IHandler<in T>
 {

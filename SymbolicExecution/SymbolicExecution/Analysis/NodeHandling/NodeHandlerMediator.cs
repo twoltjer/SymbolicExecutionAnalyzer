@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using SymbolicExecution.Analysis.NodeHandling.NodeHandlers;
+﻿using SymbolicExecution.Analysis.NodeHandling.NodeHandlers;
 
 namespace SymbolicExecution.Analysis.NodeHandling
 {
