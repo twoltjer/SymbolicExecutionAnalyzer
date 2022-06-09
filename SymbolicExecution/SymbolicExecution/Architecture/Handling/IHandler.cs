@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace SymbolicExecution.Architecture.Handling;
+﻿namespace SymbolicExecution.Architecture.Handling;
 
 public interface IHandler<in TValue, TResult>
 {

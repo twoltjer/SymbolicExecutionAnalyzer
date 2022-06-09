@@ -1,4 +1,6 @@
-namespace SymbolicExecution.CodeBlockToAnalysisStructConverter.SyntaxNodeConversionHandling;
+using SymbolicExecution.SyntaxTreeToNodeAnalysisInfoConverter.SyntaxNodeConversionHandling.Handlers;
+
+namespace SymbolicExecution.SyntaxTreeToNodeAnalysisInfoConverter.SyntaxNodeConversionHandling;
 
 public class SyntaxNodeConversionHandlerMediator : HandlerMediatorBase<SyntaxNode, Result<INodeAnalysisInfo>>
 {
@@ -9,6 +11,9 @@ public class SyntaxNodeConversionHandlerMediator : HandlerMediatorBase<SyntaxNod
 	}
 
 	public static SyntaxNodeConversionHandlerMediator Instance { get; } = new SyntaxNodeConversionHandlerMediator(
+		ImplementationDiscoverer.CreateImplementationInstances(typeof(IHandler<SyntaxNode, Result<INodeAnalysisInfo>>))
+			.Cast<IHandler<SyntaxNode, Result<INodeAnalysisInfo>>>()
+			.ToArray()
 		);
 
 	protected override Result<INodeAnalysisInfo> HandleUnhandledValue(SyntaxNode value)

@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace SymbolicExecution.Architecture.Handling;
+﻿namespace SymbolicExecution.Architecture.Handling;
 
 public abstract class HandlerMediatorBase<TValue, TResult> where TValue : notnull where TResult : notnull
 {

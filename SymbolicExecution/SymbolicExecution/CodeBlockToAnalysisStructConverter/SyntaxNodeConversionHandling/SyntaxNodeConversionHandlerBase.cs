@@ -1,6 +1,0 @@
-namespace SymbolicExecution.CodeBlockToAnalysisStructConverter.SyntaxNodeConversionHandling;
-
-public class SyntaxNodeConversionHandlerBase
-{
-	
-}
