@@ -2,6 +2,6 @@
 
 public interface IValueScope : IEquatable<IValueScope>
 {
-	IValueScope? Union(IValueScope other);
-	IValueScope? Intersection(IValueScope other);
+	Result<IValueScope> Union(IValueScope other);
+	Result<IValueScope> Intersection(IValueScope other);
 }

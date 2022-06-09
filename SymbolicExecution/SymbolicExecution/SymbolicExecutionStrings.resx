@@ -126,4 +126,13 @@
     <data name="AnalyzerTitle" xml:space="preserve">
     <value>Analyzer Title</value>
   </data>
+    <data name="AnalysisTimedOut" xml:space="preserve">
+    <value>Analysis timed out</value>
+    </data>
+    <data name="OperationSuccessful" xml:space="preserve">
+    <value>Operation successful</value>
+    </data>
+    <data name="UnhandledSyntax" xml:space="preserve">
+    <value>Unhandled syntax: {0}</value>
+    </data>
 </root>

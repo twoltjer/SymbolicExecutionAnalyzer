@@ -8,30 +8,30 @@ public sealed class ConcreteValueScope<T> : IConcreteValueScope where T : unmana
 	}
 
 	public T Value { get; }
-	public IValueScope? Union(IValueScope other)
+	public Result<IValueScope> Union(IValueScope other)
 	{
 		if (other is ConcreteValueScope<T> otherConcreteValueScope)
 		{
 			if (Value.Equals(otherConcreteValueScope.Value))
-				return this;
+				return new Result<IValueScope>(this);
 
-			return EmptyValueScope.Instance;
+			return new Result<IValueScope>(EmptyValueScope.Instance);
 		}
 
-		throw new UnexpectedValueException();
+		return new Result<IValueScope>(new AnalysisErrorInfo($"{nameof(ConcreteValueScope<T>)}.{nameof(Union)}: Could not union scopes", default));
 	}
 
-	public IValueScope? Intersection(IValueScope other)
+	public Result<IValueScope> Intersection(IValueScope other)
 	{
 		if (other is ConcreteValueScope<T> otherConcreteValueScope)
 		{
-			if (Value.Equals(otherConcreteValueScope.Value))
-				return this;
+			if (otherConcreteValueScope.Value.Equals(Value))
+				return new Result<IValueScope>(this);
 
-			return EmptyValueScope.Instance;
+			return new Result<IValueScope>(EmptyValueScope.Instance);
 		}
 
-		throw new UnexpectedValueException();
+		return new Result<IValueScope>(new AnalysisErrorInfo($"{nameof(ConcreteValueScope<T>)}.{nameof(Intersection)}: Could not intersect scopes", default));
 	}
 
 	public bool Equals(IValueScope other)

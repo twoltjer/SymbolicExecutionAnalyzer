@@ -3,84 +3,115 @@
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 {
-	public const string DiagnosticId = "SE0001";
-	private const string Category = "Naming";
-
-	// You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
-	// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Localizing%20Analyzers.md for more on localization
-	private static readonly LocalizableString _title = new LocalizableResourceString(
-		nameof(SymbolicExecutionStrings.AnalyzerTitle),
-		SymbolicExecutionStrings.ResourceManager,
-		typeof(SymbolicExecutionStrings)
+	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
+		MayThrowDiagnosticDescriptor.DiagnosticDescriptor,
+		UnexpectedValueDiagnosticDescriptor.DiagnosticDescriptor,
+		UnhandledSyntaxDiagnosticDescriptor.DiagnosticDescriptor
 		);
-
-	private static readonly LocalizableString _messageFormat = new LocalizableResourceString(
-		nameof(SymbolicExecutionStrings.AnalyzerMessageFormat),
-		SymbolicExecutionStrings.ResourceManager,
-		typeof(SymbolicExecutionStrings)
-		);
-
-	private static readonly LocalizableString _description = new LocalizableResourceString(
-		nameof(SymbolicExecutionStrings.AnalyzerDescription),
-		SymbolicExecutionStrings.ResourceManager,
-		typeof(SymbolicExecutionStrings)
-		);
-
-	private static readonly DiagnosticDescriptor _rule = new DiagnosticDescriptor(
-		DiagnosticId,
-		_title,
-		_messageFormat,
-		Category,
-		DiagnosticSeverity.Warning,
-		true,
-		_description
-		);
-
-	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(_rule);
 
 	public override void Initialize(AnalysisContext context)
 	{
 		context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 		context.EnableConcurrentExecution();
 
-		// TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
 		// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
-		// context.RegisterCompilationStartAction(RegisterCompilationStart);
 		context.RegisterCodeBlockAction(RegisterAnalyzeCodeBlock);
-		//context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
 	}
 
 	private void RegisterAnalyzeCodeBlock(
-		CodeBlockAnalysisContext codeBlockContext
+		CodeBlockAnalysisContext codeBlockAnalysisContext
 		)
 	{
-		if (codeBlockContext.OwningSymbol is IMethodSymbol methodSymbol && methodSymbol.GetAttributes()
+		if (codeBlockAnalysisContext.OwningSymbol is IMethodSymbol methodSymbol && methodSymbol.GetAttributes()
 				.Any(x => x.AttributeClass.Name == "SymbolicallyAnalyzeAttribute"))
-			AnalyzeCodeBlock(codeBlockContext);
+			AnalyzeCodeBlock(codeBlockAnalysisContext);
 	}
 
-	private void AnalyzeCodeBlock(CodeBlockAnalysisContext codeBlockContext)
+	private async Task<Diagnostic[]> AnalyzeCodeBlockAsync(CodeBlockAnalysisContext codeBlockAnalysisContext, CancellationToken token)
 	{
-		if (codeBlockContext.CodeBlock is not MethodDeclarationSyntax methodDeclaration)
-		{
-			throw new UnhandledSyntaxException();
-		}
+		var convertedSyntax =
+			await SyntaxNodeConversionHandlerMediator.Instance.HandleAsync(await codeBlockAnalysisContext.SemanticModel.SyntaxTree.GetRootAsync(token), token);
+		if (convertedSyntax.IsFaulted)
+			return new[]
+			{
+				Diagnostic.Create(
+					UnhandledSyntaxDiagnosticDescriptor.DiagnosticDescriptor,
+					convertedSyntax.ErrorInfo.Location ?? codeBlockAnalysisContext.CodeBlock.GetLocation(),
+					convertedSyntax.ErrorInfo.Message
+					),
+			};
 
-		if (methodDeclaration.GetDiagnostics().Any(x => x.Severity == DiagnosticSeverity.Error))
+		return Array.Empty<Diagnostic>();
+	}
+
+	private void AnalyzeCodeBlock(CodeBlockAnalysisContext codeBlockAnalysisContext)
+	{
+		if (codeBlockAnalysisContext.CodeBlock is not MethodDeclarationSyntax methodDeclaration)
+			// TODO: Produce a diagnostic that the attribute was used incorrectly
 			return;
+
+		var methodHasErrors = methodDeclaration.GetDiagnostics().Any(x => x.Severity == DiagnosticSeverity.Error);
+		if (methodHasErrors)
+			return;
+
 		try
 		{
-			var analysisContext = SymbolicAnalysisContext.Empty;
-			foreach (var node in codeBlockContext.CodeBlock.ChildNodes())
+			var runCts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+			var alertCts = new CancellationTokenSource(TimeSpan.FromSeconds(40));
+			var task = Task.Run(() => AnalyzeCodeBlockAsync(codeBlockAnalysisContext, runCts.Token), runCts.Token);
+			while (!task.IsFaulted && !task.IsCompleted && !task.IsCanceled)
 			{
-				analysisContext = NodeHandlerMediator.Instance.Handle(node, analysisContext, codeBlockContext);
+				Thread.Sleep(TimeSpan.FromSeconds(0.5));
+				if (runCts.IsCancellationRequested)
+				{
+					Diagnostic.Create(AnalysisTimedOutDiagnosticDescriptor.DiagnosticDescriptor, codeBlockAnalysisContext.CodeBlock.GetLocation());
+				}
+				if (alertCts.IsCancellationRequested)
+				{
+					Debug.Fail("Task did not end!");
+					break;
+				}
 			}
+
+			if (task.IsCompleted)
+			{
+				var diagnostics = task.Result;
+				foreach (var diagnostic in diagnostics)
+					codeBlockAnalysisContext.ReportDiagnostic(diagnostic);
+			}
+			// var executionPaths = new List<ExecutionPath> { ExecutionPath.Empty };
+			// var faults = new List<AnalysisErrorInfo>();
+			// foreach (var node in codeBlockAnalysisContext.CodeBlock.ChildNodes())
+			// {
+			// 	var nextExecutionPaths = new List<ExecutionPath>();
+			// 	foreach (var executionPath in executionPaths)
+			// 	{
+			// 		var executionPathResults = NodeHandlerMediator.Instance.Handle(
+			// 			node,
+			// 			executionPath
+			// 			);
+			// 		foreach (var executionPathResult in executionPathResults)
+			// 		{
+			// 			if (executionPathResult.IsFaulted)
+			// 			{
+			// 				var errorInfo = executionPathResult.ErrorInfo;
+			// 				if (!faults.Contains(errorInfo))
+			// 					faults.Add(errorInfo);
+			// 			}
+			// 			else
+			// 			{
+			// 				nextExecutionPaths.Add(executionPathResult.Value);
+			// 			}
+			// 		}
+			// 	}
+			// 	executionPaths.Clear();
+			// 	executionPaths.AddRange(nextExecutionPaths);
+			// 	nextExecutionPaths.Clear();
+			// }
 		}
-		catch (ExceptionStatementException ex)
+		catch (Exception ex)
 		{
-			var statement = ex.ThrowStatement;
-			var diagnostic = Diagnostic.Create(_rule, statement.GetLocation(), statement.ToString());
-			codeBlockContext.ReportDiagnostic(diagnostic);
+			Debug.Fail(ex.ToString());
 		}
 	}
 }

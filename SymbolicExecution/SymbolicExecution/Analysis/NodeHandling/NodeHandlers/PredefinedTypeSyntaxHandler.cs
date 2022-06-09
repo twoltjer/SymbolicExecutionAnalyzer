@@ -1,5 +1,5 @@
-﻿namespace SymbolicExecution.Analysis.NodeHandling.NodeHandlers;
-
-public class PredefinedTypeSyntaxHandler : NoopNodeHandlerBase<PredefinedTypeSyntax>
-{
-}
+﻿// namespace SymbolicExecution.Analysis.NodeHandling.NodeHandlers;
+//
+// public class PredefinedTypeSyntaxHandler : NoopNodeHandlerBase<PredefinedTypeSyntax>
+// {
+// }

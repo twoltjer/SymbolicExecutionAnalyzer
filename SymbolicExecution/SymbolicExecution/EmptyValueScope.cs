@@ -8,9 +8,9 @@ internal sealed class EmptyValueScope : IValueScope
 	{
 	}
 
-	public IValueScope Union(IValueScope other) => this;
+	public Result<IValueScope> Union(IValueScope other) => new Result<IValueScope>(this);
 
-	public IValueScope Intersection(IValueScope other) => other;
+	public Result<IValueScope> Intersection(IValueScope other) => new Result<IValueScope>(other);
 
 	public bool Equals(IValueScope other) => other is EmptyValueScope;
 }
