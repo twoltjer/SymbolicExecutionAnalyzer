@@ -1,5 +1,0 @@
-namespace SymbolicExecution.SyntaxTreeToNodeAnalysisInfoConverter.SyntaxNodes;
-
-public class BaseMethodDeclarationNodeAnalysisInfo : MemberDeclarationNodeAnalysisInfo
-{
-}

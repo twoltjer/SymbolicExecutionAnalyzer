@@ -2,7 +2,7 @@ namespace SymbolicExecution.SyntaxTreeToNodeAnalysisInfoConverter.SyntaxNodeConv
 
 public abstract class SyntaxNodeConversionHandlerBase<T> : IHandler<SyntaxNode, Result<INodeAnalysisInfo>> where T : SyntaxNode
 {
-	public bool CanHandle(SyntaxNode node) => node is T;
+	public bool CanHandle(SyntaxNode node) => node.GetType() == typeof(T);
 
 	public async Task<Result<INodeAnalysisInfo>> HandleAsync(
 		SyntaxNode node,

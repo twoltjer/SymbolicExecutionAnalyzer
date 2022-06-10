@@ -1,5 +1,0 @@
-namespace SymbolicExecution.SyntaxTreeToNodeAnalysisInfoConverter.SyntaxNodes;
-
-public class MemberDeclarationNodeAnalysisInfo : CSharpNodeAnalysisInfo
-{
-}

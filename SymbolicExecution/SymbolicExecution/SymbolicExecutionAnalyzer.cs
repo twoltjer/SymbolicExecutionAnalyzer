@@ -32,6 +32,7 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 		var convertedSyntax =
 			await SyntaxNodeConversionHandlerMediator.Instance.HandleAsync(await codeBlockAnalysisContext.SemanticModel.SyntaxTree.GetRootAsync(token), token);
 		if (convertedSyntax.IsFaulted)
+		{
 			return new[]
 			{
 				Diagnostic.Create(
@@ -40,6 +41,7 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 					convertedSyntax.ErrorInfo.Message
 					),
 			};
+		}
 
 		return Array.Empty<Diagnostic>();
 	}
