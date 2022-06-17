@@ -6,7 +6,7 @@
 
         <!-- Avoid ID conflicts with the package project. -->
         <PackageId>*$(MSBuildProjectFile)*</PackageId>
-        <LangVersion>default</LangVersion>
+        <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
