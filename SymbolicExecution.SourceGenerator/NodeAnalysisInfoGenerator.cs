@@ -17,21 +17,21 @@ public class NodeAnalysisInfoGenerator : ISourceGenerator
 
 	public void Execute(GeneratorExecutionContext context)
 	{
-		// var assembly = typeof(SyntaxNode).Assembly;
-		// var ass2 = typeof(CSharpSyntaxNode).Assembly;
-		// // ass2: C:\Program Files\dotnet\sdk\6.0.105\Roslyn\bincore\Microsoft.CodeAnalysis.CSharp.dll
-		// var exportedTypes = assembly.ExportedTypes.Concat(ass2.ExportedTypes).ToList();
-		// var syntaxNodeInfos = exportedTypes
-		// 	.Where(x => typeof(SyntaxNode).IsAssignableFrom(x))
-		// 	.Select(x => new SyntaxNodeInfo(x))
-		// 	.ToList();
-		// foreach (var syntaxNode in syntaxNodeInfos)
-		// {
-		// 	var nodeAnalysisSourceText = GenerateNodeAnalysisSourceText(syntaxNode);
-		// 	context.AddSource($"{syntaxNode.NodeAnalysisInfoName}.g.cs", nodeAnalysisSourceText);
-		// 	var handlerSourceText = GenerateHandlerSourceText(syntaxNode);
-		// 	context.AddSource($"{syntaxNode.Name}Handler.g.cs", handlerSourceText);
-		// }
+		var assembly = typeof(SyntaxNode).Assembly;
+		var ass2 = typeof(CSharpSyntaxNode).Assembly;
+		// ass2: C:\Program Files\dotnet\sdk\6.0.105\Roslyn\bincore\Microsoft.CodeAnalysis.CSharp.dll
+		var exportedTypes = assembly.ExportedTypes.Concat(ass2.ExportedTypes).ToList();
+		var syntaxNodeInfos = exportedTypes
+			.Where(x => typeof(SyntaxNode).IsAssignableFrom(x))
+			.Select(x => new SyntaxNodeInfo(x))
+			.ToList();
+		foreach (var syntaxNode in syntaxNodeInfos)
+		{
+			var nodeAnalysisSourceText = GenerateNodeAnalysisSourceText(syntaxNode);
+			context.AddSource($"{syntaxNode.NodeAnalysisInfoName}.g.cs", nodeAnalysisSourceText);
+			var handlerSourceText = GenerateHandlerSourceText(syntaxNode);
+			context.AddSource($"{syntaxNode.Name}Handler.g.cs", handlerSourceText);
+		}
 	}
 
 	private static SourceText GenerateNodeAnalysisSourceText(SyntaxNodeInfo syntaxNode)

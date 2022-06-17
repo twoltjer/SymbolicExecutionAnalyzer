@@ -43,6 +43,16 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 			};
 		}
 
+
+		return new Diagnostic[]
+		{
+			Diagnostic.Create(
+				MayThrowDiagnosticDescriptor.DiagnosticDescriptor,
+				codeBlockAnalysisContext.CodeBlock.GetLocation(),
+				"HELLO"
+				),
+		};
+		
 		return Array.Empty<Diagnostic>();
 	}
 
