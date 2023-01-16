@@ -121,7 +121,7 @@
     <value>Analyzer description</value>
   </data>
     <data name="AnalyzerMessageFormat" xml:space="preserve">
-        <value>The statement '{0}' may throw unhandled exceptions</value>
+        <value>The exception '{0}' may be thrown here and not caught</value>
     </data>
     <data name="AnalyzerTitle" xml:space="preserve">
     <value>Analyzer Title</value>

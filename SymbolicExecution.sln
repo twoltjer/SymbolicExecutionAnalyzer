@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymbolicExecution.Test", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymbolicExecution.Vsix", "SymbolicExecution\SymbolicExecution.Vsix\SymbolicExecution.Vsix.csproj", "{A1FC818B-F04A-4C5F-A970-72E779CAA462}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymbolicExecution.SourceGenerator", "SymbolicExecution.SourceGenerator\SymbolicExecution.SourceGenerator.csproj", "{C356234C-0C74-47DC-83C2-54753DEAA455}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymbolicExecution.Control", "SymbolicExecution\SymbolicExecution.Control\SymbolicExecution.Control.csproj", "{D116F8D6-4C76-449F-9030-63992E2C59DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{A1FC818B-F04A-4C5F-A970-72E779CAA462}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1FC818B-F04A-4C5F-A970-72E779CAA462}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1FC818B-F04A-4C5F-A970-72E779CAA462}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C356234C-0C74-47DC-83C2-54753DEAA455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C356234C-0C74-47DC-83C2-54753DEAA455}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C356234C-0C74-47DC-83C2-54753DEAA455}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C356234C-0C74-47DC-83C2-54753DEAA455}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D116F8D6-4C76-449F-9030-63992E2C59DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D116F8D6-4C76-449F-9030-63992E2C59DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D116F8D6-4C76-449F-9030-63992E2C59DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D116F8D6-4C76-449F-9030-63992E2C59DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

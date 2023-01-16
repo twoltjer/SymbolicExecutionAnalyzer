@@ -78,7 +78,7 @@ namespace SymbolicExecution {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The statement &apos;{0}&apos; may throw unhandled exceptions.
+        ///   Looks up a localized string similar to The exception &apos;{0}&apos; may be thrown here and not caught.
         /// </summary>
         public static string AnalyzerMessageFormat {
             get {

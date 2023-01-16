@@ -1,9 +1,15 @@
-﻿namespace SymbolicExecution.Test.SymbolicExecutionTests;
+﻿using Microsoft.CodeAnalysis.CSharp;
+using SymbolicExecution.Control;
+using SymbolicExecution.Diagnostics;
+using SymbolicExecution.Test.Verifiers;
+
+namespace SymbolicExecution.Test.SymbolicExecutionTests;
 
 public class SymbolicExecutionAnalyzerTests
 {
 	//No diagnostics expected to show up
 	[Fact]
+	[Trait("Category", "System")]
 	public async Task TestNoAnalysis()
 	{
 		var test = @"";
@@ -12,6 +18,7 @@ public class SymbolicExecutionAnalyzerTests
 	}
 
 	[Fact]
+	[Trait("Category", "System")]
 	public async Task TestUnmarkedMethodNotAnalyzed()
 	{
 		var test = @"using System;
@@ -28,43 +35,40 @@ class TestClass
 	}
 
 	[Fact]
+	[Trait("Category", "System")]
 	public async Task TestAnalyzeEmptyMethod()
 	{
-		var test = @"using System;
-
-class SymbolicallyAnalyzeAttribute : Attribute { }
-
+		var source = @$"using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
 class TestClass
-{
+{{
 	[SymbolicallyAnalyze]
 	void SayHello()
-	{
+	{{
+	}}
+}}
+";
+		await CSharpAnalyzerVerifier<SymbolicExecutionAnalyzer>.VerifyAnalyzerAsync(source);
 	}
-}";
 
-		await VerifyCS.VerifyAnalyzerAsync(test);
+	[Fact]
+	public async Task TestThrowStatementCreatesDiagnostic()
+	{
+		var test = @$"using System;
+using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
+class TestClass
+{{
+	[SymbolicallyAnalyze]
+	void SayHello()
+	{{
+		throw new InvalidOperationException();
+	}}
+}}
+";
+		var expected = VerifyCS.Diagnostic(descriptor: MayThrowDiagnosticDescriptor.DiagnosticDescriptor)
+			.WithLocation(10, 3)
+			.WithMessage("The statement 'throw new InvalidOperationException();' may throw unhandled exceptions");
+		await VerifyCS.VerifyAnalyzerAsync(test, expected);
 	}
-//
-// 	[Fact]
-// 	public async Task TestThrowStatementCreatesDiagnostic()
-// 	{
-// 		var test = @"using System;
-//
-// class SymbolicallyAnalyzeAttribute : Attribute { }
-//
-// class TestClass
-// {
-// 	[SymbolicallyAnalyze]
-// 	void SayHello()
-// 	{
-// 		throw new InvalidOperationException();
-// 	}
-// }";
-// 		var expected = VerifyCS.Diagnostic(diagnosticId: "SE0001")
-// 			.WithLocation(10, 3)
-// 			.WithMessage("The statement 'throw new InvalidOperationException();' may throw unhandled exceptions");
-// 		await VerifyCS.VerifyAnalyzerAsync(test, expected);
-// 	}
 //
 // 	[Fact]
 // 	public async Task TestIfTrueCondition()

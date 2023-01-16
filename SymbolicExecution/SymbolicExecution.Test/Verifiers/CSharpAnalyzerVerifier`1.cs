@@ -1,4 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.Immutable;
+using System.IO;
+using System.Threading;
+using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -34,7 +38,15 @@ public static partial class CSharpAnalyzerVerifier<TAnalyzer>
 		{
 			TestCode = source,
 		};
-
+		var nugetFilePath = Path.Combine(
+			new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.Parent.FullName,
+			"NuGet.Config"
+			);
+		new FileInfo(nugetFilePath).Exists.Should().BeTrue("NuGet.Config file should exist");
+		var testReferenceAssemblies = test.ReferenceAssemblies.WithNuGetConfigFilePath(nugetFilePath).WithPackages(
+			new[] { new PackageIdentity("SymbolicExecution.Control", "0.0.1") }.ToImmutableArray()
+			);
+		test.ReferenceAssemblies = testReferenceAssemblies;
 		test.ExpectedDiagnostics.AddRange(expected);
 		await test.RunAsync(CancellationToken.None);
 	}

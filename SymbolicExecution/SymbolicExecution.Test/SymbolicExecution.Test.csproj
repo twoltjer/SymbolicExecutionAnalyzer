@@ -33,6 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\SymbolicExecution.Control\SymbolicExecution.Control.csproj" />
         <ProjectReference Include="..\SymbolicExecution\SymbolicExecution.csproj" />
     </ItemGroup>
 

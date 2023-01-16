@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Title>SymbolicExecution.Control</Title>
+        <Description>Control attributes for SymbolicExecution analyzer</Description>
+        <Copyright>Copyright (c) 2023 Thomas Woltjer</Copyright>
+        <PackageOutputPath>../PackageBuild</PackageOutputPath>
+        <AssemblyVersion>0.0.1</AssemblyVersion>
+        <Version>$(AssemblyVersion)</Version>
+        <Authors>Thomas Woltjer</Authors>
+    </PropertyGroup>
+
+</Project>

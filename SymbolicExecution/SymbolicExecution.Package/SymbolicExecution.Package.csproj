@@ -5,23 +5,20 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <AssemblyVersion>0.0.1</AssemblyVersion>
+        <Version>$(AssemblyVersion)</Version>
     </PropertyGroup>
 
     <PropertyGroup>
         <PackageId>SymbolicExecution</PackageId>
-        <PackageVersion>1.0.0.0</PackageVersion>
-        <Authors>Thomas.Woltjer</Authors>
-        <PackageLicenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</PackageLicenseUrl>
-        <PackageProjectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</PackageProjectUrl>
-        <PackageIconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</PackageIconUrl>
-        <RepositoryUrl>http://REPOSITORY_URL_HERE_OR_DELETE_THIS_LINE</RepositoryUrl>
-        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <Description>SymbolicExecution</Description>
-        <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
-        <Copyright>Copyright</Copyright>
+        <Authors>Thomas Woltjer</Authors>
+        <Description>Static code analyzer</Description>
+        <Copyright>Copyright (c) 2023 Thomas Woltjer</Copyright>
         <PackageTags>SymbolicExecution, analyzers</PackageTags>
         <DevelopmentDependency>true</DevelopmentDependency>
         <NoPackageAnalysis>true</NoPackageAnalysis>
+        <PackageOutputPath>../PackageBuild</PackageOutputPath>
+
 
         <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
     </PropertyGroup>

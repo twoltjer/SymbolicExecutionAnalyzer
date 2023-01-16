@@ -1,4 +1,6 @@
-﻿namespace SymbolicExecution;
+﻿using System.Threading;
+
+namespace SymbolicExecution;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
@@ -8,122 +10,54 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 		UnexpectedValueDiagnosticDescriptor.DiagnosticDescriptor,
 		UnhandledSyntaxDiagnosticDescriptor.DiagnosticDescriptor
 		);
-
 	public override void Initialize(AnalysisContext context)
 	{
 		context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 		context.EnableConcurrentExecution();
 
-		// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
-		context.RegisterCodeBlockAction(RegisterAnalyzeCodeBlock);
+		context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.Method);
 	}
 
-	private void RegisterAnalyzeCodeBlock(
-		CodeBlockAnalysisContext codeBlockAnalysisContext
-		)
+	private static void AnalyzeSymbol(SymbolAnalysisContext context)
 	{
-		if (codeBlockAnalysisContext.OwningSymbol is IMethodSymbol methodSymbol && methodSymbol.GetAttributes()
-				.Any(x => x.AttributeClass.Name == "SymbolicallyAnalyzeAttribute"))
-			AnalyzeCodeBlock(codeBlockAnalysisContext);
-	}
-
-	private async Task<Diagnostic[]> AnalyzeCodeBlockAsync(CodeBlockAnalysisContext codeBlockAnalysisContext, CancellationToken token)
-	{
-		var convertedSyntax =
-			await SyntaxNodeConversionHandlerMediator.Instance.HandleAsync(await codeBlockAnalysisContext.SemanticModel.SyntaxTree.GetRootAsync(token), token);
-		if (convertedSyntax.IsFaulted)
+		// Check if the method has the attribute that indicates it should be analyzed
+		// for reachable throw statements.
+		var methodSymbol = (IMethodSymbol)context.Symbol;
+		if (!methodSymbol.GetAttributes().Any(attr => attr.AttributeClass.Name == "AnalyzeForThrowAttribute"))
 		{
-			return new[]
-			{
-				Diagnostic.Create(
-					UnhandledSyntaxDiagnosticDescriptor.DiagnosticDescriptor,
-					convertedSyntax.ErrorInfo.Location ?? codeBlockAnalysisContext.CodeBlock.GetLocation(),
-					convertedSyntax.ErrorInfo.Message
-					),
-			};
+			return;
 		}
 
+		// Get the syntax tree of the method body.
+		var syntaxTree = methodSymbol.DeclaringSyntaxReferences.First().GetSyntax();
+		var methodDeclaration = syntaxTree.DescendantNodes().OfType<MethodDeclarationSyntax>().Single();
+		var methodBody = methodDeclaration.Body;
 
-		return new Diagnostic[]
+		// Perform symbolic execution on the method body.
+		var walker = new SymbolicExecutionWalker(context.Compilation, context.CancellationToken);
+		var analysisResult = PerformSymbolicExecution(methodBody, context.Compilation, context.ReportDiagnostic, new SyntaxNodeHandler());
+		foreach (var exception in analysisResult.UnhandledExceptions)
 		{
-			Diagnostic.Create(
-				MayThrowDiagnosticDescriptor.DiagnosticDescriptor,
-				codeBlockAnalysisContext.CodeBlock.GetLocation(),
-				"HELLO"
-				),
-		};
+			// Report a diagnostic if a reachable throw statement was found.
+			var diagnostic = Diagnostic.Create(MayThrowDiagnosticDescriptor.DiagnosticDescriptor, exception.Location, exception.Name);
+			context.ReportDiagnostic(diagnostic);
+		}
+	}
+
+	private static SymbolicExecutionResult PerformSymbolicExecution(SyntaxNode node, Compilation compilation, Action<Diagnostic> reportDiagnostic, SyntaxNodeHandler handler)
+	{
 		
-		return Array.Empty<Diagnostic>();
 	}
+}
 
-	private void AnalyzeCodeBlock(CodeBlockAnalysisContext codeBlockAnalysisContext)
+internal struct SymbolicExecutionWalker
+{
+	public SymbolicExecutionWalker(Compilation contextCompilation, CancellationToken contextCancellationToken)
 	{
-		if (codeBlockAnalysisContext.CodeBlock is not MethodDeclarationSyntax methodDeclaration)
-			// TODO: Produce a diagnostic that the attribute was used incorrectly
-			return;
-
-		var methodHasErrors = methodDeclaration.GetDiagnostics().Any(x => x.Severity == DiagnosticSeverity.Error);
-		if (methodHasErrors)
-			return;
-
-		try
-		{
-			var runCts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-			var alertCts = new CancellationTokenSource(TimeSpan.FromSeconds(40));
-			var task = Task.Run(() => AnalyzeCodeBlockAsync(codeBlockAnalysisContext, runCts.Token), runCts.Token);
-			while (!task.IsFaulted && !task.IsCompleted && !task.IsCanceled)
-			{
-				Thread.Sleep(TimeSpan.FromSeconds(0.5));
-				if (runCts.IsCancellationRequested)
-				{
-					Diagnostic.Create(AnalysisTimedOutDiagnosticDescriptor.DiagnosticDescriptor, codeBlockAnalysisContext.CodeBlock.GetLocation());
-				}
-				if (alertCts.IsCancellationRequested)
-				{
-					Debug.Fail("Task did not end!");
-					break;
-				}
-			}
-
-			if (task.IsCompleted)
-			{
-				var diagnostics = task.Result;
-				foreach (var diagnostic in diagnostics)
-					codeBlockAnalysisContext.ReportDiagnostic(diagnostic);
-			}
-			// var executionPaths = new List<ExecutionPath> { ExecutionPath.Empty };
-			// var faults = new List<AnalysisErrorInfo>();
-			// foreach (var node in codeBlockAnalysisContext.CodeBlock.ChildNodes())
-			// {
-			// 	var nextExecutionPaths = new List<ExecutionPath>();
-			// 	foreach (var executionPath in executionPaths)
-			// 	{
-			// 		var executionPathResults = NodeHandlerMediator.Instance.Handle(
-			// 			node,
-			// 			executionPath
-			// 			);
-			// 		foreach (var executionPathResult in executionPathResults)
-			// 		{
-			// 			if (executionPathResult.IsFaulted)
-			// 			{
-			// 				var errorInfo = executionPathResult.ErrorInfo;
-			// 				if (!faults.Contains(errorInfo))
-			// 					faults.Add(errorInfo);
-			// 			}
-			// 			else
-			// 			{
-			// 				nextExecutionPaths.Add(executionPathResult.Value);
-			// 			}
-			// 		}
-			// 	}
-			// 	executionPaths.Clear();
-			// 	executionPaths.AddRange(nextExecutionPaths);
-			// 	nextExecutionPaths.Clear();
-			// }
-		}
-		catch (Exception ex)
-		{
-			Debug.Fail(ex.ToString());
-		}
+		Compilation = contextCompilation;
+		CancellationToken = contextCancellationToken;
 	}
+
+	private Compilation Compilation { get; }
+	private CancellationToken CancellationToken { get; }
 }
