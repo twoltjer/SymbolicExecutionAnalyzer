@@ -1,5 +1,5 @@
 namespace SymbolicExecution;
 
-internal class SyntaxNodeHandler
+public class SyntaxNodeHandler
 {
 }

@@ -1,8 +1,9 @@
 using System.Collections;
+using System.Collections.Generic;
 
 namespace SymbolicExecution;
 
-internal readonly struct SymbolicExecutionResult
+public readonly struct SymbolicExecutionResult : IAnalysisResult
 {
-	internal IImmutableList<SymbolicExecutionException> UnhandledExceptions { get; }
+	public IEnumerable<SymbolicExecutionException> UnhandledExceptions { get; }
 }

@@ -1,11 +1,10 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using SymbolicExecution.Control;
+﻿using SymbolicExecution.Control;
 using SymbolicExecution.Diagnostics;
 using SymbolicExecution.Test.Verifiers;
 
-namespace SymbolicExecution.Test.SymbolicExecutionTests;
+namespace SymbolicExecution.Test.SystemTests;
 
-public class SymbolicExecutionAnalyzerTests
+public class BasicAnalyzerFunctionalitySystemTests
 {
 	//No diagnostics expected to show up
 	[Fact]

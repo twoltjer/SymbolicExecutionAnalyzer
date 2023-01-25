@@ -1,6 +1,6 @@
 namespace SymbolicExecution;
 
-internal readonly struct SymbolicExecutionException
+public readonly struct SymbolicExecutionException : ISymbolicExecutionException
 {
 	internal SymbolicExecutionException(Location location, Type type)
 	{

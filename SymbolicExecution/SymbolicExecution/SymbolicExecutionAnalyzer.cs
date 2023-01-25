@@ -1,4 +1,4 @@
-﻿using System.Threading;
+﻿using System.Collections;
 
 namespace SymbolicExecution;
 
@@ -10,6 +10,8 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 		UnexpectedValueDiagnosticDescriptor.DiagnosticDescriptor,
 		UnhandledSyntaxDiagnosticDescriptor.DiagnosticDescriptor
 		);
+
+	public SyntaxNodeHandler[] SyntaxNodeHandlers => Array.Empty<SyntaxNodeHandler>();
 	public override void Initialize(AnalysisContext context)
 	{
 		context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -34,30 +36,14 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 		var methodBody = methodDeclaration.Body;
 
 		// Perform symbolic execution on the method body.
+		var abstractedSyntaxTree = new AbstractedSyntaxTree(methodBody);
 		var walker = new SymbolicExecutionWalker(context.Compilation, context.CancellationToken);
-		var analysisResult = PerformSymbolicExecution(methodBody, context.Compilation, context.ReportDiagnostic, new SyntaxNodeHandler());
+		var analysisResult = walker.Analyze(abstractedSyntaxTree);
 		foreach (var exception in analysisResult.UnhandledExceptions)
 		{
 			// Report a diagnostic if a reachable throw statement was found.
-			var diagnostic = Diagnostic.Create(MayThrowDiagnosticDescriptor.DiagnosticDescriptor, exception.Location, exception.Name);
+			var diagnostic = Diagnostic.Create(MayThrowDiagnosticDescriptor.DiagnosticDescriptor, exception.Location, exception.Type.Name);
 			context.ReportDiagnostic(diagnostic);
 		}
 	}
-
-	private static SymbolicExecutionResult PerformSymbolicExecution(SyntaxNode node, Compilation compilation, Action<Diagnostic> reportDiagnostic, SyntaxNodeHandler handler)
-	{
-		
-	}
-}
-
-internal struct SymbolicExecutionWalker
-{
-	public SymbolicExecutionWalker(Compilation contextCompilation, CancellationToken contextCancellationToken)
-	{
-		Compilation = contextCompilation;
-		CancellationToken = contextCancellationToken;
-	}
-
-	private Compilation Compilation { get; }
-	private CancellationToken CancellationToken { get; }
 }
