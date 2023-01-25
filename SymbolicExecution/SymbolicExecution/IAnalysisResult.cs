@@ -4,5 +4,5 @@ namespace SymbolicExecution;
 
 public interface IAnalysisResult
 {
-	IEnumerable<SymbolicExecutionException> UnhandledExceptions { get; }
+	ImmutableArray<SymbolicExecutionException> UnhandledExceptions { get; }
 }

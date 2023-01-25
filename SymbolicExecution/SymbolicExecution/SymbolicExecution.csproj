@@ -35,4 +35,8 @@
         </EmbeddedResource>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\SymbolicExecution.Control\SymbolicExecution.Control.csproj" />
+    </ItemGroup>
+
 </Project>

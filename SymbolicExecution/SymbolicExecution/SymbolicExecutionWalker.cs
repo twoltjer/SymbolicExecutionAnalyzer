@@ -2,7 +2,7 @@ using System.Threading;
 
 namespace SymbolicExecution;
 
-public struct SymbolicExecutionWalker : ISymbolicExecutionWalker
+public struct SymbolicExecutionWalker : ISymbolicExecutionWalker<SymbolicExecutionResult>
 {
 	public SymbolicExecutionWalker(Compilation contextCompilation, CancellationToken contextCancellationToken)
 	{
@@ -13,8 +13,8 @@ public struct SymbolicExecutionWalker : ISymbolicExecutionWalker
 	private Compilation Compilation { get; }
 	private CancellationToken CancellationToken { get; }
 
-	public IAnalysisResult Analyze(AbstractedSyntaxTree abstractedSyntaxTree)
+	public SymbolicExecutionResult Analyze(ISyntaxNodeAbstraction node)
 	{
-		throw new NotImplementedException();
+		return new SymbolicExecutionResult(ImmutableArray<SymbolicExecutionException>.Empty);
 	}
 }

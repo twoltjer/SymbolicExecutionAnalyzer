@@ -1,6 +1,6 @@
 namespace SymbolicExecution;
 
-public interface ISymbolicExecutionWalker
+public interface ISymbolicExecutionWalker<T> where T : IAnalysisResult
 {
-	IAnalysisResult Analyze(AbstractedSyntaxTree abstractedSyntaxTree);
+	T Analyze(ISyntaxNodeAbstraction node);
 }

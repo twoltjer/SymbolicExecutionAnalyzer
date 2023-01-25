@@ -5,5 +5,10 @@ namespace SymbolicExecution;
 
 public readonly struct SymbolicExecutionResult : IAnalysisResult
 {
-	public IEnumerable<SymbolicExecutionException> UnhandledExceptions { get; }
+	public SymbolicExecutionResult(ImmutableArray<SymbolicExecutionException> unhandledExceptions)
+	{
+		UnhandledExceptions = unhandledExceptions;
+	}
+
+	public ImmutableArray<SymbolicExecutionException> UnhandledExceptions { get; }
 }
