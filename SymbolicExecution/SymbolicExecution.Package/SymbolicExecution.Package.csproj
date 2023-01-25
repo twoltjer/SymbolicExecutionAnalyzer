@@ -32,7 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="OpenCover" Version="4.7.922" />
+      <PackageReference Include="OpenCover" Version="4.7.1221" />
     </ItemGroup>
 
     <Target Name="_AddAnalyzersToOutput">
