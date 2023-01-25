@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Diagnostics;
-using SymbolicExecution.Control;
-
-namespace SymbolicExecution;
+﻿namespace SymbolicExecution;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer

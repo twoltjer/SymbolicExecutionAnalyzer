@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace SymbolicExecution;
 
 public static class EnumerableExtensions

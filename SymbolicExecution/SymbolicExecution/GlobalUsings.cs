@@ -1,7 +1,14 @@
 global using System;
+global using System.Collections;
+global using System.Collections.Generic;
 global using System.Collections.Immutable;
+global using System.Diagnostics;
 global using System.Linq;
+global using System.Reflection;
 global using Microsoft.CodeAnalysis;
 global using Microsoft.CodeAnalysis.CSharp.Syntax;
 global using Microsoft.CodeAnalysis.Diagnostics;
+global using SymbolicExecution.AbstractSyntaxTree.Implementations;
+global using SymbolicExecution.AbstractSyntaxTree.Interfaces;
+global using SymbolicExecution.Control;
 global using SymbolicExecution.Diagnostics;
