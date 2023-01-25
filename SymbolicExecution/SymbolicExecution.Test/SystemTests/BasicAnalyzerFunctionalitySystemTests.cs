@@ -11,7 +11,7 @@ public class BasicAnalyzerFunctionalitySystemTests
 	[Trait("Category", "System")]
 	public async Task TestNoAnalysis()
 	{
-		var test = @"";
+		const string test = @"";
 
 		await VerifyCS.VerifyAnalyzerAsync(test);
 	}
@@ -20,7 +20,7 @@ public class BasicAnalyzerFunctionalitySystemTests
 	[Trait("Category", "System")]
 	public async Task TestUnmarkedMethodNotAnalyzed()
 	{
-		var test = @"using System;
+		const string test = @"using System;
 
 class TestClass
 {

@@ -19,39 +19,52 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 		context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 		context.EnableConcurrentExecution();
 
-		context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.Method);
+		context.RegisterSemanticModelAction(AnalyzeSymbol);
 	}
 
-	private static void AnalyzeSymbol(SymbolAnalysisContext context)
+	private static void AnalyzeSymbol(SemanticModelAnalysisContext context)
 	{
 		// Check if the method has the attribute that indicates it should be analyzed
 		// for reachable throw statements.
-		var methodSymbol = (IMethodSymbol)context.Symbol;
-		if (!methodSymbol.GetAttributes().Any(attr => attr.AttributeClass?.Name == nameof(SymbolicallyAnalyzeAttribute)))
-		{
-			return;
-		}
+		var model = context.SemanticModel;
+		var abstractedSyntaxTree = new AbstractedSyntaxTree(model);
+		var abstraction = abstractedSyntaxTree.GetRoot();
+		var methodsToAnalyze = abstraction.GetDescendantNodes(includeSelf: true)
+			.OfType<IMethodDeclarationSyntaxAbstraction>()
+			.Where(syntaxAbstraction => syntaxAbstraction.Symbol is IMethodSymbol methodSymbol && methodSymbol.GetAttributes().Any(IsSymbolicallyAnalyzeAttribute))
+			.ToArray();
 
-		// Get the syntax tree of the method body.
-		var syntaxTree = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
-		var methodDeclaration = syntaxTree as MethodDeclarationSyntax;
-		var methodBody = methodDeclaration?.Body;
-		if (methodBody == null)
+		foreach (var method in methodsToAnalyze)
 		{
-			HandleInvalidContext(context);
-			return;
+			var methodAnalyzer = new AbstractMethodAnalyzer();
+			var methodAnalysis = methodAnalyzer.Analyze(method);
+			foreach (var failure in methodAnalysis.AnalysisFailures)
+			{
+				var diagnostic = Diagnostic.Create(AnalysisFailureDiagnosticDescriptor.DiagnosticDescriptor, failure.Location, failure.Reason);
+			}
+			foreach (var exception in methodAnalysis.UnhandledExceptions)
+			{
+				// Report a diagnostic if a reachable throw statement was found.
+				var diagnostic = Diagnostic.Create(MayThrowDiagnosticDescriptor.DiagnosticDescriptor, exception.Location, exception.Type.Name);
+				context.ReportDiagnostic(diagnostic);
+			}
 		}
+	}
 
-		// Perform symbolic execution on the method body.
-		var abstractedSyntaxTree = new AbstractedSyntaxTree(methodBody);
-		var walker = new SymbolicExecutionWalker(context.Compilation, context.CancellationToken);
-		var analysisResult = walker.Analyze(abstractedSyntaxTree.GetRoot());
-		foreach (var exception in analysisResult.UnhandledExceptions)
-		{
-			// Report a diagnostic if a reachable throw statement was found.
-			var diagnostic = Diagnostic.Create(MayThrowDiagnosticDescriptor.DiagnosticDescriptor, exception.Location, exception.Type.Name);
-			context.ReportDiagnostic(diagnostic);
-		}
+	private static bool IsSymbolicallyAnalyzeAttribute(AttributeData arg)
+	{
+		return BuildNamespaceAndName(arg.AttributeClass) == typeof(SymbolicallyAnalyzeAttribute).FullName;
+	}
+
+	private static string BuildNamespaceAndName(INamespaceOrTypeSymbol? symbol)
+	{
+		if (symbol == null)
+			return string.Empty;
+
+		var containingNamespaceName = BuildNamespaceAndName(symbol.ContainingNamespace);
+		return string.IsNullOrEmpty(containingNamespaceName)
+			? symbol.Name
+			: $"{containingNamespaceName}.{symbol.Name}";
 	}
 
 	private static void HandleInvalidContext(SymbolAnalysisContext context)
@@ -69,4 +82,8 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 			);
 		context.ReportDiagnostic(diagnostic);
 	}
+}
+
+public interface IAbstractMethodAnalyzer
+{
 }
