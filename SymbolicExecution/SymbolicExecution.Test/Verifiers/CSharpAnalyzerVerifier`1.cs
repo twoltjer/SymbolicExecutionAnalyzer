@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.IO;
-using System.Threading;
+﻿using System.IO;
 using FluentAssertions;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
 
 namespace SymbolicExecution.Test.Verifiers;
 

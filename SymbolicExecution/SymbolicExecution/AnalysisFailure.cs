@@ -10,4 +10,12 @@ public readonly struct AnalysisFailure
 		Reason = reason;
 		Location = location;
 	}
+
+	public static implicit operator Diagnostic(AnalysisFailure failure)
+	{
+			return Diagnostic.Create(
+			AnalysisFailureDiagnosticDescriptor.DiagnosticDescriptor,
+			failure.Location,
+			failure.Reason);
+	}
 }

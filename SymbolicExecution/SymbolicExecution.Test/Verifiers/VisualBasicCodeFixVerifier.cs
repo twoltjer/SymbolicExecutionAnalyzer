@@ -1,10 +1,8 @@
 ﻿using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
-using Microsoft.CodeAnalysis.VisualBasic.Testing;
 
 namespace SymbolicExecution.Test.Verifiers;
 
+[ExcludeFromCodeCoverage]
 public static partial class VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix>
 	where TAnalyzer : DiagnosticAnalyzer, new()
 	where TCodeFix : CodeFixProvider, new()

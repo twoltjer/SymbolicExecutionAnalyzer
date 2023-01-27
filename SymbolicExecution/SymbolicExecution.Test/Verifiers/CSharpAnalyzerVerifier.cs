@@ -1,9 +1,6 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
+﻿namespace SymbolicExecution.Test.Verifiers;
 
-namespace SymbolicExecution.Test.Verifiers;
-
+[ExcludeFromCodeCoverage]
 public static partial class CSharpAnalyzerVerifier<TAnalyzer>
 	where TAnalyzer : DiagnosticAnalyzer, new()
 {

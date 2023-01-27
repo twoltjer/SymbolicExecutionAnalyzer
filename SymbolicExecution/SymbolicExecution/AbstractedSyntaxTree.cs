@@ -10,17 +10,34 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 		_semanticModel = semanticModel;
 	}
 
-	public ISyntaxNodeAbstraction GetRoot()
+	public TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure> GetRoot()
 	{
-		_abstraction ??= ProduceAbstraction<SyntaxNodeAbstraction, SyntaxNode>(_semanticModel, _semanticModel.SyntaxTree.GetRoot());
-		return _abstraction;
+		if (_abstraction == null)
+		{
+			var abstractionOrFailure = ProduceAbstraction<SyntaxNodeAbstraction, SyntaxNode>(
+				_semanticModel,
+				_semanticModel.SyntaxTree.GetRoot()
+				);
+			if (abstractionOrFailure.IsT1)
+				_abstraction = abstractionOrFailure.T1Value;
+			else
+				return abstractionOrFailure.T2Value;
+		}
+		return new TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure>(_abstraction);
 	}
 
-	private TAbstractedType ProduceAbstraction<TAbstractedType, TCompileType>(SemanticModel model, TCompileType node)
+	public TaggedUnion<TAbstractedType, AnalysisFailure> ProduceAbstraction<TAbstractedType, TCompileType>(SemanticModel model, TCompileType node)
 		where TAbstractedType : SyntaxNodeAbstraction
 		where TCompileType : SyntaxNode
 	{
-		var children = node.ChildNodes().Select(x => ProduceAbstraction<SyntaxNodeAbstraction, SyntaxNode>(model, x)).ToImmutableArray();
+		var childrenOrFailures = node.ChildNodes().Select(x => ProduceAbstraction<SyntaxNodeAbstraction, SyntaxNode>(model, x)).ToImmutableArray();
+
+		if (childrenOrFailures.FirstOrNull(x => !x.IsT1) is TaggedUnion<SyntaxNodeAbstraction, AnalysisFailure> potentialFailure)
+		{
+			return potentialFailure.T2Value;
+		}
+
+		var children = childrenOrFailures.Select(x => x.T1Value).ToImmutableArray();
 
 		var symbol = model.GetDeclaredSymbol(node);
 
@@ -44,10 +61,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 		};
 
 		if (result == null)
-		{
-			Debug.Fail("Unknown node type or soft cast failed");
-			throw new InvalidOperationException("Abstraction result is null");
-		}
+			return new AnalysisFailure($"No abstraction for {node.GetType().Name}", node.GetLocation());
 
 		return result;
 	}

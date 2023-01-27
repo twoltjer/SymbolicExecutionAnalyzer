@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-
-namespace SymbolicExecution.Test.Verifiers;
+﻿namespace SymbolicExecution.Test.Verifiers;
 
 internal static class CSharpVerifierHelper
 {

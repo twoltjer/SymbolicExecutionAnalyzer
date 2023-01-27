@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using Microsoft.CodeAnalysis.CodeRefactorings;
-
-namespace SymbolicExecution.Test.Verifiers;
+﻿namespace SymbolicExecution.Test.Verifiers;
 
 public static partial class VisualBasicCodeRefactoringVerifier<TCodeRefactoring>
 	where TCodeRefactoring : CodeRefactoringProvider, new()

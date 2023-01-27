@@ -2,7 +2,7 @@ namespace SymbolicExecution;
 
 public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 {
-	public IAnalysisResult Analyze(IMethodDeclarationSyntaxAbstraction method)
+	public SymbolicExecutionResult Analyze(IMethodDeclarationSyntaxAbstraction method)
 	{
 		if (!method.Children.OfType<IBlockSyntaxAbstraction>().TryGetSingle(out var blockSyntaxAbstraction))
 		{
@@ -12,9 +12,28 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 				);
 		}
 
+		var symbolicExecutionState = new SymbolicExecutionState(ImmutableArray<SymbolicExecutionException>.Empty);
+
+		var resultState = AnalyzeNode(blockSyntaxAbstraction, symbolicExecutionState);
+
 		return new SymbolicExecutionResult(
-			ImmutableArray<SymbolicExecutionException>.Empty,
+			resultState.UnhandledExceptions,
 			ImmutableArray<AnalysisFailure>.Empty
 			);
 	}
+
+	private SymbolicExecutionState AnalyzeNode(ISyntaxNodeAbstraction node, SymbolicExecutionState stateBeforeExecution)
+	{
+		return stateBeforeExecution;
+	}
+}
+
+public readonly struct SymbolicExecutionState
+{
+	public SymbolicExecutionState(ImmutableArray<SymbolicExecutionException> unhandledExceptions)
+	{
+		UnhandledExceptions = unhandledExceptions;
+	}
+
+	public ImmutableArray<SymbolicExecutionException> UnhandledExceptions { get; }
 }

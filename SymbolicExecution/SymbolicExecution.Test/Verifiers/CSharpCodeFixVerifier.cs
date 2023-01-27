@@ -1,10 +1,6 @@
-﻿using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
+﻿namespace SymbolicExecution.Test.Verifiers;
 
-namespace SymbolicExecution.Test.Verifiers;
-
+[ExcludeFromCodeCoverage]
 public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
 	where TAnalyzer : DiagnosticAnalyzer, new()
 	where TCodeFix : CodeFixProvider, new()

@@ -2,5 +2,5 @@ namespace SymbolicExecution;
 
 public interface IAbstractedSyntaxTree
 {
-	ISyntaxNodeAbstraction GetRoot();
+	TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure> GetRoot();
 }

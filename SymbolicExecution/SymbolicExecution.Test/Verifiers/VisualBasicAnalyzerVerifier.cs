@@ -1,9 +1,6 @@
-﻿using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
-using Microsoft.CodeAnalysis.VisualBasic.Testing;
+﻿namespace SymbolicExecution.Test.Verifiers;
 
-namespace SymbolicExecution.Test.Verifiers;
-
+[ExcludeFromCodeCoverage]
 public static partial class VisualBasicAnalyzerVerifier<TAnalyzer>
 	where TAnalyzer : DiagnosticAnalyzer, new()
 {

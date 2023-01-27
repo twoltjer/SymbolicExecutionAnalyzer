@@ -1,6 +1,7 @@
 ﻿namespace SymbolicExecution;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
+[ExcludeFromCodeCoverage]
 public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 {
 	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
@@ -15,16 +16,23 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 		context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 		context.EnableConcurrentExecution();
 
-		context.RegisterSemanticModelAction(AnalyzeSymbol);
+		context.RegisterCodeBlockAction(AnalyzeSymbol);
 	}
 
-	private static void AnalyzeSymbol(SemanticModelAnalysisContext context)
+	private static void AnalyzeSymbol(CodeBlockAnalysisContext context)
 	{
 		// Check if the method has the attribute that indicates it should be analyzed
 		// for reachable throw statements.
 		var model = context.SemanticModel;
 		var abstractedSyntaxTree = new AbstractedSyntaxTree(model);
-		var abstraction = abstractedSyntaxTree.GetRoot();
+		var abstractionOrFailure = abstractedSyntaxTree.GetRoot();
+		if (!abstractionOrFailure.IsT1)
+		{
+			context.ReportDiagnostic(abstractionOrFailure.T2Value);
+			return;
+		}
+
+		var abstraction = abstractionOrFailure.T1Value;
 		var methodsToAnalyze = abstraction.GetDescendantNodes(includeSelf: true)
 			.OfType<IMethodDeclarationSyntaxAbstraction>()
 			.Where(syntaxAbstraction => syntaxAbstraction.Symbol is IMethodSymbol methodSymbol && methodSymbol.GetAttributes().Any(IsSymbolicallyAnalyzeAttribute))
@@ -35,9 +43,7 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 			var methodAnalyzer = new AbstractMethodAnalyzer();
 			var methodAnalysis = methodAnalyzer.Analyze(method);
 			foreach (var failure in methodAnalysis.AnalysisFailures)
-			{
-				var diagnostic = Diagnostic.Create(AnalysisFailureDiagnosticDescriptor.DiagnosticDescriptor, failure.Location, failure.Reason);
-			}
+				context.ReportDiagnostic(failure);
 			foreach (var exception in methodAnalysis.UnhandledExceptions)
 			{
 				// Report a diagnostic if a reachable throw statement was found.

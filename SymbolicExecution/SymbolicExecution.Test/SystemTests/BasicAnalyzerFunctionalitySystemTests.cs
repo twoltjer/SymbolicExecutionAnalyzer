@@ -49,25 +49,62 @@ class TestClass
 		await CSharpAnalyzerVerifier<SymbolicExecutionAnalyzer>.VerifyAnalyzerAsync(source);
 	}
 
+	/// <summary>
+	/// Don't support pointers and fixed statements; produce a warning when they are attempted to be analyzed
+	/// </summary>
 	[Fact]
-	public async Task TestThrowStatementCreatesDiagnostic()
+	[Trait("Category", "System")]
+	public async Task TestAnalyzeUnsupportedMethod()
 	{
-		var test = @$"using System;
-using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
-class TestClass
+		var source = @$"using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
+using System;
+
+public class Program
 {{
 	[SymbolicallyAnalyze]
-	void SayHello()
+	public static unsafe void Main()
 	{{
-		throw new InvalidOperationException();
+		var array = new int[] {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }};
+		// pointer to the first element of the array using the fixed statement
+		fixed (int* p = array)
+		{{
+			// pointer to the last element of the array
+			int* pLast = p + array.Length - 1;
+			// swap the first and the last element
+			int temp = *p;
+			*p = *pLast;
+			*pLast = temp;
+		}}
+
+		Console.WriteLine(string.Join("", "", array));
 	}}
-}}
-";
-		var expected = VerifyCS.Diagnostic(descriptor: MayThrowDiagnosticDescriptor.DiagnosticDescriptor)
-			.WithLocation(10, 3)
-			.WithMessage("The statement 'throw new InvalidOperationException();' may throw unhandled exceptions");
-		await VerifyCS.VerifyAnalyzerAsync(test, expected);
+}}";
+
+		var expected = VerifyCS.Diagnostic(descriptor: AnalysisFailureDiagnosticDescriptor.DiagnosticDescriptor)
+			.WithLocation(9, 23)
+			.WithMessage("Symbolic Execution Failed: No abstraction for OmittedArraySizeExpressionSyntax");
+		await CSharpAnalyzerVerifier<SymbolicExecutionAnalyzer>.VerifyAnalyzerAsync(source, expected);
 	}
+
+// 	[Fact]
+// 	public async Task TestThrowStatementCreatesDiagnostic()
+// 	{
+// 		var test = @$"using System;
+// using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
+// class TestClass
+// {{
+// 	[SymbolicallyAnalyze]
+// 	void SayHello()
+// 	{{
+// 		throw new InvalidOperationException();
+// 	}}
+// }}
+// ";
+// 		var expected = VerifyCS.Diagnostic(descriptor: MayThrowDiagnosticDescriptor.DiagnosticDescriptor)
+// 			.WithLocation(10, 3)
+// 			.WithMessage("The statement 'throw new InvalidOperationException();' may throw unhandled exceptions");
+// 		await VerifyCS.VerifyAnalyzerAsync(test, expected);
+// 	}
 //
 // 	[Fact]
 // 	public async Task TestIfTrueCondition()

@@ -1,5 +1,3 @@
-using System.Threading;
-
 namespace SymbolicExecution;
 
 public struct SymbolicExecutionWalker : ISymbolicExecutionWalker<SymbolicExecutionResult>
