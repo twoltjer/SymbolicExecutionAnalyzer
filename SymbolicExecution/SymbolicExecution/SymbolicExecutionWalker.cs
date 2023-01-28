@@ -13,6 +13,8 @@ public struct SymbolicExecutionWalker : ISymbolicExecutionWalker<SymbolicExecuti
 
 	public SymbolicExecutionResult Analyze(ISyntaxNodeAbstraction node)
 	{
-		return new SymbolicExecutionResult(ImmutableArray<SymbolicExecutionException>.Empty, ImmutableArray<AnalysisFailure>.Empty);
+		return new SymbolicExecutionResult(
+			ImmutableArray<ISymbolicExecutionException>.Empty,
+			ImmutableArray<AnalysisFailure>.Empty);
 	}
 }

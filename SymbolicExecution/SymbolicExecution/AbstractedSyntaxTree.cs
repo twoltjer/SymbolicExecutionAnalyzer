@@ -40,11 +40,14 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 		var children = childrenOrFailures.Select(x => x.T1Value).ToImmutableArray();
 
 		var symbol = model.GetDeclaredSymbol(node);
+		var typeInfo = model.GetTypeInfo(node);
+		var convertedTypeSymbol = typeInfo.ConvertedType;
+		var actualTypeSymbol = typeInfo.Type;
 
 		var result = node switch
 		{
 			BlockSyntax => new BlockSyntaxAbstraction(children, symbol) as TAbstractedType,
-			IdentifierNameSyntax => new IdentifierNameSyntaxAbstraction(children, symbol) as TAbstractedType,
+			IdentifierNameSyntax identifierNameSyntax => new IdentifierNameSyntaxAbstraction(children, symbol) as TAbstractedType,
 			UsingDirectiveSyntax => new UsingDirectiveSyntaxAbstraction(children, symbol) as TAbstractedType,
 			CompilationUnitSyntax => new CompilationUnitSyntaxAbstraction(children, symbol) as TAbstractedType,
 			QualifiedNameSyntax => new QualifiedNameSyntaxAbstraction(children, symbol) as TAbstractedType,
@@ -53,8 +56,8 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 			PredefinedTypeSyntax => new PredefinedTypeSyntaxAbstraction(children, symbol) as TAbstractedType,
 			ParameterListSyntax => new ParameterListSyntaxAbstraction(children, symbol) as TAbstractedType,
 			ArgumentListSyntax => new ArgumentListSyntaxAbstraction(children, symbol) as TAbstractedType,
-			ObjectCreationExpressionSyntax => new ObjectCreationExpressionSyntaxAbstraction(children, symbol) as TAbstractedType,
-			ThrowStatementSyntax => new ThrowStatementSyntaxAbstraction(children, symbol) as TAbstractedType,
+			ObjectCreationExpressionSyntax objectCreationExpressionSyntax => new ObjectCreationExpressionSyntaxAbstraction(children, symbol, objectCreationExpressionSyntax.GetLocation(), actualTypeSymbol, convertedTypeSymbol) as TAbstractedType,
+			ThrowStatementSyntax throwStatementSyntax => new ThrowStatementSyntaxAbstraction(children, symbol, throwStatementSyntax.GetLocation()) as TAbstractedType,
 			MethodDeclarationSyntax methodDeclarationSyntax => new MethodDeclarationSyntaxAbstraction(children, symbol, methodDeclarationSyntax.GetLocation()) as TAbstractedType,
 			ClassDeclarationSyntax => new ClassDeclarationSyntaxAbstraction(children, symbol) as TAbstractedType,
 			_ => null,

@@ -7,33 +7,36 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 		if (!method.Children.OfType<IBlockSyntaxAbstraction>().TryGetSingle(out var blockSyntaxAbstraction))
 		{
 			return new SymbolicExecutionResult(
-				ImmutableArray<SymbolicExecutionException>.Empty,
+				ImmutableArray<ISymbolicExecutionException>.Empty,
 				new[] { new AnalysisFailure($"Could not get an {nameof(IBlockSyntaxAbstraction)} from the method {method}", method.SourceLocation) }.ToImmutableArray()
 				);
 		}
 
-		var symbolicExecutionState = new SymbolicExecutionState(ImmutableArray<SymbolicExecutionException>.Empty);
+		var symbolicExecutionState = new SymbolicExecutionState();
 
-		var resultState = AnalyzeNode(blockSyntaxAbstraction, symbolicExecutionState);
+		var resultStates = blockSyntaxAbstraction.AnalyzeNode(symbolicExecutionState);
 
+		if (!resultStates.IsT1)
+			return new SymbolicExecutionResult(
+				ImmutableArray<ISymbolicExecutionException>.Empty,
+				new[] { resultStates.T2Value }.ToImmutableArray()
+				);
+		
+		var unhandledExceptions = resultStates.T1Value
+			.Select(state => state.CurrentException)
+			.Where(exception => exception.HasValue)
+			.Select(exception => exception!.Value)
+			.Distinct()
+			.Select(ConvertToResultException)
+			.ToImmutableArray();
 		return new SymbolicExecutionResult(
-			resultState.UnhandledExceptions,
+			unhandledExceptions,
 			ImmutableArray<AnalysisFailure>.Empty
 			);
 	}
 
-	private SymbolicExecutionState AnalyzeNode(ISyntaxNodeAbstraction node, SymbolicExecutionState stateBeforeExecution)
+	private ISymbolicExecutionException ConvertToResultException(ExceptionThrownState exceptionState)
 	{
-		return stateBeforeExecution;
+		return new SymbolicExecutionException(exceptionState.Location, exceptionState.Exception.ActualTypeSymbol);
 	}
-}
-
-public readonly struct SymbolicExecutionState
-{
-	public SymbolicExecutionState(ImmutableArray<SymbolicExecutionException> unhandledExceptions)
-	{
-		UnhandledExceptions = unhandledExceptions;
-	}
-
-	public ImmutableArray<SymbolicExecutionException> UnhandledExceptions { get; }
 }

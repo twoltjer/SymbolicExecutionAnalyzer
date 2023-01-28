@@ -48,6 +48,26 @@ class TestClass
 ";
 		await CSharpAnalyzerVerifier<SymbolicExecutionAnalyzer>.VerifyAnalyzerAsync(source);
 	}
+	
+	[Fact]
+	[Trait("Category", "System")]
+	public async Task TestNonCompilingCodeWillNotAnalyze()
+	{
+		var source = @$"using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
+class TestClass
+{{
+	[SymbolicallyAnalyze]
+	void SayHello()
+	{{
+		asdfasdf
+	}}
+}}
+";
+		await CSharpAnalyzerVerifier<SymbolicExecutionAnalyzer>.VerifyAnalyzerAsync(
+			source,
+			DiagnosticResult.CompilerError("CS0103").WithLocation(7, 3),
+			DiagnosticResult.CompilerError("CS1002").WithLocation(7, 11));
+	}
 
 	/// <summary>
 	/// Don't support pointers and fixed statements; produce a warning when they are attempted to be analyzed
@@ -86,25 +106,25 @@ public class Program
 		await CSharpAnalyzerVerifier<SymbolicExecutionAnalyzer>.VerifyAnalyzerAsync(source, expected);
 	}
 
-// 	[Fact]
-// 	public async Task TestThrowStatementCreatesDiagnostic()
-// 	{
-// 		var test = @$"using System;
-// using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
-// class TestClass
-// {{
-// 	[SymbolicallyAnalyze]
-// 	void SayHello()
-// 	{{
-// 		throw new InvalidOperationException();
-// 	}}
-// }}
-// ";
-// 		var expected = VerifyCS.Diagnostic(descriptor: MayThrowDiagnosticDescriptor.DiagnosticDescriptor)
-// 			.WithLocation(10, 3)
-// 			.WithMessage("The statement 'throw new InvalidOperationException();' may throw unhandled exceptions");
-// 		await VerifyCS.VerifyAnalyzerAsync(test, expected);
-// 	}
+	[Fact]
+	public async Task TestThrowStatementCreatesDiagnostic()
+	{
+		var test = @$"using System;
+using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
+class TestClass
+{{
+	[SymbolicallyAnalyze]
+	void SayHello()
+	{{
+		throw new InvalidOperationException();
+	}}
+}}
+";
+		var expected = VerifyCS.Diagnostic(descriptor: MayThrowDiagnosticDescriptor.DiagnosticDescriptor)
+			.WithLocation(8, 3)
+			.WithMessage("The exception 'InvalidOperationException' may be thrown here and not caught");
+		await VerifyCS.VerifyAnalyzerAsync(test, expected);
+	}
 //
 // 	[Fact]
 // 	public async Task TestIfTrueCondition()

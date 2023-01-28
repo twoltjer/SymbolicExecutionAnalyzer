@@ -6,8 +6,7 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 {
 	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
 		MayThrowDiagnosticDescriptor.DiagnosticDescriptor,
-		UnexpectedValueDiagnosticDescriptor.DiagnosticDescriptor,
-		UnhandledSyntaxDiagnosticDescriptor.DiagnosticDescriptor
+		AnalysisFailureDiagnosticDescriptor.DiagnosticDescriptor
 		);
 
 	public SyntaxNodeHandler[] SyntaxNodeHandlers => Array.Empty<SyntaxNodeHandler>();
@@ -21,6 +20,11 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 
 	private static void AnalyzeSymbol(CodeBlockAnalysisContext context)
 	{
+		// Check if code block has existing error diagnostics
+		if (context.SemanticModel.GetDiagnostics(context.CodeBlock.Span, context.CancellationToken).Any(d => d.Severity == DiagnosticSeverity.Error))
+		{
+			return;
+		}
 		// Check if the method has the attribute that indicates it should be analyzed
 		// for reachable throw statements.
 		var model = context.SemanticModel;
@@ -41,7 +45,19 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 		foreach (var method in methodsToAnalyze)
 		{
 			var methodAnalyzer = new AbstractMethodAnalyzer();
-			var methodAnalysis = methodAnalyzer.Analyze(method);
+			SymbolicExecutionResult methodAnalysis;
+			try
+			{
+				methodAnalysis = methodAnalyzer.Analyze(method);
+			}
+			catch (Exception e)
+			{
+				var failure = new AnalysisFailure(
+					$"An exception occurred during analysis: {e}",
+					method.SourceLocation);
+				context.ReportDiagnostic(failure);
+				return;
+			}
 			foreach (var failure in methodAnalysis.AnalysisFailures)
 				context.ReportDiagnostic(failure);
 			foreach (var exception in methodAnalysis.UnhandledExceptions)
@@ -67,22 +83,6 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 		return string.IsNullOrEmpty(containingNamespaceName)
 			? symbol.Name
 			: $"{containingNamespaceName}.{symbol.Name}";
-	}
-
-	private static void HandleInvalidContext(SymbolAnalysisContext context)
-	{
-		var location = context.Symbol.Locations.FirstOrDefault();
-		if (location == null)
-		{
-			Debug.Fail("This should be unreachable, as there should be at least one location");
-			return;
-		}
-
-		var diagnostic = Diagnostic.Create(
-			UnexpectedValueDiagnosticDescriptor.DiagnosticDescriptor,
-			location
-			);
-		context.ReportDiagnostic(diagnostic);
 	}
 }
 
