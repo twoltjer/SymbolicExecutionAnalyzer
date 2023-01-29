@@ -47,7 +47,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 		var result = node switch
 		{
 			BlockSyntax => new BlockSyntaxAbstraction(children, symbol) as TAbstractedType,
-			IdentifierNameSyntax identifierNameSyntax => new IdentifierNameSyntaxAbstraction(children, symbol) as TAbstractedType,
+			IdentifierNameSyntax => new IdentifierNameSyntaxAbstraction(children, symbol) as TAbstractedType,
 			UsingDirectiveSyntax => new UsingDirectiveSyntaxAbstraction(children, symbol) as TAbstractedType,
 			CompilationUnitSyntax => new CompilationUnitSyntaxAbstraction(children, symbol) as TAbstractedType,
 			QualifiedNameSyntax => new QualifiedNameSyntaxAbstraction(children, symbol) as TAbstractedType,

@@ -2,7 +2,7 @@ namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
 public abstract class SyntaxNodeAbstraction : ISyntaxNodeAbstraction
 {
-	public SyntaxNodeAbstraction(ImmutableArray<SyntaxNodeAbstraction> children, ISymbol? symbol)
+	protected SyntaxNodeAbstraction(ImmutableArray<SyntaxNodeAbstraction> children, ISymbol? symbol)
 	{
 		Children = children;
 		Symbol = symbol;

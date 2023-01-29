@@ -26,12 +26,12 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 			return new AnalysisFailure("Expected object creation syntax to have two children (type and argument list)", _location);
 		}
 
-		if (Children[0] is not IIdentifierNameSyntaxAbstraction nameSyntax)
+		if (Children[0] is not IIdentifierNameSyntaxAbstraction)
 		{
 			return new AnalysisFailure("Expected object creation syntax to have an identifier name as its first child", _location);
 		}
 		
-		if (Children[1] is not IArgumentListSyntaxAbstraction argumentListSyntax)
+		if (Children[1] is not IArgumentListSyntaxAbstraction)
 		{
 			return new AnalysisFailure("Expected object creation syntax to have an argument list as its second child", _location);
 		}
