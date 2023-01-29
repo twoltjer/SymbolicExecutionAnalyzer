@@ -33,7 +33,7 @@ public static partial class CSharpAnalyzerVerifier<TAnalyzer>
 		};
 		var nugetFilePath = Path.Combine(
 			new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.Parent.FullName,
-			"NuGet.Config"
+			"NuGet.Config.Test"
 			);
 		new FileInfo(nugetFilePath).Exists.Should().BeTrue("NuGet.Config file should exist");
 		var testReferenceAssemblies = test.ReferenceAssemblies.WithNuGetConfigFilePath(nugetFilePath).WithPackages(

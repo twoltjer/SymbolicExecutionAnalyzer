@@ -1,6 +1,6 @@
 namespace SymbolicExecution;
 
-public struct SymbolicExecutionWalker : ISymbolicExecutionWalker<SymbolicExecutionResult>
+public struct SymbolicExecutionWalker : ISymbolicExecutionWalker
 {
 	public SymbolicExecutionWalker(Compilation contextCompilation, CancellationToken contextCancellationToken)
 	{
@@ -11,7 +11,7 @@ public struct SymbolicExecutionWalker : ISymbolicExecutionWalker<SymbolicExecuti
 	private Compilation Compilation { get; }
 	private CancellationToken CancellationToken { get; }
 
-	public SymbolicExecutionResult Analyze(ISyntaxNodeAbstraction node)
+	public IAnalysisResult Analyze(ISyntaxNodeAbstraction node)
 	{
 		return new SymbolicExecutionResult(
 			ImmutableArray<ISymbolicExecutionException>.Empty,
