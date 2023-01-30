@@ -2,13 +2,13 @@ namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
 public abstract class SyntaxNodeAbstraction : ISyntaxNodeAbstraction
 {
-	protected SyntaxNodeAbstraction(ImmutableArray<SyntaxNodeAbstraction> children, ISymbol? symbol)
+	protected SyntaxNodeAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol)
 	{
 		Children = children;
 		Symbol = symbol;
 	}
 
-	public ImmutableArray<SyntaxNodeAbstraction> Children { get; }
+	public ImmutableArray<ISyntaxNodeAbstraction> Children { get; }
 	public IEnumerable<ISyntaxNodeAbstraction> GetDescendantNodes(bool includeSelf)
 	{
 		foreach (var child in Children)

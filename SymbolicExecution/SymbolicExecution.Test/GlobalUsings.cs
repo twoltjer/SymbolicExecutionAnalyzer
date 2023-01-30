@@ -12,5 +12,7 @@ global using Microsoft.CodeAnalysis.Diagnostics;
 global using Microsoft.CodeAnalysis.Testing;
 global using Microsoft.CodeAnalysis.Testing.Verifiers;
 global using Microsoft.CodeAnalysis.VisualBasic.Testing;
+global using Moq;
+global using SymbolicExecution.AbstractSyntaxTree.Interfaces;
 global using Xunit;
 global using VerifyCS = SymbolicExecution.Test.Verifiers.CSharpAnalyzerVerifier<SymbolicExecution.SymbolicExecutionAnalyzer>;

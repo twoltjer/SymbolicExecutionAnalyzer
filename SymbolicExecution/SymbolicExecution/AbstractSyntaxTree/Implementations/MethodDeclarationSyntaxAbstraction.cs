@@ -5,7 +5,7 @@ public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbs
 	public Location? SourceLocation { get; }
 
 	public MethodDeclarationSyntaxAbstraction(
-		ImmutableArray<SyntaxNodeAbstraction> children,
+		ImmutableArray<ISyntaxNodeAbstraction> children,
 		ISymbol? symbol,
 		Location? sourceLocation
 		) : base(children, symbol)

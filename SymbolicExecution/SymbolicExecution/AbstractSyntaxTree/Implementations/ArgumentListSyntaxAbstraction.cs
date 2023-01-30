@@ -2,7 +2,7 @@ namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
 public class ArgumentListSyntaxAbstraction : BaseArgumentListSyntaxAbstraction, IArgumentListSyntaxAbstraction
 {
-	public ArgumentListSyntaxAbstraction(ImmutableArray<SyntaxNodeAbstraction> children, ISymbol? symbol) : base(children, symbol)
+	public ArgumentListSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol) : base(children, symbol)
 	{
 	}
 

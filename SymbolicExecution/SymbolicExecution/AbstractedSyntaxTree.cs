@@ -37,7 +37,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 			return potentialFailure.T2Value;
 		}
 
-		var children = childrenOrFailures.Select(x => x.T1Value).ToImmutableArray();
+		var children = childrenOrFailures.Select(x => x.T1Value as ISyntaxNodeAbstraction).ToImmutableArray();
 
 		var symbol = model.GetDeclaredSymbol(node);
 		var typeInfo = model.GetTypeInfo(node);

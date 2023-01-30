@@ -6,7 +6,7 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 	private readonly ITypeSymbol? _actualTypeSymbol;
 	private readonly ITypeSymbol? _convertedTypeSymbol;
 
-	public ObjectCreationExpressionSyntaxAbstraction(ImmutableArray<SyntaxNodeAbstraction> children, ISymbol? symbol,
+	public ObjectCreationExpressionSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol,
 		Location location, ITypeSymbol? actualTypeSymbol, ITypeSymbol? convertedTypeSymbol) : base(children, symbol)
 	{
 		_location = location;

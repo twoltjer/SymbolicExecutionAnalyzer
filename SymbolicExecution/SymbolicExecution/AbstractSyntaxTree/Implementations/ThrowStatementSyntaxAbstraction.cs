@@ -4,7 +4,7 @@ public class ThrowStatementSyntaxAbstraction : StatementSyntaxAbstraction, IThro
 {
 	private readonly Location _location;
 
-	public ThrowStatementSyntaxAbstraction(ImmutableArray<SyntaxNodeAbstraction> children, ISymbol? symbol,
+	public ThrowStatementSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol,
 		Location location) : base(children, symbol)
 	{
 		_location = location;
