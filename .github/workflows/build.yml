@@ -50,7 +50,7 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"twoltjer_SymbolicExecutionAnalyzer" /o:"twtduck" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths=coverage.xml
           dotnet build
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
-          & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*"
+          & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*"  -excludebyattribute:*.ExcludeFromCodeCoverage*
           $ProgressPreference = 'SilentlyContinue'
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
           .\codecov.exe -f "coverage.xml"
