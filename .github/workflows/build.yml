@@ -53,4 +53,8 @@ jobs:
       - name: Coverage
         shell: powershell
         run: |
-          .\coverage.ps1
+          $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
+          & $ocpath -register -target:"dotnet.exe" -targetargs:"test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*"
+          $ProgressPreference = 'SilentlyContinue'
+          Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
+          .\codecov.exe -f "coverage.xml"
