@@ -16,7 +16,7 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 
 	public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)
 	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Object creation syntax should not be traversed, but evaluated as an expression", _location);
 	}
 
 	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
@@ -30,7 +30,7 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 		{
 			return new AnalysisFailure("Expected object creation syntax to have an identifier name as its first child", _location);
 		}
-		
+
 		if (Children[1] is not IArgumentListSyntaxAbstraction)
 		{
 			return new AnalysisFailure("Expected object creation syntax to have an argument list as its second child", _location);
@@ -40,7 +40,7 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 		{
 			return new AnalysisFailure("Expected object creation syntax to have an actual type symbol", _location);
 		}
-		
+
 		if (_convertedTypeSymbol is null)
 		{
 			return new AnalysisFailure("Expected object creation syntax to have a converted type symbol", _location);
