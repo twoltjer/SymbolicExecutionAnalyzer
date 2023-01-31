@@ -12,11 +12,11 @@ public class CompilationUnitSyntaxAbstraction : CSharpSyntaxNodeAbstraction, ICo
 
 	public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)
 	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Cannot analyze compilation units", Location);
 	}
 
 	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Cannot analyze compilation units", Location);
 	}
 }

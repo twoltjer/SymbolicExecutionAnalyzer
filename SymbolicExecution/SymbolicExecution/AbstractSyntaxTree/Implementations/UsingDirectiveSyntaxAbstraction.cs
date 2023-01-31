@@ -12,11 +12,11 @@ public class UsingDirectiveSyntaxAbstraction : CSharpSyntaxNodeAbstraction, IUsi
 
 	public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)
 	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Cannot analyze using directives", Location);
 	}
 
 	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Cannot analyze using directives", Location);
 	}
 }

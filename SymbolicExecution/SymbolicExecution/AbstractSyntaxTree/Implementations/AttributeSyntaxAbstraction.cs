@@ -12,11 +12,11 @@ public class AttributeSyntaxAbstraction : CSharpSyntaxNodeAbstraction, IAttribut
 
 	public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)
 	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Cannot analyze attributes", Location);
 	}
 
 	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Cannot analyze attributes", Location);
 	}
 }
