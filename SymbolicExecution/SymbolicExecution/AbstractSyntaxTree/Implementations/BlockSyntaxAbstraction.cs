@@ -19,12 +19,17 @@ public class BlockSyntaxAbstraction : StatementSyntaxAbstraction, IBlockSyntaxAb
 			foreach (var state in current)
 			{
 				if (state.CurrentException != null)
+				{
 					nextIteration.Add(state);
-				var results = child.AnalyzeNode(state);
-				if (results.IsT1)
-					nextIteration.AddRange(results.T1Value);
+				}
 				else
-					return results.T2Value;
+				{
+					var results = child.AnalyzeNode(state);
+					if (results.IsT1)
+						nextIteration.AddRange(results.T1Value);
+					else
+						return results.T2Value;
+				}
 			}
 
 			current = nextIteration;
