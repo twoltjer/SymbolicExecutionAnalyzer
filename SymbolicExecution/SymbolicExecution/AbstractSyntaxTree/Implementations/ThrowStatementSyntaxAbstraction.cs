@@ -25,6 +25,6 @@ public class ThrowStatementSyntaxAbstraction : StatementSyntaxAbstraction, IThro
 
 	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Cannot analyze throw statements", Location);
 	}
 }
