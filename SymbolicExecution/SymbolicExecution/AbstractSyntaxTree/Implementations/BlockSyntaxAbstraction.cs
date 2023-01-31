@@ -18,7 +18,7 @@ public class BlockSyntaxAbstraction : StatementSyntaxAbstraction, IBlockSyntaxAb
 			var nextIteration = new List<IAnalysisState>();
 			foreach (var state in current)
 			{
-				if (state.CurrentException.HasValue)
+				if (state.CurrentException != null)
 					nextIteration.Add(state);
 				var results = child.AnalyzeNode(state);
 				if (results.IsT1)

@@ -24,8 +24,8 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 
 		var unhandledExceptions = resultStates.T1Value
 			.Select(state => state.CurrentException)
-			.Where(exception => exception.HasValue)
-			.Select(exception => exception!.Value)
+			.Where(exception => exception != null)
+			.Select(exception => exception!)
 			.Distinct()
 			.Select(ConvertToResultException)
 			.ToImmutableArray();
@@ -35,7 +35,7 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 			);
 	}
 
-	private ISymbolicExecutionException ConvertToResultException(ExceptionThrownState exceptionState)
+	private ISymbolicExecutionException ConvertToResultException(IExceptionThrownState exceptionState)
 	{
 		return new SymbolicExecutionException(exceptionState.Location, exceptionState.Exception.ActualTypeSymbol);
 	}
