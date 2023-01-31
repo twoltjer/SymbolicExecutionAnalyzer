@@ -16,7 +16,8 @@ public class IdentifierNameSyntaxAbstractionTests
 		var symbol = hasSymbol
 			? Mock.Of<ISymbol>(MockBehavior.Strict)
 			: null;
-		var subject = new IdentifierNameSyntaxAbstraction(children.ToImmutableArray(), symbol);
+		var location = Mock.Of<Location>(MockBehavior.Strict);
+		var subject = new IdentifierNameSyntaxAbstraction(children.ToImmutableArray(), symbol, location);
 		var previous = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var result = subject.AnalyzeNode(previous);
 		result.IsT1.Should().BeTrue();

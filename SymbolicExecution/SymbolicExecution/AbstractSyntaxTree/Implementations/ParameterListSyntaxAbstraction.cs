@@ -2,7 +2,11 @@ namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
 public class ParameterListSyntaxAbstraction : BaseParameterListSyntaxAbstraction, IParameterListSyntaxAbstraction
 {
-	public ParameterListSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol) : base(children, symbol)
+	public ParameterListSyntaxAbstraction(
+		ImmutableArray<ISyntaxNodeAbstraction> children,
+		ISymbol? symbol,
+		Location location
+		) : base(children, symbol, location)
 	{
 	}
 

@@ -2,7 +2,11 @@ namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
 public class BlockSyntaxAbstraction : StatementSyntaxAbstraction, IBlockSyntaxAbstraction
 {
-	public BlockSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol) : base(children, symbol)
+	public BlockSyntaxAbstraction(
+		ImmutableArray<ISyntaxNodeAbstraction> children,
+		ISymbol? symbol,
+		Location location
+		) : base(children, symbol, location)
 	{
 	}
 
@@ -22,7 +26,7 @@ public class BlockSyntaxAbstraction : StatementSyntaxAbstraction, IBlockSyntaxAb
 				else
 					return results.T2Value;
 			}
-			
+
 			current = nextIteration;
 		}
 

@@ -1,9 +1,9 @@
 namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
-public abstract class BaseParameterListSyntaxAbstraction : CSharpSyntaxNodeAbstraction,
-	IBaseParameterListSyntaxAbstraction
+public abstract class TypeDeclarationSyntaxAbstraction : BaseTypeDeclarationSyntaxAbstraction,
+	ITypeDeclarationSyntaxAbstraction
 {
-	protected BaseParameterListSyntaxAbstraction(
+	protected TypeDeclarationSyntaxAbstraction(
 		ImmutableArray<ISyntaxNodeAbstraction> children,
 		ISymbol? symbol,
 		Location location

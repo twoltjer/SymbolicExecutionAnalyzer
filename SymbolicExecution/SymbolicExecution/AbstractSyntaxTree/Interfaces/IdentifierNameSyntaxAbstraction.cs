@@ -2,7 +2,11 @@ namespace SymbolicExecution.AbstractSyntaxTree.Interfaces;
 
 public class IdentifierNameSyntaxAbstraction : SimpleNameSyntaxAbstraction, IIdentifierNameSyntaxAbstraction
 {
-	public IdentifierNameSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol) : base(children, symbol)
+	public IdentifierNameSyntaxAbstraction(
+		ImmutableArray<ISyntaxNodeAbstraction> children,
+		ISymbol? symbol,
+		Location location
+		) : base(children, symbol, location)
 	{
 	}
 

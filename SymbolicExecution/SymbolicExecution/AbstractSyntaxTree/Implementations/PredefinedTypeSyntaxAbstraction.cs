@@ -2,7 +2,11 @@ namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
 public class PredefinedTypeSyntaxAbstraction : TypeSyntaxAbstraction, IPredefinedTypeSyntaxAbstraction
 {
-	public PredefinedTypeSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol) : base(children, symbol)
+	public PredefinedTypeSyntaxAbstraction(
+		ImmutableArray<ISyntaxNodeAbstraction> children,
+		ISymbol? symbol,
+		Location location
+		) : base(children, symbol, location)
 	{
 	}
 

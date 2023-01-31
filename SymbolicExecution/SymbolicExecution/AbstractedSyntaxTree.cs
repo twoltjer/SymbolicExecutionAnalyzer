@@ -43,23 +43,24 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 		var typeInfo = model.GetTypeInfo(node);
 		var convertedTypeSymbol = typeInfo.ConvertedType;
 		var actualTypeSymbol = typeInfo.Type;
+		var location = node.GetLocation();
 
 		var result = node switch
 		{
-			BlockSyntax => new BlockSyntaxAbstraction(children, symbol) as TAbstractedType,
-			IdentifierNameSyntax => new IdentifierNameSyntaxAbstraction(children, symbol) as TAbstractedType,
-			UsingDirectiveSyntax => new UsingDirectiveSyntaxAbstraction(children, symbol) as TAbstractedType,
-			CompilationUnitSyntax => new CompilationUnitSyntaxAbstraction(children, symbol) as TAbstractedType,
-			QualifiedNameSyntax => new QualifiedNameSyntaxAbstraction(children, symbol) as TAbstractedType,
-			AttributeSyntax => new AttributeSyntaxAbstraction(children, symbol) as TAbstractedType,
-			AttributeListSyntax => new AttributeListSyntaxAbstraction(children, symbol) as TAbstractedType,
-			PredefinedTypeSyntax => new PredefinedTypeSyntaxAbstraction(children, symbol) as TAbstractedType,
-			ParameterListSyntax => new ParameterListSyntaxAbstraction(children, symbol) as TAbstractedType,
-			ArgumentListSyntax => new ArgumentListSyntaxAbstraction(children, symbol) as TAbstractedType,
-			ObjectCreationExpressionSyntax objectCreationExpressionSyntax => new ObjectCreationExpressionSyntaxAbstraction(children, symbol, objectCreationExpressionSyntax.GetLocation(), actualTypeSymbol, convertedTypeSymbol) as TAbstractedType,
-			ThrowStatementSyntax throwStatementSyntax => new ThrowStatementSyntaxAbstraction(children, symbol, throwStatementSyntax.GetLocation()) as TAbstractedType,
-			MethodDeclarationSyntax methodDeclarationSyntax => new MethodDeclarationSyntaxAbstraction(children, symbol, methodDeclarationSyntax.GetLocation()) as TAbstractedType,
-			ClassDeclarationSyntax => new ClassDeclarationSyntaxAbstraction(children, symbol) as TAbstractedType,
+			BlockSyntax => new BlockSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			IdentifierNameSyntax => new IdentifierNameSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			UsingDirectiveSyntax => new UsingDirectiveSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			CompilationUnitSyntax => new CompilationUnitSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			QualifiedNameSyntax => new QualifiedNameSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			AttributeSyntax => new AttributeSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			AttributeListSyntax => new AttributeListSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			PredefinedTypeSyntax => new PredefinedTypeSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			ParameterListSyntax => new ParameterListSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			ArgumentListSyntax => new ArgumentListSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			ObjectCreationExpressionSyntax => new ObjectCreationExpressionSyntaxAbstraction(children, symbol, location, actualTypeSymbol, convertedTypeSymbol) as TAbstractedType,
+			ThrowStatementSyntax => new ThrowStatementSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			MethodDeclarationSyntax => new MethodDeclarationSyntaxAbstraction(children, symbol, location) as TAbstractedType,
+			ClassDeclarationSyntax => new ClassDeclarationSyntaxAbstraction(children, symbol, location) as TAbstractedType,
 			_ => null,
 		};
 

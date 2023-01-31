@@ -2,7 +2,11 @@ namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
 public class AttributeListSyntaxAbstraction : CSharpSyntaxNodeAbstraction, IAttributeListSyntaxAbstraction
 {
-	public AttributeListSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol) : base(children, symbol)
+	public AttributeListSyntaxAbstraction(
+		ImmutableArray<ISyntaxNodeAbstraction> children,
+		ISymbol? symbol,
+		Location location
+		) : base(children, symbol, location)
 	{
 	}
 
