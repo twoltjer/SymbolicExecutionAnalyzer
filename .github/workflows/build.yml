@@ -41,7 +41,7 @@ jobs:
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-      - name: Build and analyze (SonarScanner and CodeCov)
+      - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -51,7 +51,70 @@ jobs:
           dotnet build
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+  coverage-unittests:
+    name: Unit Test Coverage
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Build and test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: powershell
+        run: |
+          dotnet build
+          $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
+          & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build --filter Category=Unit /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
           $ProgressPreference = 'SilentlyContinue'
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
-          .\codecov.exe -f "coverage.xml"
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          .\codecov.exe -f "coverage.xml" --flag unittests --name "Unit Tests"
+  coverage-systemtests:
+    name: System Test Coverage
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Build and test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: powershell
+        run: |
+          dotnet build
+          $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
+          & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build --filter Category=System /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
+          $ProgressPreference = 'SilentlyContinue'
+          Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
+          .\codecov.exe -f "coverage.xml" --flag systemtests --name "System Tests"
+  coverage-alltests:
+    name: Total Test Coverage
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Build and test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: powershell
+        run: |
+          dotnet build
+          $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
+          & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
+          $ProgressPreference = 'SilentlyContinue'
+          Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
+          .\codecov.exe -f "coverage.xml" --flag alltests --name "All Tests"
