@@ -41,14 +41,18 @@ jobs:
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-      - name: Build and analyze
+      - name: Build control package
+        shell: powershell
+        run: |
+          dotnet build SymbolicExecution/SymbolicExecution.Control
+      - name: Build and analyze analyzer and tests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"twoltjer_SymbolicExecutionAnalyzer" /o:"twtduck" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths=coverage.xml
-          dotnet build
+          dotnet build SymbolicExecution/SymbolicExecution.Test
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
@@ -63,17 +67,21 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 6.0.x
-      - name: Build and test
+      - name: Build control package
+        shell: powershell
+        run: |
+          dotnet build SymbolicExecution/SymbolicExecution.Control
+      - name: Build and unit test analyzer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: powershell
         run: |
-          dotnet build
+          dotnet build SymbolicExecution/SymbolicExecution.Test
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build --filter Category=Unit /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
           $ProgressPreference = 'SilentlyContinue'
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
-          .\codecov.exe -f "coverage.xml" --flag unittests --name "Unit Tests"
+          .\codecov.exe -f "coverage.xml" -F unittests --name "Unit Tests"
   coverage-systemtests:
     name: System Test Coverage
     runs-on: windows-latest
@@ -85,17 +93,21 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 6.0.x
-      - name: Build and test
+      - name: Build control package
+        shell: powershell
+        run: |
+          dotnet build SymbolicExecution/SymbolicExecution.Control
+      - name: Build and system test analyzer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: powershell
         run: |
-          dotnet build
+          dotnet build SymbolicExecution/SymbolicExecution.Test
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build --filter Category=System /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
           $ProgressPreference = 'SilentlyContinue'
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
-          .\codecov.exe -f "coverage.xml" --flag systemtests --name "System Tests"
+          .\codecov.exe -f "coverage.xml" -F systemtests --name "System Tests"
   coverage-alltests:
     name: Total Test Coverage
     runs-on: windows-latest
@@ -107,14 +119,40 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 6.0.x
-      - name: Build and test
+      - name: Build control package
+        shell: powershell
+        run: |
+          dotnet build SymbolicExecution/SymbolicExecution.Control
+      - name: Build and test analyzer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: powershell
         run: |
-          dotnet build
+          dotnet build SymbolicExecution/SymbolicExecution.Test
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
           $ProgressPreference = 'SilentlyContinue'
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
-          .\codecov.exe -f "coverage.xml" --flag alltests --name "All Tests"
+          .\codecov.exe -f "coverage.xml" -F alltests --name "All Tests"
+  msbuild:
+    name: Build whole solution (MSBuild)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Setup MSBuild.exe
+        uses: microsoft/setup-msbuild@v1
+      - name: Build control package
+        shell: powershell
+        run: |
+          dotnet build SymbolicExecution/SymbolicExecution.Control
+      - name: Build and test
+        shell: powershell
+        run: |
+          dotnet restore
+          msbuild
