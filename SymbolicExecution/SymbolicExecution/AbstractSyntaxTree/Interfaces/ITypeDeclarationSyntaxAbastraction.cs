@@ -1,5 +1,0 @@
-namespace SymbolicExecution.AbstractSyntaxTree.Interfaces;
-
-public interface ITypeDeclarationSyntaxAbastraction : IBaseTypeDeclarationSyntaxAbstraction
-{
-}

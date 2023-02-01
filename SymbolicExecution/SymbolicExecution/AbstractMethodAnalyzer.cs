@@ -8,7 +8,7 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 		{
 			return new SymbolicExecutionResult(
 				ImmutableArray<ISymbolicExecutionException>.Empty,
-				new[] { new AnalysisFailure($"Could not get an {nameof(IBlockSyntaxAbstraction)} from the method {method}", method.SourceLocation) }.ToImmutableArray()
+				new[] { new AnalysisFailure($"Could not get an {nameof(IBlockSyntaxAbstraction)} from the method {method}", method.Location) }.ToImmutableArray()
 				);
 		}
 
@@ -21,11 +21,11 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 				ImmutableArray<ISymbolicExecutionException>.Empty,
 				new[] { resultStates.T2Value }.ToImmutableArray()
 				);
-		
+
 		var unhandledExceptions = resultStates.T1Value
 			.Select(state => state.CurrentException)
-			.Where(exception => exception.HasValue)
-			.Select(exception => exception!.Value)
+			.Where(exception => exception != null)
+			.Select(exception => exception!)
 			.Distinct()
 			.Select(ConvertToResultException)
 			.ToImmutableArray();
@@ -35,7 +35,7 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 			);
 	}
 
-	private ISymbolicExecutionException ConvertToResultException(ExceptionThrownState exceptionState)
+	private ISymbolicExecutionException ConvertToResultException(IExceptionThrownState exceptionState)
 	{
 		return new SymbolicExecutionException(exceptionState.Location, exceptionState.Exception.ActualTypeSymbol);
 	}

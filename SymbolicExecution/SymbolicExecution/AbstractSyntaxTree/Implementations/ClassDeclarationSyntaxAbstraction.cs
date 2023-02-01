@@ -1,18 +1,17 @@
 namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
-public class ClassDeclarationSyntaxAbstraction : TypeDeclarationSyntaxAbastraction, IClassDeclarationSyntaxAbstraction
+public class ClassDeclarationSyntaxAbstraction : TypeDeclarationSyntaxAbstraction, IClassDeclarationSyntaxAbstraction
 {
-	public ClassDeclarationSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol) : base(children, symbol)
-	{
+	public ClassDeclarationSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol, Location location) : base(children, symbol, location) {
 	}
 
 	public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)
 	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Cannot analyze class declarations", Location);
 	}
 
-	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Cannot analyze class declarations", Location);
 	}
 }

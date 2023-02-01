@@ -1,5 +1,5 @@
 namespace SymbolicExecution.AbstractSyntaxTree.Interfaces;
 
-public interface IClassDeclarationSyntaxAbstraction : ITypeDeclarationSyntaxAbastraction
+public interface IClassDeclarationSyntaxAbstraction : ITypeDeclarationSyntaxAbstraction
 {
 }

@@ -2,10 +2,11 @@ namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
 public abstract class SyntaxNodeAbstraction : ISyntaxNodeAbstraction
 {
-	protected SyntaxNodeAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol)
+	protected SyntaxNodeAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol, Location location)
 	{
 		Children = children;
 		Symbol = symbol;
+		Location = location;
 	}
 
 	public ImmutableArray<ISyntaxNodeAbstraction> Children { get; }
@@ -30,5 +31,6 @@ public abstract class SyntaxNodeAbstraction : ISyntaxNodeAbstraction
 	public abstract TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous);
 
 	public ISymbol? Symbol { get; }
-	public abstract TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state);
+	public abstract TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state);
+	public Location Location { get; }
 }

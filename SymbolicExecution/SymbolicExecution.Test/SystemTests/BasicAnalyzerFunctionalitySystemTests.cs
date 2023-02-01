@@ -107,6 +107,7 @@ public class Program
 	}
 
 	[Fact]
+	[Trait("Category", "System")]
 	public async Task TestThrowStatementCreatesDiagnostic()
 	{
 		var test = @$"using System;

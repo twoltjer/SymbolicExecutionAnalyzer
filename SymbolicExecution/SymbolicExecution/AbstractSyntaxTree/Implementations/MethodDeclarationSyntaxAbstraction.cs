@@ -2,15 +2,12 @@ namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
 public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbstraction, IMethodDeclarationSyntaxAbstraction
 {
-	public Location? SourceLocation { get; }
-
 	public MethodDeclarationSyntaxAbstraction(
 		ImmutableArray<ISyntaxNodeAbstraction> children,
 		ISymbol? symbol,
-		Location? sourceLocation
-		) : base(children, symbol)
+		Location location
+		) : base(children, symbol, location)
 	{
-		SourceLocation = sourceLocation;
 	}
 
 	public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)
@@ -18,7 +15,7 @@ public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbs
 		throw new NotImplementedException();
 	}
 
-	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
 		throw new NotImplementedException();
 	}

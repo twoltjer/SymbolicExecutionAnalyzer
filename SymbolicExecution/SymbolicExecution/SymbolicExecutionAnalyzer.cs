@@ -54,7 +54,7 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 			{
 				var failure = new AnalysisFailure(
 					$"An exception occurred during analysis: {e}",
-					method.SourceLocation);
+					method.Location);
 				context.ReportDiagnostic(failure);
 				return;
 			}
