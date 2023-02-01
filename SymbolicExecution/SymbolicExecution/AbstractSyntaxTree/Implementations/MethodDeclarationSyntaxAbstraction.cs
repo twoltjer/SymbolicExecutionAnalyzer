@@ -15,7 +15,7 @@ public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbs
 		throw new NotImplementedException();
 	}
 
-	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
 		throw new NotImplementedException();
 	}

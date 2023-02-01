@@ -23,7 +23,7 @@ public class ThrowStatementSyntaxAbstraction : StatementSyntaxAbstraction, IThro
 		return new[] { thrownState };
 	}
 
-	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
 		return new AnalysisFailure("Cannot analyze throw statements", Location);
 	}

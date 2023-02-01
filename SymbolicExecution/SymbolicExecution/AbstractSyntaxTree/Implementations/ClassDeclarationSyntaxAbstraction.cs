@@ -10,7 +10,7 @@ public class ClassDeclarationSyntaxAbstraction : TypeDeclarationSyntaxAbstractio
 		return new AnalysisFailure("Cannot analyze class declarations", Location);
 	}
 
-	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
 		return new AnalysisFailure("Cannot analyze class declarations", Location);
 	}

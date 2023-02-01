@@ -17,7 +17,7 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 		return new AnalysisFailure("Object creation syntax should not be traversed, but evaluated as an expression", Location);
 	}
 
-	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
 		if (Children.Length != 2)
 		{

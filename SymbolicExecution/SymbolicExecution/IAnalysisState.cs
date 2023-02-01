@@ -3,5 +3,5 @@ namespace SymbolicExecution;
 public interface IAnalysisState
 {
 	IExceptionThrownState? CurrentException { get; }
-	IAnalysisState ThrowException(ObjectInstance exception, Location location);
+	IAnalysisState ThrowException(IObjectInstance exception, Location location);
 }

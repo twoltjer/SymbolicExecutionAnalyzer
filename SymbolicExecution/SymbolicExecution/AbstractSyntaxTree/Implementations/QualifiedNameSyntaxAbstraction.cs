@@ -15,7 +15,7 @@ public class QualifiedNameSyntaxAbstraction : NameSyntaxAbstraction, IQualifiedN
 		return new AnalysisFailure("Cannot analyze qualified names", Location);
 	}
 
-	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
 		return new AnalysisFailure("Cannot analyze qualified names", Location);
 	}

@@ -15,7 +15,7 @@ public class AttributeSyntaxAbstraction : CSharpSyntaxNodeAbstraction, IAttribut
 		return new AnalysisFailure("Cannot analyze attributes", Location);
 	}
 
-	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
 		return new AnalysisFailure("Cannot analyze attributes", Location);
 	}

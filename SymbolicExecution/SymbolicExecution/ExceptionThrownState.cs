@@ -2,13 +2,13 @@ namespace SymbolicExecution;
 
 public readonly struct ExceptionThrownState : IEquatable<ExceptionThrownState>, IExceptionThrownState
 {
-	public ExceptionThrownState(ObjectInstance exception, Location location)
+	public ExceptionThrownState(IObjectInstance exception, Location location)
 	{
 		Exception = exception;
 		Location = location;
 	}
 
-	public ObjectInstance Exception { get; }
+	public IObjectInstance Exception { get; }
 	public Location Location { get; }
 
 	public bool Equals(ExceptionThrownState other)

@@ -2,6 +2,6 @@ namespace SymbolicExecution;
 
 public interface IExceptionThrownState
 {
-	ObjectInstance Exception { get; }
+	IObjectInstance Exception { get; }
 	Location Location { get; }
 }

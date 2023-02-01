@@ -15,7 +15,7 @@ public class PredefinedTypeSyntaxAbstraction : TypeSyntaxAbstraction, IPredefine
 		return new AnalysisFailure("Cannot analyze predefined types", Location);
 	}
 
-	public override TaggedUnion<ObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
 	{
 		return new AnalysisFailure("Cannot analyze predefined types", Location);
 	}

@@ -70,8 +70,12 @@ public class AbstractMethodAnalyzerTests
 			MockBehavior.Strict
 			);
 		var exceptionTypeSymbol = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var exceptionConvertedTypeSymbol = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var exceptionObject = new ObjectInstance(exceptionTypeSymbol, exceptionConvertedTypeSymbol, exceptionLocation);
+		var exceptionObject = Mock.Of<IObjectInstance>(
+#pragma warning disable RS1024 // Compare symbols correctly
+			obj => obj.ActualTypeSymbol == exceptionTypeSymbol,
+#pragma warning restore RS1024
+			MockBehavior.Strict
+			);
 		var exceptionState = Mock.Of<IExceptionThrownState>(exception => exception.Location == exceptionLocation, MockBehavior.Strict);
 		Mock.Get(exceptionState)
 			.Setup(state => state.Exception)

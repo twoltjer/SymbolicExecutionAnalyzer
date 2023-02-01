@@ -49,11 +49,9 @@ public class ThrowStatementSyntaxAbstractionTests
 			new LinePositionSpan(new LinePosition(10, 10), new LinePosition(10, 12)));
 		var initialState = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var modifiedState = Mock.Of<IAnalysisState>(MockBehavior.Strict);
-		var exceptionTypeSymbol = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var convertedTypeSymbol = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
 		var throwLocation = Location.Create("Throw.cs", new TextSpan(0, 10),
 			new LinePositionSpan(new LinePosition(10, 10), new LinePosition(10, 12)));
-		var exceptionObject = new ObjectInstance(exceptionTypeSymbol, convertedTypeSymbol, exceptionLocation);
+		var exceptionObject = Mock.Of<IObjectInstance>(MockBehavior.Strict);
 		Mock.Get(initialState)
 			.Setup(state => state.ThrowException(exceptionObject, exceptionLocation))
 			.Returns(modifiedState);
@@ -63,7 +61,7 @@ public class ThrowStatementSyntaxAbstractionTests
 		var child = Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict);
 		Mock.Get(child)
 			.Setup(x => x.GetExpressionResult(initialState))
-			.Returns(exceptionObject);
+			.Returns(new TaggedUnion<IObjectInstance, AnalysisFailure>(exceptionObject));
 		var children = ImmutableArray.Create(child);
 		var subject = new ThrowStatementSyntaxAbstraction(children, null, throwLocation);
 		var result = subject.AnalyzeNode(initialState);

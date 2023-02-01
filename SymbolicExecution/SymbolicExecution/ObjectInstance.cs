@@ -1,6 +1,6 @@
 namespace SymbolicExecution;
 
-public struct ObjectInstance
+public struct ObjectInstance : IObjectInstance
 {
 	public ITypeSymbol ActualTypeSymbol { get; }
 	public ITypeSymbol ConvertedTypeSymbol { get; }
