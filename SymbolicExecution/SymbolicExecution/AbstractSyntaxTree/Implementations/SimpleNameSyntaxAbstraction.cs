@@ -5,8 +5,10 @@ public abstract class SimpleNameSyntaxAbstraction : NameSyntaxAbstraction, ISimp
 	protected SimpleNameSyntaxAbstraction(
 		ImmutableArray<ISyntaxNodeAbstraction> children,
 		ISymbol? symbol,
-		Location location
-		) : base(children, symbol, location)
+		Location location,
+		ITypeSymbol? actualTypeSymbol,
+		ITypeSymbol? convertedTypeSymbol
+		) : base(children, symbol, location, actualTypeSymbol, convertedTypeSymbol)
 	{
 	}
 }

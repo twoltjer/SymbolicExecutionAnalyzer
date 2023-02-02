@@ -12,12 +12,12 @@ public class IdentifierNameSyntaxAbstractionTests
 	{
 		var children = hasChildren
 			? new[] { Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict) }
-			: new IdentifierNameSyntaxAbstraction[0];
+			: Array.Empty<IdentifierNameSyntaxAbstraction>();
 		var symbol = hasSymbol
 			? Mock.Of<ISymbol>(MockBehavior.Strict)
 			: null;
 		var location = Mock.Of<Location>(MockBehavior.Strict);
-		var subject = new IdentifierNameSyntaxAbstraction(children.ToImmutableArray(), symbol, location);
+		var subject = new IdentifierNameSyntaxAbstraction(children.ToImmutableArray(), symbol, location, default, default);
 		var previous = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var result = subject.AnalyzeNode(previous);
 		result.IsT1.Should().BeTrue();

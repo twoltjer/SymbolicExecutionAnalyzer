@@ -8,6 +8,8 @@ public readonly struct SymbolicExecutionState : IAnalysisState
 	}
 
 	public IExceptionThrownState? CurrentException { get; }
+	public bool IsReachable => true;
+
 	public IAnalysisState ThrowException(IObjectInstance exception, Location location)
 	{
 		var exceptionThrownState = new ExceptionThrownState(exception, location);

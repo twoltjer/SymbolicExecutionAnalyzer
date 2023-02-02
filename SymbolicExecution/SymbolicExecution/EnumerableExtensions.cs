@@ -28,7 +28,7 @@ public static class EnumerableExtensions
 
 		return null;
 	}
-	
+
 	public static T? FirstOrNull<T>(this ImmutableArray<T> array, Predicate<T>? predicate = null) where T : struct
 	{
 		foreach (var item in array)
