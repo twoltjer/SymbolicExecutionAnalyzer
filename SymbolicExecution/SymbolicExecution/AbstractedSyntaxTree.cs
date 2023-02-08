@@ -106,6 +106,21 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				symbol,
 				location
 				),
+			VariableDeclaratorSyntax => new VariableDeclaratorSyntaxAbstraction(
+				children,
+				symbol,
+				location
+				),
+			VariableDeclarationSyntax => new VariableDeclarationSyntaxAbstraction(
+				children,
+				symbol,
+				location
+				),
+			LocalDeclarationStatementSyntax => new LocalDeclarationStatementSyntaxAbstraction(
+				children,
+				symbol,
+				location
+				),
 			_ => null,
 		};
 
