@@ -47,13 +47,14 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 		var actualTypeSymbol = typeInfo.Type;
 		var location = node.GetLocation();
 		var constantValue = _semanticModel.GetConstantValue(node);
+		var symbolInfo = _semanticModel.GetSymbolInfo(node);
 
 		var result = node switch
 		{
 			BlockSyntax => new BlockSyntaxAbstraction(children, symbol, location) as ISyntaxNodeAbstraction,
 			IdentifierNameSyntax => new IdentifierNameSyntaxAbstraction(
 				children,
-				symbol,
+				symbol ?? symbolInfo.Symbol,
 				location,
 				actualTypeSymbol,
 				convertedTypeSymbol
@@ -117,6 +118,18 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				location
 				),
 			LocalDeclarationStatementSyntax => new LocalDeclarationStatementSyntaxAbstraction(
+				children,
+				symbol,
+				location
+				),
+			AssignmentExpressionSyntax => new AssignmentExpressionSyntaxAbstraction(
+				children,
+				symbol,
+				location,
+				actualTypeSymbol,
+				convertedTypeSymbol
+				),
+			ExpressionStatementSyntax => new ExpressionStatementSyntaxAbstraction(
 				children,
 				symbol,
 				location

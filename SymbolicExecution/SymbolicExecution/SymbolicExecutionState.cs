@@ -4,7 +4,7 @@ public class SymbolicExecutionState : IAnalysisState
 {
 	private SymbolicExecutionState(
 		IExceptionThrownState? currentException,
-		IImmutableSet<(string name, ITypeSymbol type, IObjectInstance? instance)> localVariables
+		IImmutableDictionary<ILocalSymbol, IObjectInstance?> localVariables
 		)
 	{
 		CurrentException = currentException;
@@ -13,7 +13,7 @@ public class SymbolicExecutionState : IAnalysisState
 
 	public IExceptionThrownState? CurrentException { get; }
 
-	public IImmutableSet<(string name, ITypeSymbol type, IObjectInstance? instance)> LocalVariables { get; }
+	public IImmutableDictionary<ILocalSymbol, IObjectInstance?> LocalVariables { get; }
 	public bool IsReachable => true;
 
 	public IAnalysisState ThrowException(IObjectInstance exception, Location location)
@@ -22,17 +22,33 @@ public class SymbolicExecutionState : IAnalysisState
 		return new SymbolicExecutionState(exceptionThrownState, LocalVariables);
 	}
 
-	public IAnalysisState AddLocalVariable(string variableName, ITypeSymbol variableType)
+	public IAnalysisState AddLocalVariable(ILocalSymbol symbol)
 	{
-		var newLocalVariables = LocalVariables.Add((variableName, variableType, null));
+		var newLocalVariables = LocalVariables.Add(symbol, null);
 		return new SymbolicExecutionState(CurrentException, newLocalVariables);
+	}
+
+	public TaggedUnion<IAnalysisState, AnalysisFailure> SetSymbolValue(ISymbol symbol, IObjectInstance value)
+	{
+		if (symbol is not ILocalSymbol localSymbol)
+			return new AnalysisFailure("Cannot set the value of a non-local symbol", Location.None);
+
+		if (LocalVariables.ContainsKey(localSymbol))
+		{
+			var newLocalVariables = LocalVariables.SetItem((ILocalSymbol)symbol, value);
+			return new SymbolicExecutionState(CurrentException, newLocalVariables);
+		}
+		else
+		{
+			return new AnalysisFailure("Cannot set the value of a non-local symbol", Location.None);
+		}
 	}
 
 	public static IAnalysisState CreateInitialState()
 	{
 		return new SymbolicExecutionState(
 			currentException: null,
-			localVariables: ImmutableHashSet<(string name, ITypeSymbol type, IObjectInstance? instance)>.Empty
+			localVariables: ImmutableDictionary<ILocalSymbol, IObjectInstance?>.Empty
 			);
 	}
 }
