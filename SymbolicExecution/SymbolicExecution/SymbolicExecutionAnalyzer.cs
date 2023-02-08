@@ -71,7 +71,7 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 
 	private static bool IsSymbolicallyAnalyzeAttribute(AttributeData arg)
 	{
-		return BuildNamespaceAndName(arg.AttributeClass) == typeof(SymbolicallyAnalyzeAttribute).FullName;
+		return BuildNamespaceAndName(arg.AttributeClass) == "SymbolicExecution.Control.SymbolicallyAnalyzeAttribute";
 	}
 
 	private static string BuildNamespaceAndName(INamespaceOrTypeSymbol? symbol)

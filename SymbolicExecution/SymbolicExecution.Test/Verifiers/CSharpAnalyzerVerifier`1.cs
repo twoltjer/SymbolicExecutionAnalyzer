@@ -34,7 +34,7 @@ public static partial class CSharpAnalyzerVerifier<TAnalyzer>
 			);
 		new FileInfo(nugetFilePath).Exists.Should().BeTrue("NuGet.Config file should exist");
 		var testReferenceAssemblies = test.ReferenceAssemblies.WithNuGetConfigFilePath(nugetFilePath).WithPackages(
-			new[] { new PackageIdentity("SymbolicExecution.Control", "0.0.1") }.ToImmutableArray()
+			new[] { new PackageIdentity("SymbolicExecution.Control", "0.0.2.4") }.ToImmutableArray()
 			);
 		test.ReferenceAssemblies = testReferenceAssemblies;
 		test.ExpectedDiagnostics.AddRange(expected);
