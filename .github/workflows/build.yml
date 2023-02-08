@@ -40,11 +40,14 @@ jobs:
         shell: powershell
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Build control package
         shell: powershell
         run: |
           dotnet build SymbolicExecution/SymbolicExecution.Control
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Build and analyze analyzer and tests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,10 +55,15 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"twoltjer_SymbolicExecutionAnalyzer" /o:"twtduck" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths=coverage.xml
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           dotnet build SymbolicExecution/SymbolicExecution.Test
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
   coverage-unittests:
     name: Unit Test Coverage
     runs-on: windows-latest
@@ -71,17 +79,23 @@ jobs:
         shell: powershell
         run: |
           dotnet build SymbolicExecution/SymbolicExecution.Control
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Build and unit test analyzer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: powershell
         run: |
           dotnet build SymbolicExecution/SymbolicExecution.Test
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build --filter Category=Unit /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $ProgressPreference = 'SilentlyContinue'
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           .\codecov.exe -f "coverage.xml" -F unittests --name "Unit Tests"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
   coverage-systemtests:
     name: System Test Coverage
     runs-on: windows-latest
@@ -97,17 +111,23 @@ jobs:
         shell: powershell
         run: |
           dotnet build SymbolicExecution/SymbolicExecution.Control
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Build and system test analyzer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: powershell
         run: |
           dotnet build SymbolicExecution/SymbolicExecution.Test
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build --filter Category=System /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $ProgressPreference = 'SilentlyContinue'
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           .\codecov.exe -f "coverage.xml" -F systemtests --name "System Tests"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
   coverage-alltests:
     name: Total Test Coverage
     runs-on: windows-latest
@@ -123,17 +143,23 @@ jobs:
         shell: powershell
         run: |
           dotnet build SymbolicExecution/SymbolicExecution.Control
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Build and test analyzer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: powershell
         run: |
           dotnet build SymbolicExecution/SymbolicExecution.Test
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $ProgressPreference = 'SilentlyContinue'
           Invoke-WebRequest -Uri https://uploader.codecov.io/latest/windows/codecov.exe -OutFile codecov.exe
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           .\codecov.exe -f "coverage.xml" -F alltests --name "All Tests"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
   msbuild:
     name: Build whole solution (MSBuild)
     runs-on: windows-latest
@@ -151,8 +177,11 @@ jobs:
         shell: powershell
         run: |
           dotnet build SymbolicExecution/SymbolicExecution.Control
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Build and test
         shell: powershell
         run: |
           dotnet restore
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           msbuild
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
