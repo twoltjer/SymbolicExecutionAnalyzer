@@ -5,9 +5,9 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 	private readonly SemanticModel _semanticModel;
 	private ISyntaxNodeAbstraction? _abstraction;
 
-	private Dictionary<SyntaxNode, ISyntaxNodeAbstraction> _abstractionCache =
+	private readonly Dictionary<SyntaxNode, ISyntaxNodeAbstraction> _abstractionCache =
 		new Dictionary<SyntaxNode, ISyntaxNodeAbstraction>();
-	private Dictionary<ISyntaxNodeAbstraction, SyntaxNode> _syntaxNodeCache =
+	private readonly Dictionary<ISyntaxNodeAbstraction, SyntaxNode> _syntaxNodeCache =
 		new Dictionary<ISyntaxNodeAbstraction, SyntaxNode>();
 
 	public AbstractedSyntaxTree(SemanticModel semanticModel)
@@ -115,7 +115,8 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 			VariableDeclarationSyntax => new VariableDeclarationSyntaxAbstraction(
 				children,
 				symbol,
-				location
+				location,
+				new VariableDeclarationSyntaxAbstractionHelper(location)
 				),
 			LocalDeclarationStatementSyntax => new LocalDeclarationStatementSyntaxAbstraction(
 				children,
@@ -130,6 +131,11 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				convertedTypeSymbol
 				),
 			ExpressionStatementSyntax => new ExpressionStatementSyntaxAbstraction(
+				children,
+				symbol,
+				location
+				),
+			EqualsValueClauseSyntax => new EqualsValueClauseSyntaxAbstraction(
 				children,
 				symbol,
 				location

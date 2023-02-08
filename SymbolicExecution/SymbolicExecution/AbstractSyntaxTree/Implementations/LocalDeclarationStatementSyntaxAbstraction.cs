@@ -27,6 +27,6 @@ public class LocalDeclarationStatementSyntaxAbstraction : StatementSyntaxAbstrac
 
 	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
 	{
-		return new AnalysisFailure("Cannot get the result of an identifier name", Location.None);
+		return new AnalysisFailure("Cannot get the result of a local declaration statement", Location);
 	}
 }
