@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace SymbolicExecution.Test.UnitTests;
 
 public class IdentifierNameSyntaxAbstractionTests
@@ -22,5 +24,6 @@ public class IdentifierNameSyntaxAbstractionTests
 		var result = subject.AnalyzeNode(previous);
 		result.IsT1.Should().BeTrue();
 		result.T1Value.Single().Should().BeSameAs(previous);
+		Debug.Fail("Test fail");
 	}
 }
