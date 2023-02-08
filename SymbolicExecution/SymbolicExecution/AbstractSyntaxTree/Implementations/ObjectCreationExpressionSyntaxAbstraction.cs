@@ -2,14 +2,14 @@ namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
 public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpressionSyntaxAbstraction, IObjectCreationExpressionSyntaxAbstraction
 {
-	private readonly ITypeSymbol? _actualTypeSymbol;
-	private readonly ITypeSymbol? _convertedTypeSymbol;
-
-	public ObjectCreationExpressionSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol,
-		Location location, ITypeSymbol? actualTypeSymbol, ITypeSymbol? convertedTypeSymbol) : base(children, symbol, location)
+	public ObjectCreationExpressionSyntaxAbstraction(
+		ImmutableArray<ISyntaxNodeAbstraction> children,
+		ISymbol? symbol,
+		Location location,
+		ITypeSymbol? actualTypeSymbol,
+		ITypeSymbol? convertedTypeSymbol
+		) : base(children, symbol, location, actualTypeSymbol, convertedTypeSymbol)
 	{
-		_actualTypeSymbol = actualTypeSymbol;
-		_convertedTypeSymbol = convertedTypeSymbol;
 	}
 
 	public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)
@@ -17,7 +17,7 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 		return new AnalysisFailure("Object creation syntax should not be traversed, but evaluated as an expression", Location);
 	}
 
-	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
 	{
 		if (Children.Length != 2)
 		{
@@ -44,7 +44,12 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 			return new AnalysisFailure("Expected object creation syntax to have a converted type symbol", Location);
 		}
 
-		var objectInstance = new ObjectInstance(_actualTypeSymbol, _convertedTypeSymbol, Location);
-		return objectInstance;
+		var objectInstance = new ObjectInstance(
+			_actualTypeSymbol,
+			_convertedTypeSymbol,
+			Location,
+			new ReferenceTypeScope(_actualTypeSymbol)
+			);
+		return ImmutableArray.Create((objectInstance as IObjectInstance, state));
 	}
 }

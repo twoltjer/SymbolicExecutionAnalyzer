@@ -15,7 +15,7 @@ public class CompilationUnitSyntaxAbstraction : CSharpSyntaxNodeAbstraction, ICo
 		return new AnalysisFailure("Cannot analyze compilation units", Location);
 	}
 
-	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
 	{
 		return new AnalysisFailure("Cannot analyze compilation units", Location);
 	}

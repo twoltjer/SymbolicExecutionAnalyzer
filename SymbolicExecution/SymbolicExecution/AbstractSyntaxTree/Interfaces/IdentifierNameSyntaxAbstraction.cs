@@ -5,8 +5,10 @@ public class IdentifierNameSyntaxAbstraction : SimpleNameSyntaxAbstraction, IIde
 	public IdentifierNameSyntaxAbstraction(
 		ImmutableArray<ISyntaxNodeAbstraction> children,
 		ISymbol? symbol,
-		Location location
-		) : base(children, symbol, location)
+		Location location,
+		ITypeSymbol? actualTypeSymbol,
+		ITypeSymbol? convertedTypeSymbol
+		) : base(children, symbol, location, actualTypeSymbol, convertedTypeSymbol)
 	{
 	}
 
@@ -15,7 +17,7 @@ public class IdentifierNameSyntaxAbstraction : SimpleNameSyntaxAbstraction, IIde
 		return new[] { previous };
 	}
 
-	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
 	{
 		return new AnalysisFailure("Cannot get the result of an identifier name", Location.None);
 	}

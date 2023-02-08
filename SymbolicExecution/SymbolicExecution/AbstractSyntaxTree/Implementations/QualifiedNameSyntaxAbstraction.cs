@@ -5,8 +5,10 @@ public class QualifiedNameSyntaxAbstraction : NameSyntaxAbstraction, IQualifiedN
 	public QualifiedNameSyntaxAbstraction(
 		ImmutableArray<ISyntaxNodeAbstraction> children,
 		ISymbol? symbol,
-		Location location
-		) : base(children, symbol, location)
+		Location location,
+		ITypeSymbol? actualTypeSymbol,
+		ITypeSymbol? convertedTypeSymbol
+		) : base(children, symbol, location, actualTypeSymbol, convertedTypeSymbol)
 	{
 	}
 
@@ -15,7 +17,7 @@ public class QualifiedNameSyntaxAbstraction : NameSyntaxAbstraction, IQualifiedN
 		return new AnalysisFailure("Cannot analyze qualified names", Location);
 	}
 
-	public override TaggedUnion<IObjectInstance, AnalysisFailure> GetExpressionResult(IAnalysisState state)
+	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
 	{
 		return new AnalysisFailure("Cannot analyze qualified names", Location);
 	}

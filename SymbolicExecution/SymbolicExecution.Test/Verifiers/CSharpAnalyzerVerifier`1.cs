@@ -1,7 +1,4 @@
-﻿using System.IO;
-using FluentAssertions;
-
-namespace SymbolicExecution.Test.Verifiers;
+﻿namespace SymbolicExecution.Test.Verifiers;
 
 public static partial class CSharpAnalyzerVerifier<TAnalyzer>
 	where TAnalyzer : DiagnosticAnalyzer, new()
@@ -32,7 +29,7 @@ public static partial class CSharpAnalyzerVerifier<TAnalyzer>
 			TestCode = source,
 		};
 		var nugetFilePath = Path.Combine(
-			new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.Parent.FullName,
+			new DirectoryInfo(Environment.CurrentDirectory).Parent?.Parent?.Parent?.FullName ?? string.Empty,
 			"NuGet.Config.Test"
 			);
 		new FileInfo(nugetFilePath).Exists.Should().BeTrue("NuGet.Config file should exist");

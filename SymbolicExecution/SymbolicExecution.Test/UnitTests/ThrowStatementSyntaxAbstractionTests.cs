@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis.Text;
-
 namespace SymbolicExecution.Test.UnitTests;
 
 public class ThrowStatementSyntaxAbstractionTests
@@ -33,7 +31,7 @@ public class ThrowStatementSyntaxAbstractionTests
 		var subject = new ThrowStatementSyntaxAbstraction(children, null, location);
 		var failure = new AnalysisFailure("Reason", location);
 		Mock.Get(child)
-			.Setup(x => x.GetExpressionResult(state))
+			.Setup(x => x.GetExpressionResults(state))
 			.Returns(failure);
 		var result = subject.AnalyzeNode(state);
 		result.IsT1.Should().BeFalse();
@@ -60,8 +58,12 @@ public class ThrowStatementSyntaxAbstractionTests
 			.Returns(modifiedState);
 		var child = Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict);
 		Mock.Get(child)
-			.Setup(x => x.GetExpressionResult(initialState))
-			.Returns(new TaggedUnion<IObjectInstance, AnalysisFailure>(exceptionObject));
+			.Setup(x => x.GetExpressionResults(initialState))
+			.Returns(
+				new TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure>(
+					new[] { (exceptionObject, initialState) }.ToImmutableArray()
+					)
+				);
 		var children = ImmutableArray.Create(child);
 		var subject = new ThrowStatementSyntaxAbstraction(children, null, throwLocation);
 		var result = subject.AnalyzeNode(initialState);
@@ -78,9 +80,9 @@ public class ThrowStatementSyntaxAbstractionTests
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var children = ImmutableArray<ISyntaxNodeAbstraction>.Empty;
 		var subject = new ThrowStatementSyntaxAbstraction(children, null, location);
-		var result = subject.GetExpressionResult(state);
-		result.IsT1.Should().BeFalse();
-		result.T2Value.Location.Should().BeSameAs(location);
-		result.T2Value.Reason.Should().Be("Cannot analyze throw statements");
+		var results = subject.GetExpressionResults(state);
+		results.IsT1.Should().BeFalse();
+		results.T2Value.Location.Should().BeSameAs(location);
+		results.T2Value.Reason.Should().Be("Cannot analyze throw statements");
 	}
 }

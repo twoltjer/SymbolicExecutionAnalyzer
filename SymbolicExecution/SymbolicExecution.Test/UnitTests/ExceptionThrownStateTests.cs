@@ -1,6 +1,3 @@
-using System.Reflection.PortableExecutable;
-using Microsoft.CodeAnalysis.Text;
-
 namespace SymbolicExecution.Test.UnitTests;
 
 public class ExceptionThrownStateTests
@@ -37,7 +34,7 @@ public class ExceptionThrownStateTests
 		subject.Equals(other as object).Should().BeTrue();
 		subject.GetHashCode().Should().Be(other.GetHashCode());
 	}
-	
+
 	[Fact]
 	[Trait("Category", "Unit")]
 	public void TestEquals_DifferentLocation_ReturnsFalse()

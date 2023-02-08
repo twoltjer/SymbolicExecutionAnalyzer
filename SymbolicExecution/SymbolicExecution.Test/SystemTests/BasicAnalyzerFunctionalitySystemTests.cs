@@ -1,8 +1,4 @@
-﻿using SymbolicExecution.Control;
-using SymbolicExecution.Diagnostics;
-using SymbolicExecution.Test.Verifiers;
-
-namespace SymbolicExecution.Test.SystemTests;
+﻿namespace SymbolicExecution.Test.SystemTests;
 
 public class BasicAnalyzerFunctionalitySystemTests
 {
@@ -48,7 +44,7 @@ class TestClass
 ";
 		await CSharpAnalyzerVerifier<SymbolicExecutionAnalyzer>.VerifyAnalyzerAsync(source);
 	}
-	
+
 	[Fact]
 	[Trait("Category", "System")]
 	public async Task TestNonCompilingCodeWillNotAnalyze()
