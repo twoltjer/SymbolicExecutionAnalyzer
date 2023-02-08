@@ -12,5 +12,4 @@ global using Microsoft.CodeAnalysis.CSharp.Syntax;
 global using Microsoft.CodeAnalysis.Diagnostics;
 global using SymbolicExecution.AbstractSyntaxTree.Implementations;
 global using SymbolicExecution.AbstractSyntaxTree.Interfaces;
-global using SymbolicExecution.Control;
 global using SymbolicExecution.Diagnostics;

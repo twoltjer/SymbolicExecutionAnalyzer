@@ -8,7 +8,7 @@
         <PackageId>*$(MSBuildProjectFile)*</PackageId>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-        <AssemblyVersion>0.0.1</AssemblyVersion>
+        <AssemblyVersion>0.0.2.4</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -33,10 +33,6 @@
             <Generator>PublicResXFileCodeGenerator</Generator>
             <LastGenOutput>SymbolicExecutionStrings.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\SymbolicExecution.Control\SymbolicExecution.Control.csproj" />
     </ItemGroup>
 
 </Project>
