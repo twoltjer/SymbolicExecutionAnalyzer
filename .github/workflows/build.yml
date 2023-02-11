@@ -44,10 +44,15 @@ jobs:
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Build control package
-        shell: powershell
-        run: |
-          dotnet build SymbolicExecution/SymbolicExecution.Control
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+        run: dotnet build SymbolicExecution/SymbolicExecution.Control
+      - name: Build tests
+        run: dotnet build SymbolicExecution/SymbolicExecution.Test
+      - name: Run tests
+        run: dotnet test --no-build
+      - name: Clean
+        run: dotnet clean
+      - name: Build control package
+        run: dotnet build SymbolicExecution/SymbolicExecution.Control
       - name: Build and analyze analyzer and tests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -76,17 +81,16 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Build control package
-        shell: powershell
-        run: |
-          dotnet build SymbolicExecution/SymbolicExecution.Control
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-      - name: Build and unit test analyzer
+        run: dotnet build SymbolicExecution/SymbolicExecution.Control
+      - name: Build tests
+        run: dotnet build SymbolicExecution/SymbolicExecution.Test
+      - name: Run unit tests
+        run: dotnet test --no-build --filter Category=Unit
+      - name: Collect unit test coverage data
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: powershell
         run: |
-          dotnet build SymbolicExecution/SymbolicExecution.Test
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build --filter Category=Unit /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
@@ -108,17 +112,16 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Build control package
-        shell: powershell
-        run: |
-          dotnet build SymbolicExecution/SymbolicExecution.Control
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-      - name: Build and system test analyzer
+        run: dotnet build SymbolicExecution/SymbolicExecution.Control
+      - name: Build tests
+        run: dotnet build SymbolicExecution/SymbolicExecution.Test
+      - name: Run system tests
+        run: dotnet test --no-build --filter Category=System
+      - name: Collect system test coverage data
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: powershell
         run: |
-          dotnet build SymbolicExecution/SymbolicExecution.Test
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build --filter Category=System /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
@@ -140,17 +143,16 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Build control package
-        shell: powershell
-        run: |
-          dotnet build SymbolicExecution/SymbolicExecution.Control
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-      - name: Build and test analyzer
+        run: dotnet build SymbolicExecution/SymbolicExecution.Control
+      - name: Build tests
+        run: dotnet build SymbolicExecution/SymbolicExecution.Test
+      - name: Run system tests
+        run: dotnet test --no-build
+      - name: Collect total test coverage data
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: powershell
         run: |
-          dotnet build SymbolicExecution/SymbolicExecution.Test
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $ocpath = Join-Path $HOME .nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & $ocpath -register -target:"dotnet.exe" -targetargs:"test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover" -output:".\coverage.xml" -filter:"+[SymbolicExecution*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*.Designer.cs
@@ -174,14 +176,8 @@ jobs:
       - name: Setup MSBuild.exe
         uses: microsoft/setup-msbuild@v1
       - name: Build control package
-        shell: powershell
-        run: |
-          dotnet build SymbolicExecution/SymbolicExecution.Control
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-      - name: Build and test
-        shell: powershell
-        run: |
-          dotnet restore
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          msbuild
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+        run: dotnet build SymbolicExecution/SymbolicExecution.Control
+      - name: NuGet Restore
+        run: dotnet restore
+      - name: Build (MSBuild)
+        run: msbuild
