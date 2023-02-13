@@ -70,9 +70,10 @@ public class AbstractMethodAnalyzerTests
 			MockBehavior.Strict
 			);
 		var exceptionTypeSymbol = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
+		var typeTaggedUnion = new TaggedUnion<ITypeSymbol, Type>(exceptionTypeSymbol);
 		var exceptionObject = Mock.Of<IObjectInstance>(
 #pragma warning disable RS1024 // Compare symbols correctly
-			obj => obj.ActualTypeSymbol == exceptionTypeSymbol,
+			obj => obj.Type == typeTaggedUnion,
 #pragma warning restore RS1024
 			MockBehavior.Strict
 			);

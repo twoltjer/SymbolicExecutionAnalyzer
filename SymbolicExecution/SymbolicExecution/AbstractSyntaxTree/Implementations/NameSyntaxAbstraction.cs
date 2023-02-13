@@ -6,9 +6,8 @@ public abstract class NameSyntaxAbstraction : TypeSyntaxAbstraction, INameSyntax
 		ImmutableArray<ISyntaxNodeAbstraction> children,
 		ISymbol? symbol,
 		Location location,
-		ITypeSymbol? actualTypeSymbol,
-		ITypeSymbol? convertedTypeSymbol
-		) : base(children, symbol, location, actualTypeSymbol, convertedTypeSymbol)
+		ITypeSymbol? type
+		) : base(children, symbol, location, type)
 	{
 	}
 }

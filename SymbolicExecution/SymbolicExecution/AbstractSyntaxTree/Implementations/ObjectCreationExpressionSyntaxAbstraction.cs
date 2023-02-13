@@ -6,9 +6,8 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 		ImmutableArray<ISyntaxNodeAbstraction> children,
 		ISymbol? symbol,
 		Location location,
-		ITypeSymbol? actualTypeSymbol,
-		ITypeSymbol? convertedTypeSymbol
-		) : base(children, symbol, location, actualTypeSymbol, convertedTypeSymbol)
+		ITypeSymbol? type
+		) : base(children, symbol, location, type)
 	{
 	}
 
@@ -34,21 +33,16 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 			return new AnalysisFailure("Expected object creation syntax to have an argument list as its second child", Location);
 		}
 
-		if (_actualTypeSymbol is null)
+		if (_type is null)
 		{
 			return new AnalysisFailure("Expected object creation syntax to have an actual type symbol", Location);
 		}
 
-		if (_convertedTypeSymbol is null)
-		{
-			return new AnalysisFailure("Expected object creation syntax to have a converted type symbol", Location);
-		}
 
 		var objectInstance = new ObjectInstance(
-			_actualTypeSymbol,
-			_convertedTypeSymbol,
+			new TaggedUnion<ITypeSymbol, Type>(_type),
 			Location,
-			new ReferenceTypeScope(_actualTypeSymbol)
+			new ReferenceTypeScope(_type)
 			);
 		return ImmutableArray.Create((objectInstance as IObjectInstance, state));
 	}

@@ -17,8 +17,7 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 			children: children.ToImmutableArray(),
 			symbol: default,
 			location: location,
-			actualTypeSymbol: default,
-			convertedTypeSymbol: default
+			type: default
 			);
 		var results = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		results.IsT1.Should().BeFalse();
@@ -39,8 +38,7 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 			}.ToImmutableArray(),
 			symbol: default,
 			location: location,
-			actualTypeSymbol: default,
-			convertedTypeSymbol: default
+			type: default
 			);
 		var results = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		results.IsT1.Should().BeFalse();
@@ -61,8 +59,7 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 			}.ToImmutableArray(),
 			symbol: default,
 			location: location,
-			actualTypeSymbol: default,
-			convertedTypeSymbol: default
+			type: default
 			);
 		var results = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		results.IsT1.Should().BeFalse();
@@ -70,12 +67,9 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 		results.T2Value.Location.Should().BeSameAs(location);
 	}
 
-	[Theory]
+	[Fact]
 	[Trait("Category", "Unit")]
-	[InlineData(true, true)]
-	[InlineData(false, true)]
-	[InlineData(true, false)]
-	public void TestGetExpressionResult_ReturnsError_IfEitherSymbolIsNull(bool actualTypeSymbolIsNull, bool convertedTypeSymbolIsNull)
+	public void TestGetExpressionResult_ReturnsError_WhenTypeIsNull()
 	{
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var subject = new ObjectCreationExpressionSyntaxAbstraction(
@@ -86,14 +80,11 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 			}.ToImmutableArray(),
 			symbol: null,
 			location: location,
-			actualTypeSymbol: actualTypeSymbolIsNull ? null : Mock.Of<ITypeSymbol>(MockBehavior.Strict),
-			convertedTypeSymbol: convertedTypeSymbolIsNull ? null : Mock.Of<ITypeSymbol>(MockBehavior.Strict)
+			type: null
 			);
 		var results = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		results.IsT1.Should().BeFalse();
-		var errorReason = actualTypeSymbolIsNull
-			? "Expected object creation syntax to have an actual type symbol"
-			: "Expected object creation syntax to have a converted type symbol";
+		const string errorReason = "Expected object creation syntax to have an actual type symbol";
 		results.T2Value.Reason.Should().Be(errorReason);
 		results.T2Value.Location.Should().BeSameAs(location);
 	}
@@ -113,16 +104,14 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 			}.ToImmutableArray(),
 			symbol: Mock.Of<IMethodSymbol>(MockBehavior.Strict),
 			location: location,
-			actualTypeSymbol: actualTypeSymbol,
-			convertedTypeSymbol: convertedTypeSymbol
+			type: actualTypeSymbol
 			);
 		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var results = subject.GetExpressionResults(state);
 		results.IsT1.Should().BeTrue();
 		var (resultValue, resultState) = results.T1Value.Single();
 		resultValue.Location.Should().BeSameAs(location);
-		resultValue.ActualTypeSymbol.Should().BeSameAs(actualTypeSymbol);
-		resultValue.ConvertedTypeSymbol.Should().BeSameAs(convertedTypeSymbol);
+		resultValue.Type.T1Value.Should().BeSameAs(actualTypeSymbol);
 		resultState.Should().BeSameAs(state);
 	}
 
@@ -135,8 +124,7 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 			children: default,
 			symbol: default,
 			location: location,
-			actualTypeSymbol: default,
-			convertedTypeSymbol: default
+			type: default
 			);
 		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var result = subject.AnalyzeNode(state);

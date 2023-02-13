@@ -9,7 +9,7 @@ public class PredefinedTypeSyntaxAbstractionTests
 		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var children = ImmutableArray<ISyntaxNodeAbstraction>.Empty;
-		var subject = new PredefinedTypeSyntaxAbstraction(children, null, location, default, default);
+		var subject = new PredefinedTypeSyntaxAbstraction(children, null, location, default);
 		var result = subject.AnalyzeNode(state);
 		result.IsT1.Should().BeFalse();
 		result.T2Value.Location.Should().BeSameAs(location);
@@ -23,7 +23,7 @@ public class PredefinedTypeSyntaxAbstractionTests
 		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var children = ImmutableArray<ISyntaxNodeAbstraction>.Empty;
-		var subject = new PredefinedTypeSyntaxAbstraction(children, null, location, default, default);
+		var subject = new PredefinedTypeSyntaxAbstraction(children, null, location, default);
 		var results = subject.GetExpressionResults(state);
 		results.IsT1.Should().BeFalse();
 		results.T2Value.Location.Should().BeSameAs(location);

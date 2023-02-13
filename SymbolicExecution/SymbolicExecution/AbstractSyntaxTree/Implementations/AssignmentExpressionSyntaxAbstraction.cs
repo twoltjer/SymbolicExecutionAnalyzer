@@ -2,7 +2,12 @@ namespace SymbolicExecution.AbstractSyntaxTree.Implementations;
 
 public class AssignmentExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, IAssignmentExpressionSyntaxAbstraction
 {
-	public AssignmentExpressionSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction> children, ISymbol? symbol, Location location, ITypeSymbol? actualTypeSymbol, ITypeSymbol? convertedTypeSymbol) : base(children, symbol, location, actualTypeSymbol, convertedTypeSymbol)
+	public AssignmentExpressionSyntaxAbstraction(
+		ImmutableArray<ISyntaxNodeAbstraction> children,
+		ISymbol? symbol,
+		Location location,
+		ITypeSymbol? actualTypeSymbol
+		) : base(children, symbol, location, actualTypeSymbol)
 	{
 	}
 

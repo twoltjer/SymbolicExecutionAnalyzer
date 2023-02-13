@@ -43,8 +43,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 
 		var symbol = _semanticModel.GetDeclaredSymbol(node);
 		var typeInfo = _semanticModel.GetTypeInfo(node);
-		var convertedTypeSymbol = typeInfo.ConvertedType;
-		var actualTypeSymbol = typeInfo.Type;
+		var type = typeInfo.Type;
 		var location = node.GetLocation();
 		var constantValue = _semanticModel.GetConstantValue(node);
 		var symbolInfo = _semanticModel.GetSymbolInfo(node);
@@ -56,8 +55,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				children,
 				symbol ?? symbolInfo.Symbol,
 				location,
-				actualTypeSymbol,
-				convertedTypeSymbol
+				type
 				),
 			UsingDirectiveSyntax => new UsingDirectiveSyntaxAbstraction(children, symbol, location),
 			CompilationUnitSyntax => new CompilationUnitSyntaxAbstraction(children, symbol, location),
@@ -65,8 +63,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				children,
 				symbol,
 				location,
-				actualTypeSymbol,
-				convertedTypeSymbol
+				type
 				),
 			AttributeSyntax => new AttributeSyntaxAbstraction(children, symbol, location),
 			AttributeListSyntax => new AttributeListSyntaxAbstraction(children, symbol, location),
@@ -74,8 +71,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				children,
 				symbol,
 				location,
-				actualTypeSymbol,
-				convertedTypeSymbol
+				type
 				),
 			ParameterListSyntax => new ParameterListSyntaxAbstraction(children, symbol, location),
 			ArgumentListSyntax => new ArgumentListSyntaxAbstraction(children, symbol, location),
@@ -83,8 +79,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				children,
 				symbol,
 				location,
-				actualTypeSymbol,
-				convertedTypeSymbol
+				type
 				),
 			ThrowStatementSyntax => new ThrowStatementSyntaxAbstraction(children, symbol, location),
 			MethodDeclarationSyntax => new MethodDeclarationSyntaxAbstraction(children, symbol, location),
@@ -94,8 +89,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				symbol,
 				location,
 				constantValue,
-				actualTypeSymbol,
-				convertedTypeSymbol
+				type
 				),
 			ArgumentSyntax => new ArgumentSyntaxAbstraction(children, symbol, location),
 			IfStatementSyntax ifStatementSyntax => IfStatementSyntaxAbstraction.BuildFrom(
@@ -127,8 +121,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				children,
 				symbol,
 				location,
-				actualTypeSymbol,
-				convertedTypeSymbol
+				type
 				),
 			ExpressionStatementSyntax => new ExpressionStatementSyntaxAbstraction(
 				children,

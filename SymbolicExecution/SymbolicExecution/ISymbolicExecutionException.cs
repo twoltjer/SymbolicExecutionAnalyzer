@@ -2,6 +2,6 @@ namespace SymbolicExecution;
 
 public interface ISymbolicExecutionException
 {
-    Location Location { get; }
-    ITypeSymbol Type { get; }
+	Location Location { get; }
+	TaggedUnion<ITypeSymbol, Type> Type { get; }
 }
