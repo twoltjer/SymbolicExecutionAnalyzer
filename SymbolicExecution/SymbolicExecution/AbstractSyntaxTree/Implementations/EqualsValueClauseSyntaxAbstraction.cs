@@ -8,11 +8,11 @@ public class EqualsValueClauseSyntaxAbstraction : CSharpSyntaxNodeAbstraction, I
 
 	public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)
 	{
-		return new AnalysisFailure("Cannot analyze an equals value clause", Location.None);
+		return new AnalysisFailure("Cannot analyze an equals value clause", Location);
 	}
 
 	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
 	{
-		return new AnalysisFailure("Cannot get the result of an equals value clause", Location.None);
+		return new AnalysisFailure("Cannot get the result of an equals value clause", Location);
 	}
 }
