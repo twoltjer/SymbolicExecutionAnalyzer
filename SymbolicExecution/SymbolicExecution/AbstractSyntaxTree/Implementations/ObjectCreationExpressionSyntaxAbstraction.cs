@@ -42,7 +42,8 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 		var objectInstance = new ObjectInstance(
 			new TaggedUnion<ITypeSymbol, Type>(_type),
 			Location,
-			new ReferenceTypeScope(_type)
+			new ReferenceTypeScope(_type),
+			ObjectInstance.GetNextReferenceId()
 			);
 		return ImmutableArray.Create((objectInstance as IObjectInstance, state));
 	}

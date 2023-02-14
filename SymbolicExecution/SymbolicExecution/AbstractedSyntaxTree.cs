@@ -133,6 +133,16 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				symbol,
 				location
 				),
+			BinaryExpressionSyntax binaryExpressionSyntax => BinaryExpressionSyntaxAbstraction.BuildFrom(
+				_abstractionCache,
+				binaryExpressionSyntax.Left,
+				binaryExpressionSyntax.Right,
+				children,
+				symbol,
+				location,
+				type,
+				binaryExpressionSyntax.Kind()
+				),
 			_ => null,
 		};
 

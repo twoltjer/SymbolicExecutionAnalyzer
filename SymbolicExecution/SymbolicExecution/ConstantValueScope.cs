@@ -2,28 +2,31 @@ namespace SymbolicExecution;
 
 public class ConstantValueScope : IValueScope
 {
-	private readonly object? _value;
-	private readonly ITypeSymbol _type;
+	public object? Value { get; }
+	private readonly TaggedUnion<ITypeSymbol, Type> _type;
 
-	public ConstantValueScope(object? value, ITypeSymbol type)
+	public ConstantValueScope(object? value, TaggedUnion<ITypeSymbol, Type> type)
 	{
-		_value = value;
+		Value = value;
 		_type = type;
 	}
 
 	public bool CanBe(object? value)
 	{
-		if (_value == null)
+		if (Value == null)
 		{
 			return value == null;
 		}
 
-		return _value.Equals(value);
+		return Value.Equals(value);
 	}
 
 	public bool IsExactType(Type type)
 	{
-		return _type.Name == type.Name && _type.ContainingNamespace.ToString() == type.Namespace;
+		return _type.Match(
+			t => t.Name == type.Name && t.ContainingNamespace.ToString() == type.Namespace,
+			t => t == type
+			);
 	}
 
 	public bool IsAlways(object? value)

@@ -107,4 +107,53 @@ class TestClass
 
 		await VerifyCS.VerifyAnalyzerAsync(source);
 	}
+
+	[Fact]
+	[Trait("Category", "System")]
+	public async Task TestAnalyzeLocalInteger_BinaryEquality_True()
+	{
+		var source = @$"using System;
+using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
+
+class TestClass
+{{
+	[SymbolicallyAnalyze]
+	void SayHello()
+	{{
+		int i = 1;
+		if (i == 1)
+		{{
+			throw new InvalidOperationException(""Message"");
+		}}
+	}}
+}}
+";
+		var expected = VerifyCS.Diagnostic(descriptor: MayThrowDiagnosticDescriptor.DiagnosticDescriptor)
+			.WithLocation(12, 4)
+			.WithMessage("The exception 'InvalidOperationException' may be thrown here and not caught");
+		await VerifyCS.VerifyAnalyzerAsync(source, expected);
+	}
+	
+	[Fact]
+	[Trait("Category", "System")]
+	public async Task TestAnalyzeLocalInteger_BinaryEquality_False()
+	{
+		var source = @$"using System;
+using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
+
+class TestClass
+{{
+	[SymbolicallyAnalyze]
+	void SayHello()
+	{{
+		int i = 1;
+		if (i == 2)
+		{{
+			throw new InvalidOperationException(""Message"");
+		}}
+	}}
+}}
+";
+		await VerifyCS.VerifyAnalyzerAsync(source);
+	}
 }

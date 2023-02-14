@@ -28,7 +28,22 @@ public class LiteralExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, I
 		if (_type == null)
 			return new AnalysisFailure("Cannot analyze literal expressions without actual type symbols", Location);
 
-		var result = new ObjectInstance(new TaggedUnion<ITypeSymbol, Type>(_type), Location, new ConstantValueScope(_constantValue.Value, _type));
+		var scope = new ConstantValueScope(_constantValue.Value, new TaggedUnion<ITypeSymbol, Type>(_type));
+		var isBool = scope.IsExactType(typeof(bool));
+		var isInt = scope.IsExactType(typeof(int));
+		ObjectInstance result;
+		if (isBool)
+		{
+			result = new BoolInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isInt)
+		{
+			result = new IntInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else
+		{
+			return new AnalysisFailure("Literal expressions not a known type", Location);
+		}
 		return ImmutableArray.Create((result as IObjectInstance, state));
 	}
 }

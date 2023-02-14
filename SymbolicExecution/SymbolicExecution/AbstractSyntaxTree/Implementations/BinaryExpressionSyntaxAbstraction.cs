@@ -61,9 +61,10 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, IB
 	{
 		if (_syntaxKind == SyntaxKind.EqualsExpression)
 		{
+			return left.EqualsOperator(right, state);
 		}
-		throw new NotImplementedException();
 
+		return new AnalysisFailure("Cannot evaluate binary expression", Location);
 	}
 
 	public static IBinaryExpressionSyntaxAbstraction? BuildFrom(

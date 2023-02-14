@@ -23,7 +23,10 @@ public class LiteralExpressionSyntaxAbstractionTests
 		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var children = ImmutableArray<ISyntaxNodeAbstraction>.Empty;
-		var typeSymbol = Mock.Of<ITypeSymbol>(type => type.Name == "Boolean", MockBehavior.Strict);
+		var namespaceSymbol = Mock.Of<INamespaceSymbol>(ns => ns.ToString() == "System", MockBehavior.Strict);
+#pragma warning disable RS1024
+		var typeSymbol = Mock.Of<ITypeSymbol>(type => type.Name == "Boolean" && type.ContainingNamespace == namespaceSymbol, MockBehavior.Strict);
+#pragma warning restore RS1024
 		var subject = new LiteralExpressionSyntaxAbstraction(children, null, location, true, typeSymbol);
 		var results = subject.GetExpressionResults(state);
 		results.IsT1.Should().BeTrue();
