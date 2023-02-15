@@ -8,7 +8,7 @@
         <PackageId>*$(MSBuildProjectFile)*</PackageId>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-        <AssemblyVersion>0.0.2.5</AssemblyVersion>
+        <AssemblyVersion>0.0.2.6</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
