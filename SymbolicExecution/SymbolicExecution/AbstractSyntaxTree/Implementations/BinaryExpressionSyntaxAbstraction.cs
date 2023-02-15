@@ -91,6 +91,46 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, IB
 		{
 			return left.NotEqualsOperator(right, state, attemptReverseConversion: true);
 		}
+		else if (_syntaxKind == SyntaxKind.AddExpression)
+		{
+			return left.AddOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.SubtractExpression)
+		{
+			return left.SubtractOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.MultiplyExpression)
+		{
+			return left.MultiplyOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.DivideExpression)
+		{
+			return left.DivideOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.ModuloExpression)
+		{
+			return left.ModuloOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.BitwiseAndExpression)
+		{
+			return left.BitwiseAndOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.BitwiseOrExpression)
+		{
+			return left.BitwiseOrOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.ExclusiveOrExpression)
+		{
+			return left.ExclusiveOrOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.LeftShiftExpression)
+		{
+			return left.LeftShiftOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.RightShiftExpression)
+		{
+			return left.RightShiftOperator(right, state, attemptReverseConversion: true);
+		}
 
 		return new AnalysisFailure("Cannot evaluate binary expression", Location);
 	}

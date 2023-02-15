@@ -40,7 +40,7 @@ public class ObjectInstance : IObjectInstance
 		return new AnalysisFailure("Cannot perform logical or on objects", Location);
 	}
 	
-	public virtual TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> LogicalXorOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+	public virtual TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> ExclusiveOrOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
 	{
 		return new AnalysisFailure("Cannot perform logical xor on objects", Location);
 	}
@@ -248,6 +248,59 @@ public abstract class PrimitiveInstance<T> : ValueTypeInstance, IPrimitiveInstan
 	}
 
 	public abstract bool TryConvert(IObjectInstance value, out IPrimitiveInstance<T> converted, out AnalysisFailure? analysisFailure);
+	
+	protected TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> ArithmeticOperator<TOut>(
+		IObjectInstance right,
+		IAnalysisState state,
+		bool attemptReverseConversion,
+		Func<IObjectInstance, IAnalysisState,
+			TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure>> reverse,
+		Func<T, T, TOut> operation,
+		IEnumerable<Action<TOut>> resultChecks
+		)
+	{
+		if (right is not IPrimitiveInstance<T> rightPrimInt)
+		{
+			if (TryConvert(right, out var rightConverted, out var analysisFailure))
+			{
+				rightPrimInt = rightConverted;
+			}
+			else if (analysisFailure.HasValue)
+			{
+				return analysisFailure.Value;
+			}
+			else if (attemptReverseConversion && right is IPrimitiveInstance rightPrim)
+			{
+				return reverse(rightPrim, state);
+			}
+			else
+				return new AnalysisFailure("Right is not an instance of the same type and cannot be implicitly converted", Location);
+		}
+
+		if (Value is not ConstantValueScope valueScope)
+			return new AnalysisFailure("Value is not a constant value scope", Location);
+
+		if (rightPrimInt.Value is not ConstantValueScope rightValueScope)
+			return new AnalysisFailure("Right value is not a constant value scope", Location);
+
+		if (valueScope.Value is not T value)
+		{
+			return new AnalysisFailure("Value is not an int", Location);
+		}
+
+		if (rightValueScope.Value is not T rightValue)
+		{
+			return new AnalysisFailure("Right value is not an int", Location);
+		}
+
+		var result = operation(value, rightValue);
+		foreach (var resultCheck in resultChecks)
+		{
+			resultCheck(result);
+		}
+		var intInstance = new IntInstance(Location, new ConstantValueScope(result, typeof(TOut)), GetNextReferenceId());
+		return ImmutableArray.Create((intInstance as IObjectInstance, state));
+	}
 
 
 	public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> EqualsOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
@@ -412,20 +465,39 @@ public class IntInstance : PrimitiveInstance<int>, IIntInstance
 
 	public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> AddOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
 	{
-		return ArithmeticOperator(
-			right,
-			state,
-			attemptReverseConversion,
-			(rightPrimitive, analysisState) => rightPrimitive.AddOperator(
-				this,
-				analysisState,
-				attemptReverseConversion: false
-				),
-			(a, b) => a + b
-			);
+		try
+		{
+			var result = ArithmeticOperator(
+				right,
+				state,
+				attemptReverseConversion,
+				(rightPrimitive, analysisState) => rightPrimitive.AddOperator(
+					this,
+					analysisState,
+					attemptReverseConversion: false
+					),
+				(a, b) => a + b,
+				resultChecks: new Action<int>[]
+				{
+					value =>
+					{
+						if (value < int.MinValue)
+						{
+							throw new Exception("Overflow");
+						}
+					}
+				}
+				);
+			return result;
+		}
+		catch (Exception e) // Result checks throw exceptions
+		{
+			// Overflow
+			return new AnalysisFailure(e.Message, Location);
+		}
 	}
 
-	private TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> ArithmeticOperator(
+	private TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> ArithmeticOperatorxx(
 		IObjectInstance right,
 		IAnalysisState state,
 		bool attemptReverseConversion,
@@ -537,6 +609,22 @@ public class ByteInstance : PrimitiveInstance<byte>, IByteInstance
 		converted = default!;
 		analysisFailure = new AnalysisFailure("Cannot convert value to byte", Location);
 		return false;
+	}
+
+	public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> ExclusiveOrOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+	{
+		return ArithmeticOperator(
+			right,
+			state,
+			attemptReverseConversion,
+			(rightPrimitive, analysisState) => rightPrimitive.ExclusiveOrOperator(
+				this,
+				analysisState,
+				attemptReverseConversion: false
+				),
+			(a, b) => (a ^ b),
+			Array.Empty<Action<int>>()
+			);
 	}
 }
 

@@ -51,7 +51,7 @@ public class AssignmentExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
 			SyntaxKind.ModuloAssignmentExpression => leftValue.ModuloOperator(rightValue, state, attemptReverseConversion: true),
 			SyntaxKind.AndAssignmentExpression => leftValue.LogicalAndOperator(rightValue, state, attemptReverseConversion: true),
 			SyntaxKind.OrAssignmentExpression => leftValue.LogicalOrOperator(rightValue, state, attemptReverseConversion: true),
-			SyntaxKind.ExclusiveOrAssignmentExpression => leftValue.LogicalXorOperator(rightValue, state, attemptReverseConversion: true),
+			SyntaxKind.ExclusiveOrAssignmentExpression => leftValue.ExclusiveOrOperator(rightValue, state, attemptReverseConversion: true),
 			SyntaxKind.LeftShiftAssignmentExpression => leftValue.LeftShiftOperator(rightValue, state, attemptReverseConversion: true),
 			SyntaxKind.RightShiftAssignmentExpression => leftValue.RightShiftOperator(rightValue, state, attemptReverseConversion: true),
 			_ => new AnalysisFailure($"Unsupported assignment operator: {_syntaxKind}", Location),
