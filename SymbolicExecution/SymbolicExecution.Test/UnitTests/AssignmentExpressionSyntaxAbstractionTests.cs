@@ -16,7 +16,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var symbol = Mock.Of<ISymbol>(MockBehavior.Strict);
 		var actualType = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType);
+		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType, SyntaxKind.SimpleAssignmentExpression);
 		var result = subject.AnalyzeNode(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		result.IsT1.Should().BeFalse();
 		result.T2Value.Reason.Should().Be("Assignment expression must have exactly two children");
@@ -36,7 +36,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var symbol = Mock.Of<ISymbol>(MockBehavior.Strict);
 		var actualType = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType);
+		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType, SyntaxKind.SimpleAssignmentExpression);
 		var result = subject.AnalyzeNode(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		result.IsT1.Should().BeFalse();
 		result.T2Value.Reason.Should().Be("Assignment expression must have an identifier as its first child");
@@ -58,7 +58,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var symbol = Mock.Of<ISymbol>(MockBehavior.Strict);
 		var actualType = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType);
+		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType, SyntaxKind.SimpleAssignmentExpression);
 		var result = subject.AnalyzeNode(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		result.IsT1.Should().BeFalse();
 		result.T2Value.Reason.Should().Be("Assignment expression must have a local variable as its first child");
@@ -80,7 +80,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var symbol = Mock.Of<ISymbol>(MockBehavior.Strict);
 		var actualType = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType);
+		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType, SyntaxKind.SimpleAssignmentExpression);
 		var result = subject.AnalyzeNode(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		result.IsT1.Should().BeFalse();
 		result.T2Value.Reason.Should().Be("Assignment expression must have a local variable as its first child");
@@ -102,7 +102,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var symbol = Mock.Of<ISymbol>(MockBehavior.Strict);
 		var actualType = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType);
+		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType, SyntaxKind.SimpleAssignmentExpression);
 		var result = subject.AnalyzeNode(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		result.IsT1.Should().BeFalse();
 		result.T2Value.Reason.Should().Be("Assignment expression must have an expression as its second child");
@@ -128,7 +128,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var symbol = Mock.Of<ISymbol>(MockBehavior.Strict);
 		var actualType = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType);
+		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType, SyntaxKind.SimpleAssignmentExpression);
 		var result = subject.AnalyzeNode(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		result.IsT1.Should().BeFalse();
 		result.T2Value.Reason.Should().Be("reason");
@@ -168,7 +168,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var symbol = Mock.Of<ISymbol>(MockBehavior.Strict);
 		var actualType = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType);
+		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType, SyntaxKind.SimpleAssignmentExpression);
 		var result = subject.AnalyzeNode(initialState);
 		result.IsT1.Should().BeFalse();
 		result.T2Value.Reason.Should().Be("Reason");
@@ -213,7 +213,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var symbol = Mock.Of<ISymbol>(MockBehavior.Strict);
 		var actualType = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType);
+		var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType, SyntaxKind.SimpleAssignmentExpression);
 		var result = subject.AnalyzeNode(initialState);
 		result.IsT1.Should().BeTrue();
 		var resultsArray = result.T1Value.ToArray();
@@ -230,7 +230,8 @@ public class AssignmentExpressionSyntaxAbstractionTests
 			ImmutableArray<ISyntaxNodeAbstraction>.Empty,
 			Mock.Of<ISymbol>(MockBehavior.Strict),
 			Mock.Of<Location>(MockBehavior.Strict),
-			Mock.Of<ITypeSymbol>(MockBehavior.Strict)
+			Mock.Of<ITypeSymbol>(MockBehavior.Strict),
+			SyntaxKind.SimpleAssignmentExpression
 			);
 
 		var result = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));

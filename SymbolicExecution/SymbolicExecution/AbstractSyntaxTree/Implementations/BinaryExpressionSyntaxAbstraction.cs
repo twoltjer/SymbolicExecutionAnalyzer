@@ -87,6 +87,10 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, IB
 		{
 			return left.LessThanOrEqualOperator(right, state, attemptReverseConversion: true);
 		}
+		else if (_syntaxKind == SyntaxKind.NotEqualsExpression)
+		{
+			return left.NotEqualsOperator(right, state, attemptReverseConversion: true);
+		}
 
 		return new AnalysisFailure("Cannot evaluate binary expression", Location);
 	}

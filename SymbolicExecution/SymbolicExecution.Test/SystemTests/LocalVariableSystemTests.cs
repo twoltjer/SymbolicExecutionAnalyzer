@@ -286,4 +286,53 @@ class TestClass
 			.WithMessage("The exception 'InvalidOperationException' may be thrown here and not caught");
 		await VerifyCS.VerifyAnalyzerAsync(source, expected);
 	}
+
+	[Theory]
+	[Trait("Category", "System")]
+	[InlineData(15, "==", true)]
+	[InlineData(15, "!=", false)]
+	[InlineData(15, ">", false)]
+	[InlineData(15, ">=", true)]
+	[InlineData(15, "<", false)]
+	[InlineData(15, "<=", true)]
+	public async Task TestVariousOperations(int cComparisonValue, string comparison, bool expectError)
+	{
+		var source = @$"using System;
+using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
+
+public class Program
+{{
+	[SymbolicallyAnalyze]
+	public static void Main()
+	{{
+		byte a = 0b0000_0000;
+		byte b = 0b0000_0000;
+		var c = 12L;
+
+		if (a == b)
+		{{
+			c = 13;
+		}}
+
+		c += 2;
+
+		if (c {comparison} {cComparisonValue})
+		{{
+			throw new InvalidOperationException(""This case shouldn't be possible!"");
+		}}
+	}}
+}}
+";
+		if (expectError)
+		{
+			var expected = VerifyCS.Diagnostic(descriptor: MayThrowDiagnosticDescriptor.DiagnosticDescriptor)
+				.WithLocation(22, 4)
+				.WithMessage("The exception 'InvalidOperationException' may be thrown here and not caught");
+			await VerifyCS.VerifyAnalyzerAsync(source, expected);
+		}
+		else
+		{
+			await VerifyCS.VerifyAnalyzerAsync(source);
+		}
+	}
 }

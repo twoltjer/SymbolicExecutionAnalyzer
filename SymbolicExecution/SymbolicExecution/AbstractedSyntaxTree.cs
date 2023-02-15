@@ -118,11 +118,12 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				symbol,
 				location
 				),
-			AssignmentExpressionSyntax => new AssignmentExpressionSyntaxAbstraction(
+			AssignmentExpressionSyntax assignmentExpressionSyntax => new AssignmentExpressionSyntaxAbstraction(
 				children,
 				symbol,
 				location,
-				type
+				type,
+				assignmentExpressionSyntax.Kind()
 				),
 			ExpressionStatementSyntax => new ExpressionStatementSyntaxAbstraction(
 				children,
