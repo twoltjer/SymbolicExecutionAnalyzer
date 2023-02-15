@@ -61,7 +61,31 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, IB
 	{
 		if (_syntaxKind == SyntaxKind.EqualsExpression)
 		{
-			return left.EqualsOperator(right, state);
+			return left.EqualsOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.GreaterThanExpression)
+		{
+			return left.GreaterThanOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.LessThanExpression)
+		{
+			return left.LessThanOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.LogicalAndExpression)
+		{
+			return left.LogicalAndOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.LogicalOrExpression)
+		{
+			return left.LogicalOrOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.GreaterThanOrEqualExpression)
+		{
+			return left.GreaterThanOrEqualOperator(right, state, attemptReverseConversion: true);
+		}
+		else if (_syntaxKind == SyntaxKind.LessThanOrEqualExpression)
+		{
+			return left.LessThanOrEqualOperator(right, state, attemptReverseConversion: true);
 		}
 
 		return new AnalysisFailure("Cannot evaluate binary expression", Location);

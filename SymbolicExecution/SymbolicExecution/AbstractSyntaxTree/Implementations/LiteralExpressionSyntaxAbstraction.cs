@@ -31,6 +31,18 @@ public class LiteralExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, I
 		var scope = new ConstantValueScope(_constantValue.Value, new TaggedUnion<ITypeSymbol, Type>(_type));
 		var isBool = scope.IsExactType(typeof(bool));
 		var isInt = scope.IsExactType(typeof(int));
+		var isLong = scope.IsExactType(typeof(long));
+		var isFloat = scope.IsExactType(typeof(float));
+		var isDouble = scope.IsExactType(typeof(double));
+		var isUInt = scope.IsExactType(typeof(uint));
+		var isULong = scope.IsExactType(typeof(ulong));
+		var isDecimal = scope.IsExactType(typeof(decimal));
+		var isByte = scope.IsExactType(typeof(byte));
+		var isSByte = scope.IsExactType(typeof(sbyte));
+		var isShort = scope.IsExactType(typeof(short));
+		var isUShort = scope.IsExactType(typeof(ushort));
+		var isChar = scope.IsExactType(typeof(char));
+
 		ObjectInstance result;
 		if (isBool)
 		{
@@ -39,6 +51,50 @@ public class LiteralExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, I
 		else if (isInt)
 		{
 			result = new IntInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isLong)
+		{
+			result = new LongInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isFloat)
+		{
+			result = new FloatInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isDouble)
+		{
+			result = new DoubleInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isUInt)
+		{
+			result = new UIntInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isULong)
+		{
+			result = new ULongInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isDecimal)
+		{
+			result = new DecimalInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isByte)
+		{
+			result = new ByteInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isSByte)
+		{
+			result = new SByteInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isShort)
+		{
+			result = new ShortInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isUShort)
+		{
+			result = new UShortInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+		}
+		else if (isChar)
+		{
+			result = new CharInstance(Location, scope, ObjectInstance.GetNextReferenceId());
 		}
 		else
 		{

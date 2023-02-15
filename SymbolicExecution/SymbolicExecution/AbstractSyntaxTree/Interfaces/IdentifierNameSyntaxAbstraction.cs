@@ -2,13 +2,17 @@ namespace SymbolicExecution.AbstractSyntaxTree.Interfaces;
 
 public class IdentifierNameSyntaxAbstraction : SimpleNameSyntaxAbstraction, IIdentifierNameSyntaxAbstraction
 {
+	public bool IsVar { get; }
+
 	public IdentifierNameSyntaxAbstraction(
 		ImmutableArray<ISyntaxNodeAbstraction> children,
 		ISymbol? symbol,
 		Location location,
-		ITypeSymbol? type
+		ITypeSymbol? type,
+		bool isVar
 		) : base(children, symbol, location, type)
 	{
+		IsVar = isVar;
 	}
 
 	public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)

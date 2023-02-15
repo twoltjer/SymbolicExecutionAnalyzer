@@ -51,11 +51,12 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 		var result = node switch
 		{
 			BlockSyntax => new BlockSyntaxAbstraction(children, symbol, location) as ISyntaxNodeAbstraction,
-			IdentifierNameSyntax => new IdentifierNameSyntaxAbstraction(
+			IdentifierNameSyntax identifierNameSyntax => new IdentifierNameSyntaxAbstraction(
 				children,
 				symbol ?? symbolInfo.Symbol,
 				location,
-				type
+				type,
+				identifierNameSyntax.IsVar
 				),
 			UsingDirectiveSyntax => new UsingDirectiveSyntaxAbstraction(children, symbol, location),
 			CompilationUnitSyntax => new CompilationUnitSyntaxAbstraction(children, symbol, location),
