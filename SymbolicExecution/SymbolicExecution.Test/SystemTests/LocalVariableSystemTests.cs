@@ -307,6 +307,13 @@ public class Program
 	{{
 		byte a = 0b0000_0000;
 		byte b = 0b0000_0000;
+
+		int aXorB = a ^ b;
+
+		if (aXorB != 0b0100_0011)
+		{{
+			throw new InvalidOperationException(""We're not doing math correctly"");
+		}}
 		var c = 12L;
 
 		if (a == b)

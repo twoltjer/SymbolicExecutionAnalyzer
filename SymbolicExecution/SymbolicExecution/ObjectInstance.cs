@@ -456,6 +456,22 @@ public class IntInstance : PrimitiveInstance<int>, IIntInstance
 	{
 	}
 
+	public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> ExclusiveOrOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+	{
+		return ArithmeticOperator(
+			right,
+			state,
+			attemptReverseConversion,
+			(rightPrimitive, analysisState) => rightPrimitive.ExclusiveOrOperator(
+				this,
+				analysisState,
+				attemptReverseConversion: false
+				),
+			(a, b) => (a ^ b),
+			Array.Empty<Action<int>>()
+			);
+	}
+
 	public override bool TryConvert(IObjectInstance value, out IPrimitiveInstance<int> converted, out AnalysisFailure? analysisFailure)
 	{
 		converted = default!;
