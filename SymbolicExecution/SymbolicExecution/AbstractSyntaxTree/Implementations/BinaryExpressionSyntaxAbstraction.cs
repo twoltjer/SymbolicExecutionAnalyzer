@@ -61,7 +61,7 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, IB
 	{
 		if (_syntaxKind == SyntaxKind.EqualsExpression)
 		{
-			return left.EqualsOperator(right, state, attemptReverseConversion: true);
+			return left.EqualsOperator(right, state);
 		}
 		else if (_syntaxKind == SyntaxKind.GreaterThanExpression)
 		{
