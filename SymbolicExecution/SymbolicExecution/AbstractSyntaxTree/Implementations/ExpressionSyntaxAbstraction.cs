@@ -13,4 +13,6 @@ public abstract class ExpressionSyntaxAbstraction : ExpressionOrPatternSyntaxAbs
 	{
 		_type = typeSymbol;
 	}
+	
+	public abstract TaggedUnion<ImmutableArray<(int, IAnalysisState)>, AnalysisFailure> GetResults(IAnalysisState state);
 }

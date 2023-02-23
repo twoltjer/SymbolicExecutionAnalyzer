@@ -189,17 +189,4 @@ public class VariableDeclarationSyntaxAbstractionTests
 		result.IsT1.Should().BeTrue();
 		result.T1Value.Should().BeEquivalentTo(helperResults);
 	}
-
-	[Fact]
-	[Trait("Category", "Unit")]
-	public void TestGetExpressionResults_Always_ReturnsAnalysisFailure()
-	{
-		var nodeLocation = Mock.Of<Location>(MockBehavior.Strict);
-		var helper = Mock.Of<IVariableDeclarationSyntaxAbstractionHelper>(MockBehavior.Strict);
-		var subject = new VariableDeclarationSyntaxAbstraction(ImmutableArray<ISyntaxNodeAbstraction>.Empty, Mock.Of<ISymbol>(MockBehavior.Strict), nodeLocation, helper);
-		var result = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
-		result.IsT1.Should().BeFalse();
-		result.T2Value.Reason.Should().Be("Variable declaration syntax does not have an expression");
-		result.T2Value.Location.Should().BeSameAs(nodeLocation);
-	}
 }

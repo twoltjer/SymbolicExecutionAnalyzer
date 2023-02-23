@@ -20,7 +20,7 @@ public class LiteralExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, I
 		return new AnalysisFailure("Cannot analyze literal expressions", Location);
 	}
 
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
+	public override TaggedUnion<ImmutableArray<(int, IAnalysisState)>, AnalysisFailure> GetResults(IAnalysisState state)
 	{
 		if (!_constantValue.HasValue)
 			return new AnalysisFailure("Cannot analyze literal expressions without constant values", Location);
@@ -100,6 +100,8 @@ public class LiteralExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, I
 		{
 			return new AnalysisFailure("Literal expressions not a known type", Location);
 		}
-		return ImmutableArray.Create((result as IObjectInstance, state));
+
+		state = state.AddReference(result.Reference, result);
+		return ImmutableArray.Create((result.Reference, state));
 	}
 }

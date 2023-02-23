@@ -20,15 +20,15 @@ public class IdentifierNameSyntaxAbstraction : SimpleNameSyntaxAbstraction, IIde
 		return new[] { previous };
 	}
 
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
+	public override TaggedUnion<ImmutableArray<(int, IAnalysisState)>, AnalysisFailure> GetResults(IAnalysisState state)
 	{
 		if (Symbol == null)
 			return new AnalysisFailure("Cannot get the result of an identifier name without a symbol", Location.None);
 
-		var valueOrFault = state.GetSymbolValueOrFailure(Symbol, Location);
+		var valueOrFault = state.GetSymbolReferenceOrFailure(Symbol, Location);
 		if (!valueOrFault.IsT1)
 			return valueOrFault.T2Value;
 
-		return ImmutableArray.Create((valueOrFault.T1Value, state));
+		return ImmutableArray.Create((valueOrFault.T1Value, analysisState: state));
 	}
 }

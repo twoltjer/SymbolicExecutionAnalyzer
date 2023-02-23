@@ -16,7 +16,7 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 		return new AnalysisFailure("Object creation syntax should not be traversed, but evaluated as an expression", Location);
 	}
 
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
+	public override TaggedUnion<ImmutableArray<(int, IAnalysisState)>, AnalysisFailure> GetResults(IAnalysisState state)
 	{
 		if (Children.Length != 2)
 		{
@@ -44,7 +44,8 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 			Location,
 			new ReferenceTypeScope(_type),
 			ObjectInstance.GetNextReferenceId()
-			);
-		return ImmutableArray.Create((objectInstance as IObjectInstance, state));
+		);
+		state = state.AddReference(objectInstance.Reference, objectInstance);
+		return ImmutableArray.Create((objectInstance.Reference, state));
 	}
 }

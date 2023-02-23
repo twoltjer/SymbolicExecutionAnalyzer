@@ -14,9 +14,4 @@ public class ArgumentSyntaxAbstraction : CSharpSyntaxNodeAbstraction, IArgumentS
 	{
 		return new AnalysisFailure("Cannot analyze argument expressions", Location);
 	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Cannot analyze argument expressions", Location);
-	}
 }

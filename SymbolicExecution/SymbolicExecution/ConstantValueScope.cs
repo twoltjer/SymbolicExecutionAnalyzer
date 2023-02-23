@@ -11,7 +11,7 @@ public class ConstantValueScope : IValueScope
 		_type = type;
 	}
 
-	public bool CanBe(object? value)
+	public bool CouldBe(object? value)
 	{
 		if (Value == null)
 		{
@@ -31,6 +31,11 @@ public class ConstantValueScope : IValueScope
 
 	public bool IsAlways(object? value)
 	{
-		return CanBe(value);
+		return CouldBe(value);
+	}
+
+	public TaggedUnion<IAnalysisState, AnalysisFailure> ApplyConstraint(IConstraint exactValueConstraint)
+	{
+		return new AnalysisFailure("Cannot apply constraint to constant value", Location.None);
 	}
 }

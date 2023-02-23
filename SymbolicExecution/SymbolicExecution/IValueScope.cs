@@ -2,7 +2,11 @@ namespace SymbolicExecution;
 
 public interface IValueScope
 {
-	bool CanBe(object? value);
-	bool IsExactType(Type type);
+	bool CouldBe(object? value);
 	bool IsAlways(object? value);
+	TaggedUnion<IAnalysisState, AnalysisFailure> ApplyConstraint(IConstraint exactValueConstraint);
+}
+
+public interface IConstraint
+{
 }

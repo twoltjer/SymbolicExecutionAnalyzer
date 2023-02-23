@@ -15,7 +15,9 @@ public class ThrowStatementSyntaxAbstraction : StatementSyntaxAbstraction, IThro
 		if (Children.Length != 1)
 			return new AnalysisFailure("Throw statement expected to have exactly one child", Location);
 
-		var expressionResultOrFailure = Children[0].GetExpressionResults(previous);
+		if (Children[0] is not IExpressionSyntaxAbstraction expressionSyntaxAbstraction)
+			return new AnalysisFailure("Throw statement child expected to be an expression", Location);
+		var expressionResultOrFailure = expressionSyntaxAbstraction.GetResults(previous);
 		if (!expressionResultOrFailure.IsT1)
 			return expressionResultOrFailure.T2Value;
 
@@ -28,10 +30,5 @@ public class ThrowStatementSyntaxAbstraction : StatementSyntaxAbstraction, IThro
 		}
 
 		return thrownStates;
-	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Cannot analyze throw statements", Location);
 	}
 }

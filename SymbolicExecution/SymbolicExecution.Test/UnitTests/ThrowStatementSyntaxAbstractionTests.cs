@@ -26,12 +26,12 @@ public class ThrowStatementSyntaxAbstractionTests
 	{
 		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var location = Mock.Of<Location>(MockBehavior.Strict);
-		var child = Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict);
-		var children = ImmutableArray.Create(child);
+		var child = Mock.Of<IExpressionSyntaxAbstraction>(MockBehavior.Strict);
+		var children = ImmutableArray.Create(child as ISyntaxNodeAbstraction);
 		var subject = new ThrowStatementSyntaxAbstraction(children, null, location);
 		var failure = new AnalysisFailure("Reason", location);
 		Mock.Get(child)
-			.Setup(x => x.GetExpressionResults(state))
+			.Setup(x => x.GetResults(state))
 			.Returns(failure);
 		var result = subject.AnalyzeNode(state);
 		result.IsT1.Should().BeFalse();
@@ -51,38 +51,24 @@ public class ThrowStatementSyntaxAbstractionTests
 			new LinePositionSpan(new LinePosition(10, 10), new LinePosition(10, 12)));
 		var exceptionObject = Mock.Of<IObjectInstance>(MockBehavior.Strict);
 		Mock.Get(initialState)
-			.Setup(state => state.ThrowException(exceptionObject, exceptionLocation))
+			.Setup(state => state.ThrowException(exceptionObject.Reference, exceptionLocation))
 			.Returns(modifiedState);
 		Mock.Get(initialState)
-			.Setup(state => state.ThrowException(exceptionObject, throwLocation))
+			.Setup(state => state.ThrowException(exceptionObject.Reference, throwLocation))
 			.Returns(modifiedState);
-		var child = Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict);
+		var child = Mock.Of<IExpressionSyntaxAbstraction>(MockBehavior.Strict);
 		Mock.Get(child)
-			.Setup(x => x.GetExpressionResults(initialState))
+			.Setup(x => x.GetResults(initialState))
 			.Returns(
-				new TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure>(
-					new[] { (exceptionObject, initialState) }.ToImmutableArray()
+				new TaggedUnion<ImmutableArray<(int, IAnalysisState)>, AnalysisFailure>(
+					new[] { (exceptionObject.Reference, initialState) }.ToImmutableArray()
 					)
 				);
-		var children = ImmutableArray.Create(child);
+		var children = ImmutableArray.Create(child as ISyntaxNodeAbstraction);
 		var subject = new ThrowStatementSyntaxAbstraction(children, null, throwLocation);
 		var result = subject.AnalyzeNode(initialState);
 		result.IsT1.Should().BeTrue();
 		result.T1Value.Count().Should().Be(1);
 		result.T1Value.Single().Should().BeSameAs(modifiedState);
-	}
-
-	[Fact]
-	[Trait("Category", "Unit")]
-	public void TestGetExpressionResult_Always_ReturnsAnalysisFailure()
-	{
-		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
-		var location = Mock.Of<Location>(MockBehavior.Strict);
-		var children = ImmutableArray<ISyntaxNodeAbstraction>.Empty;
-		var subject = new ThrowStatementSyntaxAbstraction(children, null, location);
-		var results = subject.GetExpressionResults(state);
-		results.IsT1.Should().BeFalse();
-		results.T2Value.Location.Should().BeSameAs(location);
-		results.T2Value.Reason.Should().Be("Cannot analyze throw statements");
 	}
 }

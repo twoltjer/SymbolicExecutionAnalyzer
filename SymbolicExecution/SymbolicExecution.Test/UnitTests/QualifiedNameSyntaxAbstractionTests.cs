@@ -24,7 +24,7 @@ public class QualifiedNameSyntaxAbstractionTests
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var children = ImmutableArray<ISyntaxNodeAbstraction>.Empty;
 		var subject = new QualifiedNameSyntaxAbstraction(children, null, location, default);
-		var results = subject.GetExpressionResults(state);
+		var results = subject.GetResults(state);
 		results.IsT1.Should().BeFalse();
 		results.T2Value.Location.Should().BeSameAs(location);
 		results.T2Value.Reason.Should().Be("Cannot analyze qualified names");

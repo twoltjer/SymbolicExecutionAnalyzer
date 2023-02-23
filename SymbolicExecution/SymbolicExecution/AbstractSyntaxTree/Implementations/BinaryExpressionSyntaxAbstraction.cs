@@ -28,18 +28,19 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, IB
 		return new AnalysisFailure("Cannot analyze a binary expression", Location);
 	}
 
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
+
+	public override TaggedUnion<ImmutableArray<(int, IAnalysisState)>, AnalysisFailure> GetResults(IAnalysisState state)
 	{
-		var leftOrFailure = _left.GetExpressionResults(state);
+		var leftOrFailure = _left.GetResults(state);
 		if (!leftOrFailure.IsT1)
 			return leftOrFailure.T2Value;
 		
 		var leftResults = leftOrFailure.T1Value;
 		
-		var results = new List<(IObjectInstance, IAnalysisState)>();
+		var results = new List<(int, IAnalysisState)>();
 		foreach (var (leftResult, leftState) in leftResults)
 		{
-			var rightOrFailure = _right.GetExpressionResults(leftState);
+			var rightOrFailure = _right.GetResults(leftState);
 			if (!rightOrFailure.IsT1)
 				return rightOrFailure.T2Value;
 
@@ -57,40 +58,40 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, IB
 		return results.ToImmutableArray();
 	}
 
-	public TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> Evaluate(IObjectInstance left, IObjectInstance right, IAnalysisState state)
+	private TaggedUnion<ImmutableArray<(int, IAnalysisState)>, AnalysisFailure> Evaluate(int leftReference, int rightReference, IAnalysisState state)
 	{
-		if (_syntaxKind == SyntaxKind.EqualsExpression)
-		{
-			return left.EqualsOperator(right, state, attemptReverseConversion: true);
-		}
-		else if (_syntaxKind == SyntaxKind.GreaterThanExpression)
-		{
-			return left.GreaterThanOperator(right, state, attemptReverseConversion: true);
-		}
-		else if (_syntaxKind == SyntaxKind.LessThanExpression)
-		{
-			return left.LessThanOperator(right, state, attemptReverseConversion: true);
-		}
-		else if (_syntaxKind == SyntaxKind.LogicalAndExpression)
-		{
-			return left.LogicalAndOperator(right, state, attemptReverseConversion: true);
-		}
-		else if (_syntaxKind == SyntaxKind.LogicalOrExpression)
-		{
-			return left.LogicalOrOperator(right, state, attemptReverseConversion: true);
-		}
-		else if (_syntaxKind == SyntaxKind.GreaterThanOrEqualExpression)
-		{
-			return left.GreaterThanOrEqualOperator(right, state, attemptReverseConversion: true);
-		}
-		else if (_syntaxKind == SyntaxKind.LessThanOrEqualExpression)
-		{
-			return left.LessThanOrEqualOperator(right, state, attemptReverseConversion: true);
-		}
-		else if (_syntaxKind == SyntaxKind.NotEqualsExpression)
-		{
-			return left.NotEqualsOperator(right, state, attemptReverseConversion: true);
-		}
+		// if (_syntaxKind == SyntaxKind.EqualsExpression)
+		// {
+		// 	return left.EqualsOperator(right, state, attemptReverseConversion: true);
+		// }
+		// else if (_syntaxKind == SyntaxKind.GreaterThanExpression)
+		// {
+		// 	return left.GreaterThanOperator(right, state, attemptReverseConversion: true);
+		// }
+		// else if (_syntaxKind == SyntaxKind.LessThanExpression)
+		// {
+		// 	return left.LessThanOperator(right, state, attemptReverseConversion: true);
+		// }
+		// else if (_syntaxKind == SyntaxKind.LogicalAndExpression)
+		// {
+		// 	return left.LogicalAndOperator(right, state, attemptReverseConversion: true);
+		// }
+		// else if (_syntaxKind == SyntaxKind.LogicalOrExpression)
+		// {
+		// 	return left.LogicalOrOperator(right, state, attemptReverseConversion: true);
+		// }
+		// else if (_syntaxKind == SyntaxKind.GreaterThanOrEqualExpression)
+		// {
+		// 	return left.GreaterThanOrEqualOperator(right, state, attemptReverseConversion: true);
+		// }
+		// else if (_syntaxKind == SyntaxKind.LessThanOrEqualExpression)
+		// {
+		// 	return left.LessThanOrEqualOperator(right, state, attemptReverseConversion: true);
+		// }
+		// else if (_syntaxKind == SyntaxKind.NotEqualsExpression)
+		// {
+		// 	return left.NotEqualsOperator(right, state, attemptReverseConversion: true);
+		// }
 
 		return new AnalysisFailure("Cannot evaluate binary expression", Location);
 	}

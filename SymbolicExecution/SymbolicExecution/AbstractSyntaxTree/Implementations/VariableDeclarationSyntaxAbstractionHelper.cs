@@ -34,17 +34,22 @@ public class VariableDeclarationSyntaxAbstractionHelper : IVariableDeclarationSy
 		{
 			return new AnalysisFailure("Equals value clause must have exactly one child", _location);
 		}
+		
+		if (equalsValueClauseChildren[0] is not IExpressionSyntaxAbstraction expressionSyntaxAbstraction)
+		{
+			return new AnalysisFailure("Equals value clause must have an expression as its child", _location);
+		}
 
-		var valueResultsOrFailure = equalsValueClauseChildren[0].GetExpressionResults(previous);
-		if (!valueResultsOrFailure.IsT1)
-			return valueResultsOrFailure.T2Value;
+		var valueRefsOrFailure = expressionSyntaxAbstraction.GetResults(previous);
+		if (!valueRefsOrFailure.IsT1)
+			return valueRefsOrFailure.T2Value;
 
-		var valueResults = valueResultsOrFailure.T1Value;
+		var valueResults = valueRefsOrFailure.T1Value;
 		var returnStates = new List<IAnalysisState>(valueResults.Length);
 		foreach (var (value, state) in valueResults)
 		{
 			var stateWithVar = state.AddLocalVariable(localSymbol);
-			var result = stateWithVar.SetSymbolValue(localSymbol, value);
+			var result = stateWithVar.SetSymbolReference(localSymbol, value);
 			if (result.IsT1)
 				returnStates.Add(result.T1Value);
 			else

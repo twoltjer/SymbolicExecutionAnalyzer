@@ -9,7 +9,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope(null, new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe(null);
+		var actual = constantValueScope.CouldBe(null);
 
 		actual.Should().BeTrue();
 	}
@@ -23,7 +23,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope(null, new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe(input);
+		var actual = constantValueScope.CouldBe(input);
 
 		actual.Should().BeFalse();
 	}
@@ -35,7 +35,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope(true, new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe(null);
+		var actual = constantValueScope.CouldBe(null);
 
 		actual.Should().BeFalse();
 	}
@@ -47,7 +47,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope(true, new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe(true);
+		var actual = constantValueScope.CouldBe(true);
 
 		actual.Should().BeTrue();
 	}
@@ -59,7 +59,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope(true, new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe(false);
+		var actual = constantValueScope.CouldBe(false);
 
 		actual.Should().BeFalse();
 	}
@@ -71,7 +71,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope(0, new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe(null);
+		var actual = constantValueScope.CouldBe(null);
 
 		actual.Should().BeFalse();
 	}
@@ -83,7 +83,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope(0, new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe(0);
+		var actual = constantValueScope.CouldBe(0);
 
 		actual.Should().BeTrue();
 	}
@@ -95,7 +95,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope(0, new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe(1);
+		var actual = constantValueScope.CouldBe(1);
 
 		actual.Should().BeFalse();
 	}
@@ -107,7 +107,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope("A", new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe(null);
+		var actual = constantValueScope.CouldBe(null);
 
 		actual.Should().BeFalse();
 	}
@@ -119,7 +119,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope("A", new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe("A");
+		var actual = constantValueScope.CouldBe("A");
 
 		actual.Should().BeTrue();
 	}
@@ -131,7 +131,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope("A", new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe("B");
+		var actual = constantValueScope.CouldBe("B");
 
 		actual.Should().BeFalse();
 	}
@@ -143,7 +143,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope("1", new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe(1);
+		var actual = constantValueScope.CouldBe(1);
 
 		actual.Should().BeFalse();
 	}
@@ -155,7 +155,7 @@ public class ConstantValueScopeTests
 		var mockTypeSymbol = new Mock<ITypeSymbol>(MockBehavior.Strict);
 		var constantValueScope = new ConstantValueScope(string.Empty, new TaggedUnion<ITypeSymbol, Type>(mockTypeSymbol.Object));
 
-		var actual = constantValueScope.CanBe(null);
+		var actual = constantValueScope.CouldBe(null);
 
 		actual.Should().BeFalse();
 	}

@@ -145,6 +145,14 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				type,
 				binaryExpressionSyntax.Kind()
 				),
+			ParameterSyntax => new ParameterSyntaxAbstraction(children, symbol, location),
+			PrefixUnaryExpressionSyntax prefixUnaryExpressionSyntax => new PrefixUnaryExpressionSyntaxAbstraction(
+				children,
+				symbol,
+				location,
+				type,
+				prefixUnaryExpressionSyntax.Kind()
+				),
 			_ => null,
 		};
 

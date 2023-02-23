@@ -9,7 +9,7 @@ public class ReferenceTypeScope : IValueScope
 		_typeSymbol = typeSymbol;
 	}
 
-	public bool CanBe(object? value)
+	public bool CouldBe(object? value)
 	{
 		return false;
 	}
@@ -22,5 +22,10 @@ public class ReferenceTypeScope : IValueScope
 	public bool IsAlways(object? value)
 	{
 		return false;
+	}
+
+	public TaggedUnion<IAnalysisState, AnalysisFailure> ApplyConstraint(IConstraint exactValueConstraint)
+	{
+		return new AnalysisFailure("Cannot apply constraint to reference type", Location.None);
 	}
 }

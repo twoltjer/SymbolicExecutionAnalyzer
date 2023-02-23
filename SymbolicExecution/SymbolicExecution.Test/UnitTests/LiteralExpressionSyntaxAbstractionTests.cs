@@ -28,14 +28,15 @@ public class LiteralExpressionSyntaxAbstractionTests
 		var typeSymbol = Mock.Of<ITypeSymbol>(type => type.Name == "Boolean" && type.ContainingNamespace == namespaceSymbol, MockBehavior.Strict);
 #pragma warning restore RS1024
 		var subject = new LiteralExpressionSyntaxAbstraction(children, null, location, true, typeSymbol);
-		var results = subject.GetExpressionResults(state);
+		var results = subject.GetResults(state);
 		results.IsT1.Should().BeTrue();
 		results.T1Value.Length.Should().Be(1);
 		var result = results.T1Value.Single();
-		result.Item1.Type.Match(x => x.Name, y => y.Name).Should().Be("Boolean");
-		result.Item1.Location.Should().BeSameAs(location);
-		result.Item1.Value.Should().BeOfType<ConstantValueScope>();
-		result.Item1.Value.IsAlways(true).Should().BeTrue();
+		var resultObject = result.Item2.References[result.Item1];
+		resultObject.Type.Match(x => x.Name, y => y.Name).Should().Be("Boolean");
+		resultObject.Location.Should().BeSameAs(location);
+		resultObject.ValueScope.Should().BeOfType<ConstantValueScope>();
+		resultObject.ValueScope.IsAlways(true).Should().BeTrue();
 	}
 
 	[Fact]
@@ -48,7 +49,7 @@ public class LiteralExpressionSyntaxAbstractionTests
 		var typeSymbol = Mock.Of<ITypeSymbol>(type => type.Name == "Boolean", MockBehavior.Strict);
 		var symbol = Mock.Of<ISymbol>(MockBehavior.Strict);
 		var subject = new LiteralExpressionSyntaxAbstraction(children, symbol, location, new Optional<object>(), typeSymbol);
-		var results = subject.GetExpressionResults(state);
+		var results = subject.GetResults(state);
 		results.IsT1.Should().BeFalse();
 		results.T2Value.Location.Should().BeSameAs(location);
 		results.T2Value.Reason.Should().Be("Cannot analyze literal expressions without constant values");
@@ -62,7 +63,7 @@ public class LiteralExpressionSyntaxAbstractionTests
 		var location = Mock.Of<Location>(MockBehavior.Strict);
 		var children = ImmutableArray<ISyntaxNodeAbstraction>.Empty;
 		var subject = new LiteralExpressionSyntaxAbstraction(children, null, location, true, null);
-		var results = subject.GetExpressionResults(state);
+		var results = subject.GetResults(state);
 		results.IsT1.Should().BeFalse();
 		results.T2Value.Location.Should().BeSameAs(location);
 		results.T2Value.Reason.Should().Be("Cannot analyze literal expressions without actual type symbols");

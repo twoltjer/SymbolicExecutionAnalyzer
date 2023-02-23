@@ -17,7 +17,7 @@ public class AssignmentExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
 		_syntaxKind = syntaxKind;
 	}
 
-	private TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> PerformAssignment(IAnalysisState state, ILocalSymbol localSymbol, IObjectInstance rightValue)
+	private TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> PerformAssignment(IAnalysisState state, ILocalSymbol localSymbol, int rightValue)
 	{
 		if (_syntaxKind == SyntaxKind.SimpleAssignmentExpression)
 			return PerformSimpleAssignment(state, localSymbol, rightValue);
@@ -25,35 +25,35 @@ public class AssignmentExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
 			return PerformOperatorAssignment(state, localSymbol, rightValue);
 	}
 
-	private TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> PerformSimpleAssignment(IAnalysisState state, ILocalSymbol localSymbol, IObjectInstance rightValue)
+	private TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> PerformSimpleAssignment(IAnalysisState state, ILocalSymbol localSymbol, int rightValue)
 	{
-		var newStateOrFailure = state.SetSymbolValue(localSymbol, rightValue);
+		var newStateOrFailure = state.SetSymbolReference(localSymbol, rightValue);
 		if (!newStateOrFailure.IsT1)
 			return newStateOrFailure.T2Value;
 
 		return new[] { newStateOrFailure.T1Value };
 	}
 
-	private TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> PerformOperatorAssignment(IAnalysisState state, ILocalSymbol localSymbol, IObjectInstance rightValue)
+	private TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> PerformOperatorAssignment(IAnalysisState state, ILocalSymbol localSymbol, int rightValue)
 	{
-		var leftValueOrFailure = state.GetSymbolValueOrFailure(localSymbol, Location);
-		if (!leftValueOrFailure.IsT1)
-			return leftValueOrFailure.T2Value;
+		var leftReferenceOrFailure = state.GetSymbolReferenceOrFailure(localSymbol, Location);
+		if (!leftReferenceOrFailure.IsT1)
+			return leftReferenceOrFailure.T2Value;
 
-		var leftValue = leftValueOrFailure.T1Value;
+		var leftReference = leftReferenceOrFailure.T1Value;
 
-		TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> operationResultOrFailure = _syntaxKind switch
+		TaggedUnion<IEnumerable<(int, IAnalysisState)>, AnalysisFailure> operationResultOrFailure = _syntaxKind switch
 		{
-			SyntaxKind.AddAssignmentExpression => leftValue.AddOperator(rightValue, state, attemptReverseConversion: true),
-			SyntaxKind.SubtractAssignmentExpression => leftValue.SubtractOperator(rightValue, state, attemptReverseConversion: true),
-			SyntaxKind.MultiplyAssignmentExpression => leftValue.MultiplyOperator(rightValue, state, attemptReverseConversion: true),
-			SyntaxKind.DivideAssignmentExpression => leftValue.DivideOperator(rightValue, state, attemptReverseConversion: true),
-			SyntaxKind.ModuloAssignmentExpression => leftValue.ModuloOperator(rightValue, state, attemptReverseConversion: true),
-			SyntaxKind.AndAssignmentExpression => leftValue.LogicalAndOperator(rightValue, state, attemptReverseConversion: true),
-			SyntaxKind.OrAssignmentExpression => leftValue.LogicalOrOperator(rightValue, state, attemptReverseConversion: true),
-			SyntaxKind.ExclusiveOrAssignmentExpression => leftValue.LogicalXorOperator(rightValue, state, attemptReverseConversion: true),
-			SyntaxKind.LeftShiftAssignmentExpression => leftValue.LeftShiftOperator(rightValue, state, attemptReverseConversion: true),
-			SyntaxKind.RightShiftAssignmentExpression => leftValue.RightShiftOperator(rightValue, state, attemptReverseConversion: true),
+			// SyntaxKind.AddAssignmentExpression => leftReference.AddOperator(rightValue, state, attemptReverseConversion: true),
+			// SyntaxKind.SubtractAssignmentExpression => leftReference.SubtractOperator(rightValue, state, attemptReverseConversion: true),
+			// SyntaxKind.MultiplyAssignmentExpression => leftReference.MultiplyOperator(rightValue, state, attemptReverseConversion: true),
+			// SyntaxKind.DivideAssignmentExpression => leftReference.DivideOperator(rightValue, state, attemptReverseConversion: true),
+			// SyntaxKind.ModuloAssignmentExpression => leftReference.ModuloOperator(rightValue, state, attemptReverseConversion: true),
+			// SyntaxKind.AndAssignmentExpression => leftReference.LogicalAndOperator(rightValue, state, attemptReverseConversion: true),
+			// SyntaxKind.OrAssignmentExpression => leftReference.LogicalOrOperator(rightValue, state, attemptReverseConversion: true),
+			// SyntaxKind.ExclusiveOrAssignmentExpression => leftReference.LogicalXorOperator(rightValue, state, attemptReverseConversion: true),
+			// SyntaxKind.LeftShiftAssignmentExpression => leftReference.LeftShiftOperator(rightValue, state, attemptReverseConversion: true),
+			// SyntaxKind.RightShiftAssignmentExpression => leftReference.RightShiftOperator(rightValue, state, attemptReverseConversion: true),
 			_ => new AnalysisFailure($"Unsupported assignment operator: {_syntaxKind}", Location),
 		};
 
@@ -64,7 +64,7 @@ public class AssignmentExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
 		var newStates = new List<IAnalysisState>();
 		foreach (var (result, modifiedState) in operationResult)
 		{
-			var newStateOrFailure = modifiedState.SetSymbolValue(localSymbol, result);
+			var newStateOrFailure = modifiedState.SetSymbolReference(localSymbol, result);
 			if (!newStateOrFailure.IsT1)
 				return newStateOrFailure.T2Value;
 
@@ -88,7 +88,7 @@ public class AssignmentExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
 		if (Children[1] is not IExpressionSyntaxAbstraction expression)
 			return new AnalysisFailure("Assignment expression must have an expression as its second child", Location);
 
-		var resultsOrFailure = expression.GetExpressionResults(previous);
+		var resultsOrFailure = expression.GetResults(previous);
 		if (!resultsOrFailure.IsT1)
 			return resultsOrFailure.T2Value;
 
@@ -107,7 +107,7 @@ public class AssignmentExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
 		return returnStates;
 	}
 
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
+	public override TaggedUnion<ImmutableArray<(int, IAnalysisState)>, AnalysisFailure> GetResults(IAnalysisState state)
 	{
 		return new AnalysisFailure("Cannot get the result of an assignment expression", Location);
 	}

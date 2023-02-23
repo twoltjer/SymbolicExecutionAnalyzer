@@ -14,9 +14,4 @@ public class ArgumentListSyntaxAbstraction : BaseArgumentListSyntaxAbstraction, 
 	{
 		return new AnalysisFailure("Cannot analyze argument lists", Location);
 	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Cannot analyze argument lists", Location);
-	}
 }

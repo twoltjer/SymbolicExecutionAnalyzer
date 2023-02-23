@@ -52,19 +52,4 @@ public class LocalDeclarationStatementSyntaxAbstractionTests
         resultsArray.Length.Should().Be(1);
         resultsArray[0].Should().BeSameAs(modifiedState);
     }
-    
-    [Fact]
-    [Trait("Category", "Unit")]
-    public void TestGetExpressionResults_Always_ReturnsFailure()
-    {
-        var subject = new LocalDeclarationStatementSyntaxAbstraction(
-            ImmutableArray<ISyntaxNodeAbstraction>.Empty,
-            Mock.Of<ISymbol>(MockBehavior.Strict),
-            Mock.Of<Location>(MockBehavior.Strict));
-        
-        var result = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
-        result.IsT1.Should().BeFalse();
-        result.T2Value.Reason.Should().Be("Cannot get the result of a local declaration statement");
-        result.T2Value.Location.Should().BeSameAs(subject.Location);
-    }
 }

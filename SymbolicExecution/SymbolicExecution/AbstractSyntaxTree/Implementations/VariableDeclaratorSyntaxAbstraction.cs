@@ -10,9 +10,4 @@ public class VariableDeclaratorSyntaxAbstraction : CSharpSyntaxNodeAbstraction, 
 	{
 		return new AnalysisFailure("Cannot analyze a variable declarator", Location);
 	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Cannot get the expression results of a variable declarator", Location);
-	}
 }

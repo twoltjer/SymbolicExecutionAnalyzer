@@ -62,20 +62,4 @@ public class ExpressionStatementSyntaxAbstractionTests
 		result.IsT1.Should().BeTrue();
 		result.T1Value.Single().Should().BeSameAs(modifiedState);
 	}
-
-	[Fact]
-	[Trait("Category", "Unit")]
-	public void TestGetExpressionResults_Always_ReturnsAnalysisFailure()
-	{
-		var nodeLocation = Mock.Of<Location>(MockBehavior.Strict);
-		var subject = new ExpressionStatementSyntaxAbstraction(
-			ImmutableArray<ISyntaxNodeAbstraction>.Empty,
-			Mock.Of<ISymbol>(MockBehavior.Strict),
-			nodeLocation
-			);
-		var result = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
-		result.IsT1.Should().BeFalse();
-		result.T2Value.Reason.Should().Be("Cannot get the result of an expression statement");
-		result.T2Value.Location.Should().BeSameAs(nodeLocation);
-	}
 }

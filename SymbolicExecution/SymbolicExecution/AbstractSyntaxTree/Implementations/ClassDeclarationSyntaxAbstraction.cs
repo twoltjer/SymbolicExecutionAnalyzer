@@ -9,9 +9,4 @@ public class ClassDeclarationSyntaxAbstraction : TypeDeclarationSyntaxAbstractio
 	{
 		return new AnalysisFailure("Cannot analyze class declarations", Location);
 	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Cannot analyze class declarations", Location);
-	}
 }

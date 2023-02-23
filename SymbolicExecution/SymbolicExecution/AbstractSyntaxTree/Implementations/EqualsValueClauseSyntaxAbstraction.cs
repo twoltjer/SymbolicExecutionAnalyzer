@@ -10,9 +10,4 @@ public class EqualsValueClauseSyntaxAbstraction : CSharpSyntaxNodeAbstraction, I
 	{
 		return new AnalysisFailure("Cannot analyze an equals value clause", Location);
 	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Cannot get the result of an equals value clause", Location);
-	}
 }

@@ -12,11 +12,6 @@ public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbs
 
 	public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)
 	{
-		throw new NotImplementedException();
-	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Cannot analyze method declarations", Location);
 	}
 }

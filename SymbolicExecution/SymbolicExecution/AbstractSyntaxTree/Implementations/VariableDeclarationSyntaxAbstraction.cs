@@ -58,9 +58,4 @@ public class VariableDeclarationSyntaxAbstraction : CSharpSyntaxNodeAbstraction,
 
 		return _helper.AnalyzeNodeWithOneDeclaratorChild(previous, localSymbol, variableDeclaratorChildren[0]);
 	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Variable declaration syntax does not have an expression", Location);
-	}
 }

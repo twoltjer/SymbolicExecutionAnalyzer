@@ -37,9 +37,4 @@ public class BlockSyntaxAbstraction : StatementSyntaxAbstraction, IBlockSyntaxAb
 
 		return new TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure>(current);
 	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		throw new NotImplementedException();
-	}
 }

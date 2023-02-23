@@ -24,9 +24,4 @@ public class LocalDeclarationStatementSyntaxAbstraction : StatementSyntaxAbstrac
 
 		return variableDeclarationSyntaxAbstraction.AnalyzeNode(previous);
 	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Cannot get the result of a local declaration statement", Location);
-	}
 }

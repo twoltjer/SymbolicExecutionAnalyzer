@@ -22,21 +22,26 @@ public class IfStatementSyntaxAbstraction : StatementSyntaxAbstraction, IIfState
 
 	public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)
 	{
-		var conditionResultsOrFailure = _condition.GetExpressionResults(previous);
+		var conditionResultsOrFailure = _condition.GetResults(previous);
 		if (!conditionResultsOrFailure.IsT1)
 			return conditionResultsOrFailure.T2Value;
 
 		var conditionResults = conditionResultsOrFailure.T1Value;
 		var modifiedStates = new List<IAnalysisState>();
-		foreach (var (conditionResult, stateAfterExpression) in conditionResults)
+		foreach (var (conditionResultReference, stateAfterExpression) in conditionResults)
 		{
 			if (!stateAfterExpression.IsReachable)
 				continue;
 
-			if (!conditionResult.IsExactType(typeof(bool)))
+			var conditionResult = stateAfterExpression.References[conditionResultReference];
+			if (!conditionResult.IsType(typeof(bool)))
 				return new AnalysisFailure("Condition must be a boolean", Location);
 
-			if (conditionResult.Value.CanBe(true))
+			var stateWithAppliedTrueConstraintOrFailure =
+				conditionResult.ValueScope.ApplyConstraint(new ExactValueConstraint(true));
+			if (!stateWithAppliedTrueConstraintOrFailure.IsT1)
+				return stateWithAppliedTrueConstraintOrFailure.T2Value;
+			if (stateWithAppliedTrueConstraintOrFailure.T1Value.IsReachable)
 			{
 				 var statementResultsOrFailure = _statement.AnalyzeNode(stateAfterExpression);
 				 if (!statementResultsOrFailure.IsT1)
@@ -45,18 +50,19 @@ public class IfStatementSyntaxAbstraction : StatementSyntaxAbstraction, IIfState
 				 modifiedStates.AddRange(statementResultsOrFailure.T1Value);
 			}
 
-			if (conditionResult.Value.CanBe(false))
+			var stateWithAppliedFalseConstraintOrFailure =
+				conditionResult.ValueScope.ApplyConstraint(new ExactValueConstraint(false));
+			
+			if (!stateWithAppliedFalseConstraintOrFailure.IsT1)
+				return stateWithAppliedFalseConstraintOrFailure.T2Value;
+			
+			if (stateWithAppliedFalseConstraintOrFailure.T1Value.IsReachable)
 			{
 				modifiedStates.Add(stateAfterExpression);
 			}
 		}
 
 		return modifiedStates;
-	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Cannot analyze if statements", Location);
 	}
 
 	[ExcludeFromCodeCoverage]
@@ -102,5 +108,12 @@ public class IfStatementSyntaxAbstraction : StatementSyntaxAbstraction, IIfState
 			symbol,
 			location
 			);
+	}
+}
+
+public class ExactValueConstraint : IConstraint
+{
+	public ExactValueConstraint(object? value)
+	{
 	}
 }

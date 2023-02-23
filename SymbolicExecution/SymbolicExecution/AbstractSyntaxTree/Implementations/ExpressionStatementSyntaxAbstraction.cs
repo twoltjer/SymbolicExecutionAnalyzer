@@ -16,9 +16,4 @@ public class ExpressionStatementSyntaxAbstraction : StatementSyntaxAbstraction, 
 
 		return assignment.AnalyzeNode(previous);
 	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Cannot get the result of an expression statement", Location);
-	}
 }

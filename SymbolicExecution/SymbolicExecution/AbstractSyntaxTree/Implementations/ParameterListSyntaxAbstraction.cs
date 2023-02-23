@@ -14,9 +14,4 @@ public class ParameterListSyntaxAbstraction : BaseParameterListSyntaxAbstraction
 	{
 		return new AnalysisFailure("Cannot analyze parameter lists", Location);
 	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Cannot analyze parameter lists", Location);
-	}
 }

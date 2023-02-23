@@ -31,6 +31,5 @@ public abstract class SyntaxNodeAbstraction : ISyntaxNodeAbstraction
 	public abstract TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous);
 
 	public ISymbol? Symbol { get; }
-	public abstract TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state);
 	public Location Location { get; }
 }

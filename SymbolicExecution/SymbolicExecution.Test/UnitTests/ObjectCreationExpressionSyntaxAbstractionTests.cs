@@ -19,7 +19,7 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 			location: location,
 			type: default
 			);
-		var results = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
+		var results = subject.GetResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		results.IsT1.Should().BeFalse();
 		results.T2Value.Reason.Should().Be("Expected object creation syntax to have two children (type and argument list)");
 		results.T2Value.Location.Should().BeSameAs(location);
@@ -40,7 +40,7 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 			location: location,
 			type: default
 			);
-		var results = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
+		var results = subject.GetResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		results.IsT1.Should().BeFalse();
 		results.T2Value.Reason.Should().Be("Expected object creation syntax to have an identifier name as its first child");
 		results.T2Value.Location.Should().BeSameAs(location);
@@ -61,7 +61,7 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 			location: location,
 			type: default
 			);
-		var results = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
+		var results = subject.GetResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		results.IsT1.Should().BeFalse();
 		results.T2Value.Reason.Should().Be("Expected object creation syntax to have an argument list as its second child");
 		results.T2Value.Location.Should().BeSameAs(location);
@@ -82,7 +82,7 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 			location: location,
 			type: null
 			);
-		var results = subject.GetExpressionResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
+		var results = subject.GetResults(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		results.IsT1.Should().BeFalse();
 		const string errorReason = "Expected object creation syntax to have an actual type symbol";
 		results.T2Value.Reason.Should().Be(errorReason);
@@ -107,9 +107,10 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 			type: actualTypeSymbol
 			);
 		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
-		var results = subject.GetExpressionResults(state);
+		var results = subject.GetResults(state);
 		results.IsT1.Should().BeTrue();
-		var (resultValue, resultState) = results.T1Value.Single();
+		var (resultRef, resultState) = results.T1Value.Single();
+		var resultValue = resultState.References[resultRef];
 		resultValue.Location.Should().BeSameAs(location);
 		resultValue.Type.T1Value.Should().BeSameAs(actualTypeSymbol);
 		resultState.Should().BeSameAs(state);

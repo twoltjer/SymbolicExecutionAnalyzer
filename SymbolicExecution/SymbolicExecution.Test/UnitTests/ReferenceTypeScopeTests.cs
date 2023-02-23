@@ -14,7 +14,7 @@ public class ReferenceTypeScopeTests
 	{
 		var typeSymbol = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
 		var subject = new ReferenceTypeScope(typeSymbol);
-		subject.CanBe(input).Should().BeFalse();
+		subject.CouldBe(input).Should().BeFalse();
 	}
 
 	[Fact]

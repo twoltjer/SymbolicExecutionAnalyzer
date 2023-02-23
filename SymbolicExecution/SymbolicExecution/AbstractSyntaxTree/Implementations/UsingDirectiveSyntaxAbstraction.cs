@@ -14,9 +14,4 @@ public class UsingDirectiveSyntaxAbstraction : CSharpSyntaxNodeAbstraction, IUsi
 	{
 		return new AnalysisFailure("Cannot analyze using directives", Location);
 	}
-
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
-	{
-		return new AnalysisFailure("Cannot analyze using directives", Location);
-	}
 }
