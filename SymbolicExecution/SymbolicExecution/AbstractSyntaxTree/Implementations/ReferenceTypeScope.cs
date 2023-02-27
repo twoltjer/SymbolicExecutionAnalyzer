@@ -9,23 +9,36 @@ public class ReferenceTypeScope : IValueScope
 		_typeSymbol = typeSymbol;
 	}
 
-	public bool CouldBe(object? value)
+	// public bool CouldBe(object? value)
+	// {
+	// 	return false;
+	// }
+	//
+	// public bool IsExactType(Type type)
+	// {
+	// 	return _typeSymbol.Name == type.Name && _typeSymbol.ContainingNamespace.ToString() == type.Namespace;
+	// }
+	//
+	// public bool IsAlways(object? value)
+	// {
+	// 	return false;
+	// }
+	//
+	// public TaggedUnion<IAnalysisState, AnalysisFailure> ApplyConstraint(IConstraint constraint)
+	// {
+	// 	return new AnalysisFailure("Cannot apply constraint to reference type", Location.None);
+	// }
+	public TaggedUnion<IValueScope, AnalysisFailure> AddConstraint(
+		IConstraint constraint,
+		Location location,
+		SymbolicExecutionState symbolicExecutionState
+		)
 	{
-		return false;
+		return new AnalysisFailure("Cannot apply constraint to reference type", location);
 	}
 
-	public bool IsExactType(Type type)
+	public TaggedUnion<bool, AnalysisFailure> GetIsReachable(Location location)
 	{
-		return _typeSymbol.Name == type.Name && _typeSymbol.ContainingNamespace.ToString() == type.Namespace;
-	}
-
-	public bool IsAlways(object? value)
-	{
-		return false;
-	}
-
-	public TaggedUnion<IAnalysisState, AnalysisFailure> ApplyConstraint(IConstraint exactValueConstraint)
-	{
-		return new AnalysisFailure("Cannot apply constraint to reference type", Location.None);
+		return new AnalysisFailure("Cannot get reachable on reference type", location);
 	}
 }

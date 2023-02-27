@@ -7,6 +7,9 @@ public readonly struct AnalysisFailure
 
 	public AnalysisFailure(string reason, Location? location)
 	{
+		if (Debugger.IsAttached)
+			Debugger.Break();	
+
 		Reason = reason;
 		Location = location;
 	}

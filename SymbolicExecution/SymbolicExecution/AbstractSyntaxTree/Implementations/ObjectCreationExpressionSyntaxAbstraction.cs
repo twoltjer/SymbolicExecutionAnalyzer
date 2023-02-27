@@ -39,7 +39,7 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 		}
 
 
-		var objectInstance = new ObjectInstance(
+		var objectInstance = new ReferenceTypeInstance(
 			new TaggedUnion<ITypeSymbol, Type>(_type),
 			Location,
 			new ReferenceTypeScope(_type),

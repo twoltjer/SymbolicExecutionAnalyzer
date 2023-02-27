@@ -30,18 +30,24 @@ public class IfStatementSyntaxAbstraction : StatementSyntaxAbstraction, IIfState
 		var modifiedStates = new List<IAnalysisState>();
 		foreach (var (conditionResultReference, stateAfterExpression) in conditionResults)
 		{
-			if (!stateAfterExpression.IsReachable)
+			var isReachableOrFailure = stateAfterExpression.GetIsReachable(Location);
+			if (!isReachableOrFailure.IsT1)
+				return isReachableOrFailure.T2Value;
+
+			if (!isReachableOrFailure.T1Value)
 				continue;
 
 			var conditionResult = stateAfterExpression.References[conditionResultReference];
 			if (!conditionResult.IsType(typeof(bool)))
 				return new AnalysisFailure("Condition must be a boolean", Location);
 
-			var stateWithAppliedTrueConstraintOrFailure =
-				conditionResult.ValueScope.ApplyConstraint(new ExactValueConstraint(true));
+			var stateWithAppliedTrueConstraintOrFailure = stateAfterExpression.AddConstraint(conditionResult.Reference, new ExactValueConstraint(true), Location);
 			if (!stateWithAppliedTrueConstraintOrFailure.IsT1)
 				return stateWithAppliedTrueConstraintOrFailure.T2Value;
-			if (stateWithAppliedTrueConstraintOrFailure.T1Value.IsReachable)
+			var trueStateReachableOrFailure = stateWithAppliedTrueConstraintOrFailure.T1Value.GetIsReachable(Location);
+			if (!trueStateReachableOrFailure.IsT1)
+				return trueStateReachableOrFailure.T2Value;
+			if (trueStateReachableOrFailure.T1Value)
 			{
 				 var statementResultsOrFailure = _statement.AnalyzeNode(stateAfterExpression);
 				 if (!statementResultsOrFailure.IsT1)
@@ -51,12 +57,15 @@ public class IfStatementSyntaxAbstraction : StatementSyntaxAbstraction, IIfState
 			}
 
 			var stateWithAppliedFalseConstraintOrFailure =
-				conditionResult.ValueScope.ApplyConstraint(new ExactValueConstraint(false));
+				stateAfterExpression.AddConstraint(conditionResult.Reference, new ExactValueConstraint(false), Location);
 			
 			if (!stateWithAppliedFalseConstraintOrFailure.IsT1)
 				return stateWithAppliedFalseConstraintOrFailure.T2Value;
 			
-			if (stateWithAppliedFalseConstraintOrFailure.T1Value.IsReachable)
+			var falseStateReachableOrFailure = stateWithAppliedFalseConstraintOrFailure.T1Value.GetIsReachable(Location);
+			if (!falseStateReachableOrFailure.IsT1)
+				return falseStateReachableOrFailure.T2Value;
+			if (falseStateReachableOrFailure.T1Value)
 			{
 				modifiedStates.Add(stateAfterExpression);
 			}
@@ -113,7 +122,10 @@ public class IfStatementSyntaxAbstraction : StatementSyntaxAbstraction, IIfState
 
 public class ExactValueConstraint : IConstraint
 {
+	public object? Value { get; }
+
 	public ExactValueConstraint(object? value)
 	{
+		Value = value;
 	}
 }

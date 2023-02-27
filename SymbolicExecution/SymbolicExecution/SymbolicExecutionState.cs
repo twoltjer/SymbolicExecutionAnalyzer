@@ -20,7 +20,19 @@ public class SymbolicExecutionState : IAnalysisState
 
 	public IImmutableDictionary<ILocalSymbol, int?> LocalVariables { get; }
 	public IImmutableDictionary<IParameterSymbol, int?> ParameterVariables { get; }
-	public bool IsReachable => true;
+	public TaggedUnion<bool, AnalysisFailure> GetIsReachable(Location location)
+	{
+		foreach (var instance in References.Values)
+		{
+			var isReachableOrFailure = instance.ValueScope.GetIsReachable(location);
+			if (!isReachableOrFailure.IsT1)
+				return isReachableOrFailure.T2Value;
+			if (!isReachableOrFailure.T1Value)
+				return false;
+		}
+
+		return true;
+	}
 
 	public IAnalysisState ThrowException(int exception, Location location)
 	{
@@ -32,6 +44,12 @@ public class SymbolicExecutionState : IAnalysisState
 	{
 		var newLocalVariables = LocalVariables.Add(symbol, null);
 		return new SymbolicExecutionState(CurrentException, References, newLocalVariables, ParameterVariables);
+	}
+	
+	public IAnalysisState AddParameterVariable(IParameterSymbol symbol)
+	{
+		var newParameterVariables = ParameterVariables.Add(symbol, null);
+		return new SymbolicExecutionState(CurrentException, References, LocalVariables, newParameterVariables);
 	}
 
 	public TaggedUnion<IAnalysisState, AnalysisFailure> SetSymbolReference(ISymbol symbol, int reference)
@@ -50,6 +68,19 @@ public class SymbolicExecutionState : IAnalysisState
 		{
 			return new AnalysisFailure("Symbol missing from list of local variables", Location.None);
 		}
+	}
+
+	public TaggedUnion<IAnalysisState, AnalysisFailure> AddConstraint(int reference, IConstraint constraint, Location location)
+	{
+		var objectInstance = References[reference];
+		var valueScope = objectInstance.ValueScope;
+		var valueScopeOrFailure = valueScope.AddConstraint(constraint, location, this);
+		if (!valueScopeOrFailure.IsT1)
+			return valueScopeOrFailure.T2Value;
+		
+		var newValueScope = valueScopeOrFailure.T1Value;
+		var newReferences = References.SetItem(reference, objectInstance.WithValueScope(newValueScope));
+		return new SymbolicExecutionState(CurrentException, newReferences, LocalVariables, ParameterVariables);
 	}
 
 	public TaggedUnion<int, AnalysisFailure> GetSymbolReferenceOrFailure(ISymbol symbol, Location location)
@@ -74,7 +105,7 @@ public class SymbolicExecutionState : IAnalysisState
 		}
 	}
 
-	public IAnalysisState AddReference(int reference, ObjectInstance objectInstance)
+	public IAnalysisState AddReference(int reference, IObjectInstance objectInstance)
 	{
 		var newReferences = References.Add(reference, objectInstance);
 		return new SymbolicExecutionState(CurrentException, newReferences, LocalVariables, ParameterVariables);

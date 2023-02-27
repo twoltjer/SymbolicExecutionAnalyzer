@@ -1,8 +1,8 @@
 ﻿namespace SymbolicExecution;
 
-public class ValueTypeInstance : ObjectInstance, IValueTypeInstance
+public abstract class ValueTypeInstance : ObjectInstance, IValueTypeInstance
 {
-    public ValueTypeInstance(
+    protected ValueTypeInstance(
         TaggedUnion<ITypeSymbol, Type> type,
         Location location,
         IValueScope value,

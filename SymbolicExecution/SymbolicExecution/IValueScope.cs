@@ -2,9 +2,12 @@ namespace SymbolicExecution;
 
 public interface IValueScope
 {
-	bool CouldBe(object? value);
-	bool IsAlways(object? value);
-	TaggedUnion<IAnalysisState, AnalysisFailure> ApplyConstraint(IConstraint exactValueConstraint);
+	TaggedUnion<IValueScope, AnalysisFailure> AddConstraint(
+		IConstraint constraint,
+		Location location,
+		SymbolicExecutionState symbolicExecutionState
+		);
+	TaggedUnion<bool, AnalysisFailure> GetIsReachable(Location location);
 }
 
 public interface IConstraint

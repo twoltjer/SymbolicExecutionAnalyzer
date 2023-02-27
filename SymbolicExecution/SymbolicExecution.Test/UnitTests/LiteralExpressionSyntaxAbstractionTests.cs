@@ -16,28 +16,6 @@ public class LiteralExpressionSyntaxAbstractionTests
 		result.T2Value.Reason.Should().Be("Cannot analyze literal expressions");
 	}
 
-	[Fact]
-	[Trait("Category", "Unit")]
-	public void TestGetExpressionResult_WhenBooleanTrue_ReturnsBooleanTrueConstant()
-	{
-		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
-		var location = Mock.Of<Location>(MockBehavior.Strict);
-		var children = ImmutableArray<ISyntaxNodeAbstraction>.Empty;
-		var namespaceSymbol = Mock.Of<INamespaceSymbol>(ns => ns.ToString() == "System", MockBehavior.Strict);
-#pragma warning disable RS1024
-		var typeSymbol = Mock.Of<ITypeSymbol>(type => type.Name == "Boolean" && type.ContainingNamespace == namespaceSymbol, MockBehavior.Strict);
-#pragma warning restore RS1024
-		var subject = new LiteralExpressionSyntaxAbstraction(children, null, location, true, typeSymbol);
-		var results = subject.GetResults(state);
-		results.IsT1.Should().BeTrue();
-		results.T1Value.Length.Should().Be(1);
-		var result = results.T1Value.Single();
-		var resultObject = result.Item2.References[result.Item1];
-		resultObject.Type.Match(x => x.Name, y => y.Name).Should().Be("Boolean");
-		resultObject.Location.Should().BeSameAs(location);
-		resultObject.ValueScope.Should().BeOfType<ConstantValueScope>();
-		resultObject.ValueScope.IsAlways(true).Should().BeTrue();
-	}
 
 	[Fact]
 	[Trait("Category", "Unit")]

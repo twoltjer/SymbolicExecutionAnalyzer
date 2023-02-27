@@ -7,78 +7,103 @@ public class BoolInstance : PrimitiveInstance<bool>, IBoolInstance
     {
     }
 
-    public override bool TryConvert(IObjectInstance value, out IPrimitiveInstance<bool> converted, out AnalysisFailure? analysisFailure)
-    {
-        analysisFailure = null;
-        if (value is BoolInstance boolInstance)
-        {
-            converted = boolInstance;
-            return true;
-        }
-        else
-        {
-            converted = default!;
-            return false;
-        }
-    }
-
     public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> LogicalAndOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
     {
-        if (right is not IPrimitiveInstance<bool> rightBool)
-        {
-            if (TryConvert(right, out var rightConverted, out var analysisFailure))
-            {
-                rightBool = rightConverted;
-            }
-            else if (analysisFailure.HasValue)
-            {
-                return analysisFailure.Value;
-            }
-            else if (attemptReverseConversion && right is IPrimitiveInstance rightPrim)
-            {
-                return rightPrim.LogicalAndOperator(this, state, false);
-            }
-            else
-                return new AnalysisFailure("Right is not a bool", Location);
-        }
-
-        if (ValueScope is not ConstantValueScope leftConstant)
-            return new AnalysisFailure("Left is not a constant", Location);
-
-        if (rightBool.ValueScope is not ConstantValueScope rightConstant)
-            return new AnalysisFailure("Right is not a constant", Location);
-
-        var boolInstance = new BoolInstance(Location, new ConstantValueScope((bool)leftConstant.Value! && (bool)rightConstant.Value!, typeof(bool)), GetNextReferenceId());
-        return ImmutableArray.Create((boolInstance as IObjectInstance, state));
+        return new AnalysisFailure("LogicalAndOperator not implemented on BoolInstance", Location);
     }
 
     public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> LogicalOrOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
     {
-        if (right is not IPrimitiveInstance<bool> rightBool)
-        {
-            if (TryConvert(right, out var rightConverted, out var analysisFailure))
-            {
-                rightBool = rightConverted;
-            }
-            else if (analysisFailure.HasValue)
-            {
-                return analysisFailure.Value;
-            }
-            else if (attemptReverseConversion && right is IPrimitiveInstance rightPrim)
-            {
-                return rightPrim.LogicalOrOperator(this, state, false);
-            }
-            else
-                return new AnalysisFailure("Right is not a bool", Location);
-        }
+        return new AnalysisFailure("LogicalOrOperator not implemented on BoolInstance", Location);
+    }
+    
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> LogicalXorOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("LogicalXorOperator not implemented on BoolInstance", Location);
+    }
+    
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GreaterThanOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("GreaterThanOperator not implemented on BoolInstance", Location);
+    }
+    
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> LessThanOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("LessThanOperator not implemented on BoolInstance", Location);
+    }
+    
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GreaterThanOrEqualOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("GreaterThanOrEqualOperator not implemented on BoolInstance", Location);
+    }
+    
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> LessThanOrEqualOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("LessThanOrEqualOperator not implemented on BoolInstance", Location);
+    }
+    
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> NotEqualsOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("NotEqualsOperator not implemented on BoolInstance", Location);
+    }
 
-        if (ValueScope is not ConstantValueScope leftConstant)
-            return new AnalysisFailure("Left is not a constant", Location);
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> AddOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("AddOperator not implemented on BoolInstance", Location);
+    }
 
-        if (rightBool.ValueScope is not ConstantValueScope rightConstant)
-            return new AnalysisFailure("Right is not a constant", Location);
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> SubtractOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("SubtractOperator not implemented on BoolInstance", Location);
+    }
 
-        var boolInstance = new BoolInstance(Location, new ConstantValueScope((bool)leftConstant.Value! || (bool)rightConstant.Value!, typeof(bool)), GetNextReferenceId());
-        return ImmutableArray.Create((boolInstance as IObjectInstance, state));
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> MultiplyOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("MultiplyOperator not implemented on BoolInstance", Location);
+    }
+
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> DivideOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("DivideOperator not implemented on BoolInstance", Location);
+    }
+
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> ModuloOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("ModuloOperator not implemented on BoolInstance", Location);
+    }
+
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> BitwiseAndOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("BitwiseAndOperator not implemented on BoolInstance", Location);
+    }
+
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> BitwiseOrOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("BitwiseOrOperator not implemented on BoolInstance", Location);
+    }
+
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> BitwiseXorOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("BitwiseXorOperator not implemented on BoolInstance", Location);
+    }
+
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> LeftShiftOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("LeftShiftOperator not implemented on BoolInstance", Location);
+    }
+
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> RightShiftOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("RightShiftOperator not implemented on BoolInstance", Location);
+    }
+
+    public override IObjectInstance WithValueScope(IValueScope valueScope)
+    {
+        return new BoolInstance(Location, valueScope, Reference);
+    }
+
+    public override TaggedUnion<IEnumerable<(IObjectInstance, IAnalysisState)>, AnalysisFailure> EqualsOperator(IObjectInstance right, IAnalysisState state, bool attemptReverseConversion)
+    {
+        return new AnalysisFailure("EqualsOperator not implemented on BoolInstance", Location);
     }
 }
