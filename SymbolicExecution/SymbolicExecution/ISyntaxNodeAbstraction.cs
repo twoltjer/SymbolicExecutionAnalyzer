@@ -8,4 +8,5 @@ public interface ISyntaxNodeAbstraction
 	TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous);
 	TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state);
 	Location Location { get; }
+	Func<ISyntaxNodeAbstraction>? ParentResolver { get; set; }
 }
