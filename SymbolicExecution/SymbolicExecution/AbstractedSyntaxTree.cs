@@ -20,8 +20,10 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 		if (_abstraction == null)
 		{
 			var abstractionOrFailure = ProduceAbstraction(
-				_semanticModel.SyntaxTree.GetRoot()
+				_semanticModel.SyntaxTree.GetRoot(),
+				resolveNodeParent: null
 				);
+			
 			if (abstractionOrFailure.IsT1)
 				_abstraction = abstractionOrFailure.T1Value;
 			else
@@ -30,11 +32,13 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 		return new TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure>(_abstraction);
 	}
 
-	public TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure> ProduceAbstraction(SyntaxNode node)
+	public TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure> ProduceAbstraction(SyntaxNode node, Func<ISyntaxNodeAbstraction>? resolveNodeParent)
 	{
-		var childrenOrFailures = node.ChildNodes().Select(ProduceAbstraction).ToImmutableArray();
+		var childrenOrFailures = node.ChildNodes()
+			.Select(child => ProduceAbstraction(child, resolveNodeParent: () => _abstractionCache[node]))
+			.ToImmutableArray();
 
-		if (childrenOrFailures.FirstOrNull(x => !x.IsT1) is TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure> potentialFailure)
+		if (childrenOrFailures.FirstOrNull(x => !x.IsT1) is { } potentialFailure)
 		{
 			return potentialFailure.T2Value;
 		}
@@ -146,6 +150,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 		if (result == null)
 			return new AnalysisFailure($"No abstraction for {node.GetType().Name}", node.GetLocation());
 
+		result.ParentResolver = resolveNodeParent;
 		_abstractionCache[node] = result;
 		_syntaxNodeCache[result] = node;
 		return new TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure>(result);

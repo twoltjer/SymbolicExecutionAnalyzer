@@ -33,4 +33,5 @@ public abstract class SyntaxNodeAbstraction : ISyntaxNodeAbstraction
 	public ISymbol? Symbol { get; }
 	public abstract TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state);
 	public Location Location { get; }
+	public Func<ISyntaxNodeAbstraction>? ParentResolver { get; set; }
 }
