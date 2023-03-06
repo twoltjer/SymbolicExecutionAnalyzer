@@ -35,6 +35,22 @@ public class LiteralExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, I
 			state = state.AddReference(instance.Reference, instance);
 			return ImmutableArray.Create((instance.Reference, state));
 		}
+
+		if (_constantValue.Value is long longValue)
+		{
+			var scope = new ConcreteIntValueScope(longValue);
+			var instance = new IntInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+			state = state.AddReference(instance.Reference, instance);
+			return ImmutableArray.Create((instance.Reference, state));
+		}
+
+		if (_constantValue.Value is int intValue)
+		{
+			var scope = new ConcreteIntValueScope(intValue);
+			var instance = new IntInstance(Location, scope, ObjectInstance.GetNextReferenceId());
+			state = state.AddReference(instance.Reference, instance);
+			return ImmutableArray.Create((instance.Reference, state));
+		}
 		
 		return new AnalysisFailure("Cannot analyze literal expressions that are not bools", Location);
 	}

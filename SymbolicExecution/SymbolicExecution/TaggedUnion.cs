@@ -66,3 +66,16 @@ public readonly struct TaggedUnion<T1, T2> : IEquatable<TaggedUnion<T1, T2>>
 		return !left.Equals(right);
 	}
 }
+
+public static class TaggedUnionExtensions
+{
+	public static TaggedUnion<T1, T2> SafeCast<T1, T2, T3, T4>(this TaggedUnion<T3, T4> taggedUnion)
+		where T3 : T1
+		where T4 : T2
+	{
+		return taggedUnion.Match(
+			t3 => new TaggedUnion<T1, T2>(t3),
+			t4 => new TaggedUnion<T1, T2>(t4)
+			);
+	} 
+}

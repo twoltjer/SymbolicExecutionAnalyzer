@@ -153,6 +153,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				type,
 				prefixUnaryExpressionSyntax.Kind()
 				),
+			InvocationExpressionSyntax => new InvocationExpressionSyntaxAbstraction(children, symbol, location, type, symbolInfo),
 			_ => null,
 		};
 

@@ -44,12 +44,14 @@ public class IfStatementSyntaxAbstraction : StatementSyntaxAbstraction, IIfState
 			var stateWithAppliedTrueConstraintOrFailure = stateAfterExpression.AddConstraint(conditionResult.Reference, new ExactValueConstraint(true), Location);
 			if (!stateWithAppliedTrueConstraintOrFailure.IsT1)
 				return stateWithAppliedTrueConstraintOrFailure.T2Value;
-			var trueStateReachableOrFailure = stateWithAppliedTrueConstraintOrFailure.T1Value.GetIsReachable(Location);
+			var trueState = stateWithAppliedTrueConstraintOrFailure.T1Value;
+			var trueStateReachableOrFailure = trueState.GetIsReachable(Location);
 			if (!trueStateReachableOrFailure.IsT1)
 				return trueStateReachableOrFailure.T2Value;
-			if (trueStateReachableOrFailure.T1Value)
+			var trueStateReachable = trueStateReachableOrFailure.T1Value;
+			if (trueStateReachable)
 			{
-				 var statementResultsOrFailure = _statement.AnalyzeNode(stateAfterExpression);
+				 var statementResultsOrFailure = _statement.AnalyzeNode(trueState);
 				 if (!statementResultsOrFailure.IsT1)
 					 return statementResultsOrFailure.T2Value;
 
@@ -61,13 +63,14 @@ public class IfStatementSyntaxAbstraction : StatementSyntaxAbstraction, IIfState
 			
 			if (!stateWithAppliedFalseConstraintOrFailure.IsT1)
 				return stateWithAppliedFalseConstraintOrFailure.T2Value;
-			
-			var falseStateReachableOrFailure = stateWithAppliedFalseConstraintOrFailure.T1Value.GetIsReachable(Location);
+
+			var falseState = stateWithAppliedFalseConstraintOrFailure.T1Value;
+			var falseStateReachableOrFailure = falseState.GetIsReachable(Location);
 			if (!falseStateReachableOrFailure.IsT1)
 				return falseStateReachableOrFailure.T2Value;
 			if (falseStateReachableOrFailure.T1Value)
 			{
-				modifiedStates.Add(stateAfterExpression);
+				modifiedStates.Add(falseState);
 			}
 		}
 

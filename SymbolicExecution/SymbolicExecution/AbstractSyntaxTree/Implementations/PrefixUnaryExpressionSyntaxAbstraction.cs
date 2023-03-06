@@ -30,17 +30,31 @@ public class PrefixUnaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstractio
             return childResultsOrFailure.T2Value;
         
         var childResults = childResultsOrFailure.T1Value;
+        var results = new List<(int, IAnalysisState)>();
         foreach (var (childValueRef, childState) in childResults)
         {
             var value = childState.References[childValueRef];
             var previousValueScope = value.ValueScope as BoolValueScope;
             if (previousValueScope == null)
                 return new AnalysisFailure("Cannot apply a prefix unary operator to a non-boolean value", Location);
-
+            
+            
             var newValueScopeOrFailure = _syntaxKind switch
             {
-                SyntaxKind.BitwiseNotExpression => new DerivedBoolValueScope(parentRef: childValueRef, DerivedBoolValueScope.BoolDerivation.NotEquals),
+                SyntaxKind.LogicalNotExpression => DerivedBoolValueScope.Create(DerivedBoolValueScope.BoolDerivation.LogicalNot, childValueRef, default, Location).SafeCast<IValueScope, AnalysisFailure, DerivedBoolValueScope, AnalysisFailure>(),
+                _ => new AnalysisFailure("Unknown prefix unary operator", Location)
             };
+            
+            if (!newValueScopeOrFailure.IsT1)
+                return newValueScopeOrFailure.T2Value;
+            
+            var newValueScope = newValueScopeOrFailure.T1Value;
+            var newValue = new BoolInstance(Location, newValueScope, ObjectInstance.GetNextReferenceId());
+            var newValueReference = newValue.Reference;
+            var newState = childState.AddReference(newValueReference, newValue);
+            results.Add((newValueReference, newState));
         }
+        
+        return results.ToImmutableArray();
     }
 }

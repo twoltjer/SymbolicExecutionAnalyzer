@@ -92,8 +92,67 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, IB
 		// {
 		// 	return left.NotEqualsOperator(right, state, attemptReverseConversion: true);
 		// }
-
-		return new AnalysisFailure("Cannot evaluate binary expression", Location);
+		var right = state.References[rightReference];
+		var left = state.References[leftReference];
+		var rightValueScope = right.ValueScope;
+		var leftValueScope = left.ValueScope;
+		if (_syntaxKind == SyntaxKind.GreaterThanExpression)
+		{
+			var resultValueOrFailure = DerivedBoolValueScope.Create(
+				DerivedBoolValueScope.BoolDerivation.GreaterThan,
+				leftReference,
+				rightReference,
+				Location
+				);
+			if (!resultValueOrFailure.IsT1)
+				return resultValueOrFailure.T2Value;
+			var resultValue = resultValueOrFailure.T1Value;
+			var resultRef = ObjectInstance.GetNextReferenceId();
+			var resultInstance = new BoolInstance(Location, resultValue, resultRef); 
+			
+			var modifiedState = state.AddReference(resultRef, resultInstance);
+			return new[] {(resultRef, modifiedState)}.ToImmutableArray();
+		}
+		else if (_syntaxKind == SyntaxKind.LessThanExpression)
+		{
+			var resultValueOrFailure = DerivedBoolValueScope.Create(
+				DerivedBoolValueScope.BoolDerivation.LessThan,
+				leftReference,
+				rightReference,
+				Location
+				);
+			
+			if (!resultValueOrFailure.IsT1)
+				return resultValueOrFailure.T2Value;
+			
+			var resultValue = resultValueOrFailure.T1Value;
+			var resultRef = ObjectInstance.GetNextReferenceId();
+			var resultInstance = new BoolInstance(Location, resultValue, resultRef);
+			var modifiedState = state.AddReference(resultRef, resultInstance);
+			return new[] {(resultRef, modifiedState)}.ToImmutableArray();
+		}
+		else if (_syntaxKind == SyntaxKind.LogicalAndExpression)
+		{
+			var resultValueOrFailure = DerivedBoolValueScope.Create(
+				DerivedBoolValueScope.BoolDerivation.LogicalAnd,
+				leftReference,
+				rightReference,
+				Location
+				);
+			
+			if (!resultValueOrFailure.IsT1)
+				return resultValueOrFailure.T2Value;
+			
+			var resultValue = resultValueOrFailure.T1Value;
+			var resultRef = ObjectInstance.GetNextReferenceId();
+			var resultInstance = new BoolInstance(Location, resultValue, resultRef);
+			var modifiedState = state.AddReference(resultRef, resultInstance);
+			return new[] {(resultRef, modifiedState)}.ToImmutableArray();
+		}
+		else
+		{
+			return new AnalysisFailure("Cannot evaluate binary expression", Location);
+		}
 	}
 
 	public static IBinaryExpressionSyntaxAbstraction? BuildFrom(
