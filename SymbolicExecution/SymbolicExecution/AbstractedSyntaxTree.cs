@@ -144,11 +144,92 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				symbol,
 				location
 				),
+			InvocationExpressionSyntax => new InvocationExpressionSyntaxAbstraction(
+				children,
+				symbol,
+				location,
+				actualTypeSymbol,
+				convertedTypeSymbol
+				),
+			ParameterSyntax => new ParameterSyntaxAbstraction(
+				children,
+				symbol,
+				location
+				),
+			ArrayRankSpecifierSyntax => new ArrayRankSpecifierSyntaxAbstraction(
+				children,
+				symbol,
+				location
+				),
+			ArrayTypeSyntax => new ArrayTypeSyntaxAbstraction(
+				children,
+				symbol,
+				location,
+				actualTypeSymbol,
+				convertedTypeSymbol
+				),
+			BinaryExpressionSyntax => new BinaryExpressionSyntaxAbstraction(
+				children,
+				symbol,
+				location,
+				actualTypeSymbol,
+				convertedTypeSymbol
+				),	
+			ArrayCreationExpressionSyntax => new ArrayCreationExpressionSyntaxAbstraction(
+				children,
+				symbol,
+				location,
+				actualTypeSymbol,
+				convertedTypeSymbol
+				),
+			BracketedArgumentListSyntax => new BracketedArgumentListSyntaxAbstraction(
+				children,
+				symbol,
+				location
+				),
+			ElementAccessExpressionSyntax => new ElementAccessExpressionSyntaxAbstraction(
+				children,
+				symbol,
+				location,
+				actualTypeSymbol,
+				convertedTypeSymbol
+				),
+			PostfixUnaryExpressionSyntax => new PostfixUnaryExpressionSyntaxAbstraction(
+				children,
+				symbol,
+				location,
+				actualTypeSymbol,
+				convertedTypeSymbol
+				),
+			ForStatementSyntax => new ForStatementSyntaxAbstraction(
+				children,
+				symbol,
+				location
+				),
+			ReturnStatementSyntax => new ReturnStatementSyntaxAbstraction(
+				children,
+				symbol,
+				location
+				),
 			_ => null,
 		};
 
 		if (result == null)
-			return new AnalysisFailure($"No abstraction for {node.GetType().Name}", node.GetLocation());
+		{
+			// Internal types
+			var nodeTypeName = node.GetType().Name;
+			if (nodeTypeName == "OmittedArraySizeExpressionSyntax")
+			{
+				return new OmittedArraySizeExpressionSyntaxAbstraction(
+					children,
+					symbol,
+					location,
+					actualTypeSymbol,
+					convertedTypeSymbol
+					);
+			}
+			return new AnalysisFailure($"No abstraction for {nodeTypeName}", node.GetLocation());
+		}
 
 		result.ParentResolver = resolveNodeParent;
 		_abstractionCache[node] = result;
