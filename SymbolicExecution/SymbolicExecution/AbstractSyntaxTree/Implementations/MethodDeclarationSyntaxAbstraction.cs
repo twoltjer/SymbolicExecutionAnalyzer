@@ -20,7 +20,7 @@ public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbs
 		return new AnalysisFailure("Method declarations are not supported yet", Location);
 	}
 
-	public TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeMethodCall(IAnalysisState priorState, ImmutableArray<IObjectInstance> parameters)
+	public TaggedUnion<IEnumerable<(IObjectInstance? returned, IAnalysisState state)>, AnalysisFailure> AnalyzeMethodCall(IAnalysisState priorState, ImmutableArray<IObjectInstance> parameters)
 	{
 		var parameterLists = Children
 			.OfType<IParameterListSyntaxAbstraction>().ToList();
@@ -92,6 +92,6 @@ public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbs
 			return new AnalysisFailure("Method body did not return any results", Location);
 		}
 		
-		return resultStates.ToImmutableArray();
+		return resultStates.Select(x => (default(IObjectInstance), x)).ToImmutableArray();
 	}
 }

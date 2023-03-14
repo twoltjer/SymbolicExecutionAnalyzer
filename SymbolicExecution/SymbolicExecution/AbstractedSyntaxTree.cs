@@ -212,6 +212,13 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				symbol,
 				location
 				),
+			MemberAccessExpressionSyntax => new MemberAccessExpressionSyntaxAbstraction(
+				children,
+				symbol,
+				location,
+				actualTypeSymbol,
+				convertedTypeSymbol
+				),
 			_ => null,
 		};
 
@@ -222,6 +229,16 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 			if (nodeTypeName == "OmittedArraySizeExpressionSyntax")
 			{
 				return new OmittedArraySizeExpressionSyntaxAbstraction(
+					children,
+					symbol,
+					location,
+					actualTypeSymbol,
+					convertedTypeSymbol
+					);
+			}
+			if (nodeTypeName == "SimpleMemberAccessExpressionSyntax")
+			{
+				return new SimpleMemberAccessExpressionSyntaxAbstraction(
 					children,
 					symbol,
 					location,

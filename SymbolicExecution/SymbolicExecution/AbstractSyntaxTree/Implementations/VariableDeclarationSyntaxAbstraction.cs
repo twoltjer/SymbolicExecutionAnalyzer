@@ -23,10 +23,13 @@ public class VariableDeclarationSyntaxAbstraction : CSharpSyntaxNodeAbstraction,
 		}
 
 		// First child should be a predefined type
-		if (!(Children[0] is IPredefinedTypeSyntaxAbstraction))
+		if (!(Children[0] is IPredefinedTypeSyntaxAbstraction) && !(Children[0] is IIdentifierNameSyntaxAbstraction
+		    {
+			    Symbol: ITypeSymbol
+		    }))
 		{
 			return new AnalysisFailure(
-				"Local declaration statement must have a predefined type as its first child",
+				"Local declaration statement must have a predefined type as its first child or an identifier name with a type symbol",
 				Location
 				);
 		}

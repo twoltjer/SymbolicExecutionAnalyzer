@@ -16,120 +16,27 @@ public class InvocationExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
         _symbolInfo = symbolInfo;
     }
 
+    public bool IsPureSystemMethodInvocation()
+    {
+        if (_symbolInfo.Symbol is IMethodSymbol methodSymbol)
+        {
+            var isPureSystemMethodInvocation = methodSymbol.ContainingNamespace?.ToString() == "System";
+            return isPureSystemMethodInvocation;
+        }
+
+        return false;
+    }
+    
     public override TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure> AnalyzeNode(IAnalysisState previous)
     {
-        // Find class and method
-        var targetTypeSymbolOrFailure = _symbolInfo.Symbol?.ContainingType is INamedTypeSymbol targetType
-                ? new TaggedUnion<INamedTypeSymbol, AnalysisFailure>(targetType)
-                : new AnalysisFailure("Cannot find the target type of the invocation expression", Location);
-        
-        if (!targetTypeSymbolOrFailure.IsT1)
+        var results = GetExpressionResults(previous);
+        if (!results.IsT1)
         {
-            return targetTypeSymbolOrFailure.T2Value;
-        }
-        
-        var targetTypeSymbol = targetTypeSymbolOrFailure.T1Value;
-        
-        var classNodeAbstractionOrFailure = FindTypeDeclarationNodeAbstraction(targetTypeSymbol);
-        
-        if (!classNodeAbstractionOrFailure.IsT1)
-        {
-            return classNodeAbstractionOrFailure.T2Value;
-        }
-        
-        var classNodeAbstraction = classNodeAbstractionOrFailure.T1Value;
-        
-        var targetMethodSymbolOrFailure = _symbolInfo.Symbol is IMethodSymbol targetMethod
-            ? new TaggedUnion<IMethodSymbol, AnalysisFailure>(targetMethod)
-            : new AnalysisFailure("Cannot find the target method of the invocation expression", Location);
-
-        if (!targetMethodSymbolOrFailure.IsT1)
-        {
-            return targetMethodSymbolOrFailure.T2Value;
-        }
-        
-        var targetMethodSymbol = targetMethodSymbolOrFailure.T1Value;
-        
-        var methodNodeAbstractionOrFailure = FindMethodDeclarationNodeAbstraction(classNodeAbstraction, targetMethodSymbol);
-        
-        if (!methodNodeAbstractionOrFailure.IsT1)
-        {
-            return methodNodeAbstractionOrFailure.T2Value;
-        }
-        
-        var methodNodeAbstraction = methodNodeAbstractionOrFailure.T1Value;
-        
-        // Analyze arguments
-        if (Children.Length != 2)
-        {
-            return new AnalysisFailure("Invocation expression must have exactly two children", Location);
-        }
-        
-        var argumentListSyntaxAbstraction = Children[1] as ArgumentListSyntaxAbstraction;
-        
-if (argumentListSyntaxAbstraction == null)
-        {
-            return new AnalysisFailure("Invocation expression must have an argument list as its second child", Location);
+            return results.T2Value;
         }
 
-        var priorStatesWithResultRefs = new List<(IAnalysisState, ImmutableArray<IObjectInstance>)> { (previous, ImmutableArray<IObjectInstance>.Empty)}.ToImmutableArray();
-        var currentStatesWithResultRefs = new List<(IAnalysisState, List<IObjectInstance>)>();
-        foreach (var argumentSyntaxAbstraction in argumentListSyntaxAbstraction.Children)
-        {
-            if (argumentSyntaxAbstraction is ArgumentSyntaxAbstraction argument)
-            {
-                if (argument.Children.Length != 1)
-                {
-                    return new AnalysisFailure("Invocation expression must have an argument as its child", Location);
-                }
-                
-                if (argument.Children[0] is ExpressionSyntaxAbstraction argumentExpression)
-                {
-                    foreach (var (priorState, priorResultRefs) in priorStatesWithResultRefs)
-                    {
-                        var argumentResultOrFailure = argumentExpression.GetExpressionResults(priorState);
-                        if (!argumentResultOrFailure.IsT1)
-                        {
-                            return argumentResultOrFailure.T2Value;
-                        }
-
-                        foreach (var (argumentResult, argumentState) in argumentResultOrFailure.T1Value)
-                        {
-                            var currentResultRefs = new List<IObjectInstance>(priorResultRefs);
-                            currentResultRefs.Add(argumentResult);
-                            currentStatesWithResultRefs.Add((argumentState, currentResultRefs));
-                        }
-                    }
-                    priorStatesWithResultRefs = currentStatesWithResultRefs.Select(x => (x.Item1, x.Item2.ToImmutableArray())).ToImmutableArray();
-                }
-                else
-                {
-                    return new AnalysisFailure("Invocation expression must have an argument as its child", Location);
-                }
-            }
-            else
-            {
-                return new AnalysisFailure("Invocation expression must have an argument as its child", Location);
-            }
-        }
-        
-        var results = new List<IAnalysisState>();
-        foreach (var (priorState, priorResultRefs) in priorStatesWithResultRefs)
-        {
-            var methodResultOrFailure = methodNodeAbstraction.AnalyzeMethodCall(priorState, priorResultRefs);
-            if (!methodResultOrFailure.IsT1)
-            {
-                return methodResultOrFailure.T2Value;
-            }
-            
-            results.AddRange(methodResultOrFailure.T1Value);
-        }
-        
-        if (results.Count > 0)
-            return results.ToImmutableArray();
-        
-            
-        return new AnalysisFailure("Cannot analyze an invocation expression", Location);
+        var newStates = results.T1Value.Select(x => x.Item2).ToImmutableArray();
+        return newStates;
     }
 
     private TaggedUnion<ITypeDeclarationSyntaxAbstraction, AnalysisFailure> FindTypeDeclarationNodeAbstraction(
@@ -224,6 +131,153 @@ if (argumentListSyntaxAbstraction == null)
 
     public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
     {
-        return new AnalysisFailure("Cannot get the result of an invocation expression", Location);
+        if (IsPureSystemMethodInvocation())
+        {
+            // Still need to analyze the arguments to the method
+            var argumentListSyntaxes = Children
+                .OfType<ArgumentListSyntaxAbstraction>()
+                .ToArray();
+            
+            if (argumentListSyntaxes.Length != 1)
+                return new AnalysisFailure("Expected exactly one argument list", Location);
+            
+            var argumentListSyntax = argumentListSyntaxes[0];
+            var arguments = argumentListSyntax.Children
+                .OfType<ArgumentSyntaxAbstraction>()
+                .ToArray();
+            
+            var previousStates = new List<IAnalysisState> {state};
+            var currentResults = new List<IAnalysisState>();
+            foreach (var argument in arguments)
+            {
+                foreach (var previousState in previousStates)
+                {
+                    var result = argument.GetExpressionResults(previousState);
+                    if (!result.IsT1)
+                        return result.T2Value;
+                    
+                    var resultTuples = result.T1Value;
+                    foreach (var (_, resultState) in resultTuples)
+                    {
+                        currentResults.Add(resultState);
+                    }
+                }
+                previousStates = currentResults;
+            }
+            return previousStates.Select(x => (default(IObjectInstance?), x)).ToImmutableArray()!;
+        }
+        
+        // Find class and method
+        var targetTypeSymbolOrFailure = _symbolInfo.Symbol?.ContainingType is INamedTypeSymbol targetType
+                ? new TaggedUnion<INamedTypeSymbol, AnalysisFailure>(targetType)
+                : new AnalysisFailure("Cannot find the target type of the invocation expression", Location);
+        
+        if (!targetTypeSymbolOrFailure.IsT1)
+        {
+            return targetTypeSymbolOrFailure.T2Value;
+        }
+        
+        var targetTypeSymbol = targetTypeSymbolOrFailure.T1Value;
+        
+        var classNodeAbstractionOrFailure = FindTypeDeclarationNodeAbstraction(targetTypeSymbol);
+        
+        if (!classNodeAbstractionOrFailure.IsT1)
+        {
+            return classNodeAbstractionOrFailure.T2Value;
+        }
+        
+        var classNodeAbstraction = classNodeAbstractionOrFailure.T1Value;
+        
+        var targetMethodSymbolOrFailure = _symbolInfo.Symbol is IMethodSymbol targetMethod
+            ? new TaggedUnion<IMethodSymbol, AnalysisFailure>(targetMethod)
+            : new AnalysisFailure("Cannot find the target method of the invocation expression", Location);
+
+        if (!targetMethodSymbolOrFailure.IsT1)
+        {
+            return targetMethodSymbolOrFailure.T2Value;
+        }
+        
+        var targetMethodSymbol = targetMethodSymbolOrFailure.T1Value;
+        
+        var methodNodeAbstractionOrFailure = FindMethodDeclarationNodeAbstraction(classNodeAbstraction, targetMethodSymbol);
+        
+        if (!methodNodeAbstractionOrFailure.IsT1)
+        {
+            return methodNodeAbstractionOrFailure.T2Value;
+        }
+        
+        var methodNodeAbstraction = methodNodeAbstractionOrFailure.T1Value;
+        
+        // Analyze arguments
+        if (Children.Length != 2)
+        {
+            return new AnalysisFailure("Invocation expression must have exactly two children", Location);
+        }
+        
+        var argumentListSyntaxAbstraction = Children[1] as ArgumentListSyntaxAbstraction;
+        
+        if (argumentListSyntaxAbstraction == null)
+        {
+            return new AnalysisFailure("Invocation expression must have an argument list as its second child", Location);
+        }
+
+        var priorStatesWithResultRefs = new List<(IAnalysisState, ImmutableArray<IObjectInstance>)> { (state, ImmutableArray<IObjectInstance>.Empty)}.ToImmutableArray();
+        var currentStatesWithResultRefs = new List<(IAnalysisState, List<IObjectInstance>)>();
+        foreach (var argumentSyntaxAbstraction in argumentListSyntaxAbstraction.Children)
+        {
+            if (argumentSyntaxAbstraction is ArgumentSyntaxAbstraction argument)
+            {
+                if (argument.Children.Length != 1)
+                {
+                    return new AnalysisFailure("Invocation expression must have an argument as its child", Location);
+                }
+                
+                if (argument.Children[0] is ExpressionSyntaxAbstraction argumentExpression)
+                {
+                    foreach (var (priorState, priorResultRefs) in priorStatesWithResultRefs)
+                    {
+                        var argumentResultOrFailure = argumentExpression.GetExpressionResults(priorState);
+                        if (!argumentResultOrFailure.IsT1)
+                        {
+                            return argumentResultOrFailure.T2Value;
+                        }
+
+                        foreach (var (argumentResult, argumentState) in argumentResultOrFailure.T1Value)
+                        {
+                            var currentResultRefs = new List<IObjectInstance>(priorResultRefs);
+                            currentResultRefs.Add(argumentResult);
+                            currentStatesWithResultRefs.Add((argumentState, currentResultRefs));
+                        }
+                    }
+                    priorStatesWithResultRefs = currentStatesWithResultRefs.Select(x => (x.Item1, x.Item2.ToImmutableArray())).ToImmutableArray();
+                }
+                else
+                {
+                    return new AnalysisFailure("Invocation expression must have an argument as its child", Location);
+                }
+            }
+            else
+            {
+                return new AnalysisFailure("Invocation expression must have an argument as its child", Location);
+            }
+        }
+        
+        var results = new List<(IObjectInstance? returned, IAnalysisState state)>();
+        foreach (var (priorState, priorResultRefs) in priorStatesWithResultRefs)
+        {
+            var methodResultOrFailure = methodNodeAbstraction.AnalyzeMethodCall(priorState, priorResultRefs);
+            if (!methodResultOrFailure.IsT1)
+            {
+                return methodResultOrFailure.T2Value;
+            }
+            
+            results.AddRange(methodResultOrFailure.T1Value);
+        }
+        
+        if (results.Count > 0)
+            return results.ToImmutableArray()!;
+        
+            
+        return new AnalysisFailure("Cannot analyze an invocation expression without any results", Location);
     }
 }

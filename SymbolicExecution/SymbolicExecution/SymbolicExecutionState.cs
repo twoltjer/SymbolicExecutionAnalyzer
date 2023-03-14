@@ -59,6 +59,22 @@ public class SymbolicExecutionState : IAnalysisState
 
 	public TaggedUnion<IObjectInstance, AnalysisFailure> GetSymbolValueOrFailure(ISymbol symbol, Location location)
 	{
+		if (symbol is IParameterSymbol parameterSymbol)
+		{
+			if (ParameterVariables.TryGetValue(parameterSymbol, out var paramValue))
+			{
+				if (paramValue == null)
+					return new AnalysisFailure("Cannot get the value of a parameter variable that has not been initialized", location);
+				else
+					return new TaggedUnion<IObjectInstance, AnalysisFailure>(paramValue);
+			}
+			else
+			{
+				return new AnalysisFailure("Cannot find symbol", location);
+			}
+		}
+			
+			
 		if (symbol is not ILocalSymbol localSymbol)
 			return new AnalysisFailure("Cannot get the value of a non-local symbol", location);
 

@@ -25,7 +25,7 @@ class TestClass
 
 	void PrintRow(int n)
 	{{
-		
+		Console.WriteLine(string.Join(' ', GetRow(n)));
 	}}
 
 	int[] GetRow(int n)
