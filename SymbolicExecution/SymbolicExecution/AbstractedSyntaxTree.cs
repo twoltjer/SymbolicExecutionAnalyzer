@@ -149,7 +149,8 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				symbol,
 				location,
 				actualTypeSymbol,
-				convertedTypeSymbol
+				convertedTypeSymbol,
+				symbolInfo
 				),
 			ParameterSyntax => new ParameterSyntaxAbstraction(
 				children,
