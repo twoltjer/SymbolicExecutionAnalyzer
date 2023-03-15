@@ -6,7 +6,8 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 {
 	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
 		MayThrowDiagnosticDescriptor.DiagnosticDescriptor,
-		AnalysisFailureDiagnosticDescriptor.DiagnosticDescriptor
+		AnalysisFailureDiagnosticDescriptor.DiagnosticDescriptor,
+		MayOverflowDiagnosticDescriptor.DiagnosticDescriptor
 		);
 
 	public SyntaxNodeHandler[] SyntaxNodeHandlers => Array.Empty<SyntaxNodeHandler>();
@@ -44,6 +45,21 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 
 		foreach (var method in methodsToAnalyze)
 		{
+			var found = abstractedSyntaxTree.TryGetAbstractedSyntaxNode(context.CodeBlock, out var codeBlockAbstraction);
+			if (!found)
+			{
+				var failure = new AnalysisFailure(
+					$"Could not find the code block {context.CodeBlock} in the abstracted syntax tree",
+					context.CodeBlock.GetLocation());
+				context.ReportDiagnostic(failure);
+				return;
+			}
+			if (codeBlockAbstraction != method)
+			{
+				// The code block is not the method itself, so it must be a nested code block.
+				// We only analyze the method itself, so we can ignore this code block.
+				continue;
+			}
 			var methodAnalyzer = new AbstractMethodAnalyzer();
 			SymbolicExecutionResult methodAnalysis;
 			try
@@ -62,11 +78,17 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 				context.ReportDiagnostic(failure);
 			foreach (var exception in methodAnalysis.UnhandledExceptions)
 			{
-				// Report a diagnostic if a reachable throw statement was found.
+				// Report a diagnostic if a reachable throw statement was found or an overflow occurred.
+				var exceptionTypeName = exception.Type.Match(t1 => t1.Name, t2 => t2.Name);
+				var diagnosticDescriptor = exceptionTypeName switch
+				{
+					nameof(OverflowException) => MayOverflowDiagnosticDescriptor.DiagnosticDescriptor,
+					_ => MayThrowDiagnosticDescriptor.DiagnosticDescriptor
+				};
 				var diagnostic = Diagnostic.Create(
-					MayThrowDiagnosticDescriptor.DiagnosticDescriptor,
+					diagnosticDescriptor,
 					exception.Location,
-					exception.Type.Match(t1 => t1.Name, t2 => t2.Name)
+					exceptionTypeName
 					);
 				context.ReportDiagnostic(diagnostic);
 			}

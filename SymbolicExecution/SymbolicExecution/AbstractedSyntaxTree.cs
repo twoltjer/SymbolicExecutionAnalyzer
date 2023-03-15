@@ -14,6 +14,12 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 	{
 		_semanticModel = semanticModel;
 	}
+	
+	public bool TryGetAbstractedSyntaxNode(SyntaxNode syntaxNode, out ISyntaxNodeAbstraction abstraction)
+	{
+		abstraction = _abstractionCache[syntaxNode];
+		return abstraction != null;
+	}
 
 	public TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure> GetRoot()
 	{

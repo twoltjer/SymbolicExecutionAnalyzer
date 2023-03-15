@@ -31,10 +31,12 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 				new[] { resultStates.T2Value }.ToImmutableArray()
 				);
 
-		var unhandledExceptions = resultStates.T1Value
+		var exceptionThrownStates = resultStates.T1Value
 			.Select(state => state.CurrentException)
 			.Where(exception => exception != null)
 			.Select(exception => exception!)
+			.ToList();
+		var unhandledExceptions = exceptionThrownStates
 			.Distinct()
 			.Select(ConvertToResultException)
 			.ToImmutableArray();

@@ -14,7 +14,7 @@ public static class MayThrowDiagnosticDescriptor
 		);
 
 	private static readonly LocalizableString _messageFormat = new LocalizableResourceString(
-		nameof(SymbolicExecutionStrings.AnalyzerMessageFormat),
+		nameof(SymbolicExecutionStrings.AnalyzerMayThrowMessageFormat),
 		SymbolicExecutionStrings.ResourceManager,
 		typeof(SymbolicExecutionStrings)
 		);

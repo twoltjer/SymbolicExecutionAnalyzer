@@ -16,6 +16,11 @@ public readonly struct ExceptionThrownState : IEquatable<ExceptionThrownState>, 
 		return Exception.Equals(other.Exception) && Location.Equals(other.Location);
 	}
 
+	public bool Equals(IExceptionThrownState other)
+	{
+		return other is ExceptionThrownState exceptionThrownState && Equals(exceptionThrownState);
+	}
+
 	public override bool Equals(object? obj)
 	{
 		return obj is ExceptionThrownState other && Equals(other);
