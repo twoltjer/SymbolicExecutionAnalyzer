@@ -45,21 +45,6 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 
 		foreach (var method in methodsToAnalyze)
 		{
-			var found = abstractedSyntaxTree.TryGetAbstractedSyntaxNode(context.CodeBlock, out var codeBlockAbstraction);
-			if (!found)
-			{
-				var failure = new AnalysisFailure(
-					$"Could not find the code block {context.CodeBlock} in the abstracted syntax tree",
-					context.CodeBlock.GetLocation());
-				context.ReportDiagnostic(failure);
-				return;
-			}
-			if (codeBlockAbstraction != method)
-			{
-				// The code block is not the method itself, so it must be a nested code block.
-				// We only analyze the method itself, so we can ignore this code block.
-				continue;
-			}
 			var methodAnalyzer = new AbstractMethodAnalyzer();
 			SymbolicExecutionResult methodAnalysis;
 			try
@@ -74,6 +59,16 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 				context.ReportDiagnostic(failure);
 				return;
 			}
+
+			if (model.GetDeclaredSymbol(context.CodeBlock) is not IMethodSymbol methodSymbol)
+			{
+				var failure = new AnalysisFailure(
+					$"Analyzing method without a symbol is not supported",
+					method.Location);
+				context.ReportDiagnostic(failure);
+				return;
+			}
+
 			foreach (var failure in methodAnalysis.AnalysisFailures)
 				context.ReportDiagnostic(failure);
 			foreach (var exception in methodAnalysis.UnhandledExceptions)
@@ -85,12 +80,15 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 					nameof(OverflowException) => MayOverflowDiagnosticDescriptor.DiagnosticDescriptor,
 					_ => MayThrowDiagnosticDescriptor.DiagnosticDescriptor
 				};
-				var diagnostic = Diagnostic.Create(
-					diagnosticDescriptor,
-					exception.Location,
-					exceptionTypeName
-					);
-				context.ReportDiagnostic(diagnostic);
+				if (SymbolEqualityComparer.Default.Equals(methodSymbol, exception.MethodSymbol))
+				{
+					var diagnostic = Diagnostic.Create(
+						diagnosticDescriptor,
+						exception.Location,
+						exceptionTypeName
+						);
+					context.ReportDiagnostic(diagnostic);
+				}
 			}
 		}
 	}

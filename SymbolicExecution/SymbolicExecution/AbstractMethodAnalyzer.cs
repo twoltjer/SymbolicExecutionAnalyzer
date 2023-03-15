@@ -48,6 +48,6 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 
 	private ISymbolicExecutionException ConvertToResultException(IExceptionThrownState exceptionState)
 	{
-		return new SymbolicExecutionException(exceptionState.Location, exceptionState.Exception.ActualTypeSymbol);
+		return new SymbolicExecutionException(exceptionState.Location, exceptionState.Exception.ActualTypeSymbol, exceptionState.MethodSymbol);
 	}
 }

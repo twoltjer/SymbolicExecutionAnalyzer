@@ -78,6 +78,7 @@ public class AbstractMethodAnalyzerTests
 		var exceptionObject = Mock.Of<IObjectInstance>(
 			MockBehavior.Strict
 			);
+		var methodSymbol = Mock.Of<IMethodSymbol>(MockBehavior.Strict);
 		Mock.Get(exceptionObject)
 			.Setup(obj => obj.ActualTypeSymbol)
 			.Returns(exceptionTypeUnion);
@@ -85,6 +86,9 @@ public class AbstractMethodAnalyzerTests
 		Mock.Get(exceptionState)
 			.Setup(state => state.Exception)
 			.Returns(exceptionObject);
+		Mock.Get(exceptionState)
+			.Setup(state => state.MethodSymbol)
+			.Returns(methodSymbol);
 		IAnalysisState resultState;
 		if (analyzeFoundUnhandledException)
 		{

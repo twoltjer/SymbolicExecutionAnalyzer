@@ -46,7 +46,7 @@ public class SymbolicExecutionState : IAnalysisState
 
 	public IAnalysisState ThrowException(IObjectInstance exception, Location location)
 	{
-		var exceptionThrownState = new ExceptionThrownState(exception, location);
+		var exceptionThrownState = new ExceptionThrownState(exception, location, _currentMethod);
 		return new SymbolicExecutionState(exceptionThrownState, LocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod, ReturningValue, IsReturning);
 	}
 
