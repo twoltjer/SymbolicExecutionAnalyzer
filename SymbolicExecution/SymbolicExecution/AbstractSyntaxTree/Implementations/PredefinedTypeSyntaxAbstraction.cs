@@ -21,4 +21,6 @@ public class PredefinedTypeSyntaxAbstraction : TypeSyntaxAbstraction, IPredefine
 	{
 		return new AnalysisFailure("Cannot analyze predefined types", Location);
 	}
+
+	public ISymbol? ActualTypeSymbol => _actualTypeSymbol;
 }

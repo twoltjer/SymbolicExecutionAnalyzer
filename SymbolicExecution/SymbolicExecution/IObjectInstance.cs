@@ -2,8 +2,8 @@ namespace SymbolicExecution;
 
 public interface IObjectInstance
 {
-	ITypeSymbol ActualTypeSymbol { get; }
-	ITypeSymbol ConvertedTypeSymbol { get; }
+	TaggedUnion<ITypeSymbol, Type> ActualTypeSymbol { get; }
+	TaggedUnion<ITypeSymbol, Type> ConvertedTypeSymbol { get; }
 	Location Location { get; }
 	IValueScope Value { get; }
 	bool IsExactType(Type type);

@@ -72,7 +72,7 @@ public class AbstractMethodAnalyzerTests
 		var exceptionTypeSymbol = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
 		var exceptionObject = Mock.Of<IObjectInstance>(
 #pragma warning disable RS1024 // Compare symbols correctly
-			obj => obj.ActualTypeSymbol == exceptionTypeSymbol,
+			obj => obj.ActualTypeSymbol.T1Value == exceptionTypeSymbol,
 #pragma warning restore RS1024
 			MockBehavior.Strict
 			);

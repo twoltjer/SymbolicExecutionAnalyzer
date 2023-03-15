@@ -29,8 +29,8 @@ public class LiteralExpressionSyntaxAbstractionTests
 		results.IsT1.Should().BeTrue();
 		results.T1Value.Length.Should().Be(1);
 		var result = results.T1Value.Single();
-		result.Item1.ActualTypeSymbol.Name.Should().Be("Boolean");
-		result.Item1.ConvertedTypeSymbol.Name.Should().Be("Boolean");
+		result.Item1.ActualTypeSymbol.T1Value.Name.Should().Be("Boolean");
+		result.Item1.ConvertedTypeSymbol.T1Value.Name.Should().Be("Boolean");
 		result.Item1.Location.Should().BeSameAs(location);
 		result.Item1.Value.Should().BeOfType<ConstantValueScope>();
 		result.Item1.Value.IsAlways(true).Should().BeTrue();

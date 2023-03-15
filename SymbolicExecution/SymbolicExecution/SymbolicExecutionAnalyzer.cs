@@ -63,7 +63,11 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 			foreach (var exception in methodAnalysis.UnhandledExceptions)
 			{
 				// Report a diagnostic if a reachable throw statement was found.
-				var diagnostic = Diagnostic.Create(MayThrowDiagnosticDescriptor.DiagnosticDescriptor, exception.Location, exception.Type.Name);
+				var diagnostic = Diagnostic.Create(
+					MayThrowDiagnosticDescriptor.DiagnosticDescriptor,
+					exception.Location,
+					exception.Type.Match(t1 => t1.Name, t2 => t2.Name)
+					);
 				context.ReportDiagnostic(diagnostic);
 			}
 		}

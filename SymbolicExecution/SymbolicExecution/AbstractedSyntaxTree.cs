@@ -169,12 +169,13 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				actualTypeSymbol,
 				convertedTypeSymbol
 				),
-			BinaryExpressionSyntax => new BinaryExpressionSyntaxAbstraction(
+			BinaryExpressionSyntax binaryExpressionSyntax => new BinaryExpressionSyntaxAbstraction(
 				children,
 				symbol,
 				location,
 				actualTypeSymbol,
-				convertedTypeSymbol
+				convertedTypeSymbol,
+				binaryExpressionSyntax.Kind()
 				),	
 			ArrayCreationExpressionSyntax => new ArrayCreationExpressionSyntaxAbstraction(
 				children,
