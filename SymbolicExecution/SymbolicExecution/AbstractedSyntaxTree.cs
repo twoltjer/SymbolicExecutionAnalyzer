@@ -227,6 +227,11 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				actualTypeSymbol,
 				convertedTypeSymbol
 				),
+			FileScopedNamespaceDeclarationSyntax => new FileScopedNamespaceDeclarationSyntaxAbstraction(
+				children,
+				symbol,
+				location
+				),
 			_ => null,
 		};
 

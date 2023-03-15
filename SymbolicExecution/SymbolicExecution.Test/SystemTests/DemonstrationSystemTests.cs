@@ -9,6 +9,8 @@ public class DemonstrationSystemTests
         var source = @$"using System;
 using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
 
+namespace SymbolicExecutionDemo;
+
 class TestClass
 {{
     public static void Main()
@@ -55,7 +57,7 @@ class TestClass
 }}
 ";
         var expected = VerifyCS.Diagnostic(descriptor: MayOverflowDiagnosticDescriptor.DiagnosticDescriptor)
-            .WithLocation(43, 22)
+            .WithLocation(45, 22)
             .WithMessage("This expression may overflow");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }

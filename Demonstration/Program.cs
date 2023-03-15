@@ -4,7 +4,7 @@
     {
         var testClass = new TestClass();
         testClass.PrintRowTen();
-        testClass.PrintRowTenThousand();
+        testClass.PrintRowFifty();
     }
     
     void PrintRowTen()
@@ -12,7 +12,7 @@
         PrintRow(10);
     }
 
-    void PrintRowTenThousand()
+    void PrintRowFifty()
     {
         PrintRow(50);
     }
