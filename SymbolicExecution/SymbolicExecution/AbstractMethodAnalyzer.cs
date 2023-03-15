@@ -12,8 +12,8 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 				);
 		}
 
-		var symbolicExecutionState = SymbolicExecutionState.CreateInitialState();
-
+		var symbolicExecutionState = SymbolicExecutionState.CreateInitialState(method.Symbol as IMethodSymbol);
+		
 		var resultStates = blockSyntaxAbstraction.AnalyzeNode(symbolicExecutionState);
 
 		if (!resultStates.IsT1)

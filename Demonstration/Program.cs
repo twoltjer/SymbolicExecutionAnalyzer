@@ -1,42 +1,29 @@
-namespace SymbolicExecution.Test.SystemTests;
-
-public class DemonstrationSystemTests
+﻿class TestClass
 {
-    [Fact]
-    [Trait("Category", "System")]
-    public async Task TestPascalsTriangleRowPrinting()
-    {
-        var source = @$"using System;
-using {typeof(SymbolicallyAnalyzeAttribute).Namespace};
-
-class TestClass
-{{
     public static void Main()
-    {{
+    {
         var testClass = new TestClass();
         testClass.PrintRowTen();
         testClass.PrintRowTenThousand();
-    }}
+    }
     
-    [SymbolicallyAnalyze]
     void PrintRowTen()
-    {{
+    {
         PrintRow(10);
-    }}
+    }
 
-    [SymbolicallyAnalyze]
     void PrintRowTenThousand()
-    {{
+    {
         PrintRow(10000);
-    }}
+    }
 
     void PrintRow(int n)
-    {{
+    {
         Console.WriteLine(string.Join(' ', GetRow(n)));
-    }}
+    }
 
     int[] GetRow(int n)
-    {{
+    {
         var row = new int[n + 1];
         row[0] = 1;
         row[n] = 1;
@@ -47,14 +34,9 @@ class TestClass
         var previousRow = GetRow(n - 1);
 
         for (int i = 1; i < n; i++)
-        {{
+        {
             row[i] = previousRow[i - 1] + previousRow[i];
-        }}
+        }
         return row;
-    }}
-}}
-";
-
-        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 }

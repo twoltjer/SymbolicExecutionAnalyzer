@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace SymbolicExecution;
 
 public class SymbolicExecutionState : IAnalysisState
@@ -7,7 +9,9 @@ public class SymbolicExecutionState : IAnalysisState
 		IImmutableDictionary<ILocalSymbol, IObjectInstance?> localVariables,
 		IImmutableDictionary<IParameterSymbol, IObjectInstance?> parameterVariables,
 		IImmutableStack<IImmutableDictionary<ILocalSymbol, IObjectInstance?>> localsStack,
-		IImmutableStack<IImmutableDictionary<IParameterSymbol, IObjectInstance?>> parametersStack
+		IImmutableStack<IImmutableDictionary<IParameterSymbol, IObjectInstance?>> parametersStack,
+		IImmutableStack<IMethodSymbol?> methodStack,
+		IMethodSymbol currentMethod
 		)
 	{
 		CurrentException = currentException;
@@ -15,6 +19,8 @@ public class SymbolicExecutionState : IAnalysisState
 		ParameterVariables = parameterVariables;
 		LocalsStack = localsStack;
 		ParametersStack = parametersStack;
+		MethodStack = methodStack;
+		_currentMethod = currentMethod;
 	}
 
 	public IExceptionThrownState? CurrentException { get; }
@@ -26,19 +32,21 @@ public class SymbolicExecutionState : IAnalysisState
 	public IImmutableStack<IImmutableDictionary<ILocalSymbol, IObjectInstance?>> LocalsStack { get; }
 
 	public IImmutableStack<IImmutableDictionary<IParameterSymbol, IObjectInstance?>> ParametersStack { get; }
+	
+	public IImmutableStack<IMethodSymbol?> MethodStack { get; }
 
 	public bool IsReachable => true;
 
 	public IAnalysisState ThrowException(IObjectInstance exception, Location location)
 	{
 		var exceptionThrownState = new ExceptionThrownState(exception, location);
-		return new SymbolicExecutionState(exceptionThrownState, LocalVariables, ParameterVariables, LocalsStack, ParametersStack);
+		return new SymbolicExecutionState(exceptionThrownState, LocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod);
 	}
 
 	public IAnalysisState AddLocalVariable(ILocalSymbol symbol)
 	{
 		var newLocalVariables = LocalVariables.Add(symbol, null);
-		return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack);
+		return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod);
 	}
 
 	public TaggedUnion<IAnalysisState, AnalysisFailure> SetSymbolValue(ISymbol symbol, IObjectInstance value)
@@ -49,7 +57,7 @@ public class SymbolicExecutionState : IAnalysisState
 		if (LocalVariables.ContainsKey(localSymbol))
 		{
 			var newLocalVariables = LocalVariables.SetItem(localSymbol, value);
-			return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack);
+			return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod);
 		}
 		else
 		{
@@ -90,18 +98,30 @@ public class SymbolicExecutionState : IAnalysisState
 			return new AnalysisFailure("Cannot find symbol", location);
 		}
 	}
+	
+	private readonly IMethodSymbol _currentMethod;
 
-	public IAnalysisState PushStackFrame(ImmutableArray<(IParameterSymbol symbol, IObjectInstance value)> parameterValues)
+	public IAnalysisState PushStackFrame(
+		ImmutableArray<(IParameterSymbol symbol, IObjectInstance value)> parameterValues,
+		IMethodSymbol? methodSymbol
+		)
 	{
 		var newLocalsStack = LocalsStack.Push(LocalVariables);
 		var newParametersStack = ParametersStack.Push(ParameterVariables);
 		var newLocalVariables = ImmutableDictionary<ILocalSymbol, IObjectInstance?>.Empty;
 		var newParameterVariables = ImmutableDictionary<IParameterSymbol, IObjectInstance?>.Empty;
+		var newMethodStack = MethodStack;
+		newMethodStack = newMethodStack.Push(_currentMethod);
+
+		if (methodSymbol == null)
+		{
+			Debug.Fail("Method symbol should not be null");
+		}
 		foreach (var (symbol, value) in parameterValues)
 		{
 			newParameterVariables = newParameterVariables.Add(symbol, value);
 		}
-		return new SymbolicExecutionState(CurrentException, newLocalVariables, newParameterVariables, newLocalsStack, newParametersStack);
+		return new SymbolicExecutionState(CurrentException, newLocalVariables, newParameterVariables, newLocalsStack, newParametersStack, newMethodStack, methodSymbol);
 	}
 	
 	public IAnalysisState PopStackFrame()
@@ -110,17 +130,42 @@ public class SymbolicExecutionState : IAnalysisState
 		var newParametersStack = ParametersStack.Pop();
 		var newLocalVariables = LocalsStack.Peek();
 		var newParameterVariables = ParametersStack.Peek();
-		return new SymbolicExecutionState(CurrentException, newLocalVariables, newParameterVariables, newLocalsStack, newParametersStack);
+		var newMethodStack = MethodStack.Pop();
+		var newCurrentMethod = MethodStack.Peek();
+		return new SymbolicExecutionState(CurrentException, newLocalVariables, newParameterVariables, newLocalsStack, newParametersStack, newMethodStack, newCurrentMethod);
 	}
 
-	public static IAnalysisState CreateInitialState()
+	public override string ToString()
 	{
+		var sb = new StringBuilder();
+		sb.AppendLine("Current method: " + _currentMethod.Name);
+		sb.AppendLine("Current exception: " + CurrentException);
+		sb.AppendLine("Local variables:");
+		foreach (var (symbol, value) in LocalVariables.Select(x => (x.Key, x.Value)))
+		{
+			sb.AppendLine($"{symbol.Name} = {value}");
+		}
+		sb.AppendLine("Parameter variables:");
+		foreach (var (symbol, value) in ParameterVariables.Select(x => (x.Key, x.Value)))
+		{
+			sb.AppendLine($"{symbol.Name} = {value}");
+		}
+		var str = sb.ToString();
+		return str;
+	}
+
+	public static IAnalysisState CreateInitialState(IMethodSymbol? methodSymbol)
+	{
+		if (methodSymbol == null)
+			Debug.Fail("Method symbol should not be null");
 		return new SymbolicExecutionState(
 			currentException: null,
 			localVariables: ImmutableDictionary<ILocalSymbol, IObjectInstance?>.Empty,
 			parameterVariables: ImmutableDictionary<IParameterSymbol, IObjectInstance?>.Empty,
 			localsStack: ImmutableStack<IImmutableDictionary<ILocalSymbol, IObjectInstance?>>.Empty,
-			parametersStack: ImmutableStack<IImmutableDictionary<IParameterSymbol, IObjectInstance?>>.Empty
+			parametersStack: ImmutableStack<IImmutableDictionary<IParameterSymbol, IObjectInstance?>>.Empty,
+			methodStack: ImmutableStack<IMethodSymbol?>.Empty,
+			currentMethod: methodSymbol
 			);
 	}
 }

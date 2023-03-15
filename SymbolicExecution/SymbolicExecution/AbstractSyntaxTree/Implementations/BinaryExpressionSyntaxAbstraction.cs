@@ -63,12 +63,20 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
                 var leftBig = new BigInteger(leftValueInt);
                 var rightBig = new BigInteger(rightValueInt);
 
-                if (_syntaxKind != SyntaxKind.AddExpression)
+                var resultOrAnalysisFailure = _syntaxKind switch
                 {
-                    return new AnalysisFailure("Binary expressions except adding are not supported", Location);
-                }
-
-                var result = leftBig + rightBig;
+                    SyntaxKind.AddExpression => leftBig + rightBig,
+                    SyntaxKind.SubtractExpression => leftBig - rightBig,
+                    SyntaxKind.MultiplyExpression => leftBig * rightBig,
+                    SyntaxKind.DivideExpression => leftBig / rightBig,
+                    SyntaxKind.ModuloExpression => leftBig % rightBig,
+                    _ => new TaggedUnion<BigInteger, AnalysisFailure>(new AnalysisFailure("Expression kind not a supported binary expression", Location))
+                }; 
+                
+                if (!resultOrAnalysisFailure.IsT1)
+                    return resultOrAnalysisFailure.T2Value;
+                
+                var result = resultOrAnalysisFailure.T1Value;
 
                 if (result > int.MaxValue)
                 {

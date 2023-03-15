@@ -56,7 +56,7 @@ public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbs
 
 		var paramsTuples = paramSymbols.Zip(parameters, (symbol, value) => (symbol, value)).ToImmutableArray();
 		var initialStackCount = priorState.ParametersStack.Count();
-		var methodState = priorState.PushStackFrame(paramsTuples);
+		var methodState = priorState.PushStackFrame(paramsTuples, Symbol as IMethodSymbol);
 		
 		var methodBody = Children.OfType<IBlockSyntaxAbstraction>().ToList();
 		

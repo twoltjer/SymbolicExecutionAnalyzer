@@ -31,4 +31,9 @@ public class ConstantValueScope : IValueScope
 	{
 		return CanBe(value);
 	}
+	
+	public override string ToString()
+	{
+		return Value?.ToString() ?? "null";
+	}
 }

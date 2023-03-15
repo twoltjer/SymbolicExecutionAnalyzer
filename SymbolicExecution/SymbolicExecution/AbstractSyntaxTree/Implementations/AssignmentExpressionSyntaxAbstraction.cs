@@ -11,11 +11,19 @@ public class AssignmentExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
 		if (Children.Length != 2)
 			return new AnalysisFailure("Assignment expression must have exactly two children", Location);
 
-		if (Children[0] is not IIdentifierNameSyntaxAbstraction identifier)
-			return new AnalysisFailure("Assignment expression must have an identifier as its first child", Location);
-
-		if (identifier.Symbol is not ILocalSymbol localSymbol)
-			return new AnalysisFailure("Assignment expression must have a local variable as its first child", Location);
+		Func<IAnalysisState, IObjectInstance, TaggedUnion<IAnalysisState, AnalysisFailure>> setValueOnState;
+		if (Children[0] is IIdentifierNameSyntaxAbstraction identifier && identifier.Symbol is ILocalSymbol localSymbol)
+		{
+			setValueOnState = (state, value) => state.SetSymbolValue(localSymbol, value);
+		}
+		else if (Children[0] is ElementAccessExpressionSyntaxAbstraction)
+		{
+			return new AnalysisFailure("Cannot assign to an element access expression", Location);
+		}
+		else
+		{
+			return new AnalysisFailure("Cannot assign to a non-identifier expression", Location);
+		}
 
 		if (Children[1] is not IExpressionSyntaxAbstraction expression)
 			return new AnalysisFailure("Assignment expression must have an expression as its second child", Location);
@@ -29,7 +37,7 @@ public class AssignmentExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
 		for (var i = 0; i < results.Length; i++)
 		{
 			var (value, state) = results[i];
-			var modifiedStateOrFailure = state.SetSymbolValue(localSymbol, value);
+			var modifiedStateOrFailure = setValueOnState(state, value);
 			if (!modifiedStateOrFailure.IsT1)
 				return modifiedStateOrFailure.T2Value;
 

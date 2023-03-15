@@ -4,7 +4,7 @@ public class SymbolicExecutionStateTests
 {
 	public static IEnumerable<object[]> GetInitialStates()
 	{
-		var emptyState = SymbolicExecutionState.CreateInitialState();
+		var emptyState = SymbolicExecutionState.CreateInitialState(Mock.Of<IMethodSymbol>(MockBehavior.Strict));
 		yield return new object[]
 		{
 			emptyState,

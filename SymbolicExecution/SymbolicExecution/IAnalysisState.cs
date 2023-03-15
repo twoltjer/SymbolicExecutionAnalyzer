@@ -10,6 +10,9 @@ public interface IAnalysisState
 	IAnalysisState AddLocalVariable(ILocalSymbol symbol);
 	TaggedUnion<IAnalysisState, AnalysisFailure> SetSymbolValue(ISymbol symbol, IObjectInstance value);
 	TaggedUnion<IObjectInstance, AnalysisFailure> GetSymbolValueOrFailure(ISymbol symbol, Location location);
-	IAnalysisState PushStackFrame(ImmutableArray<(IParameterSymbol symbol, IObjectInstance value)> toImmutableArray);
+	IAnalysisState PushStackFrame(
+		ImmutableArray<(IParameterSymbol symbol, IObjectInstance value)> toImmutableArray,
+		IMethodSymbol? methodSymbol
+		);
 	IAnalysisState PopStackFrame();
 }

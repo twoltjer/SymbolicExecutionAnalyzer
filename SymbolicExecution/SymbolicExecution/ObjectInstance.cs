@@ -15,4 +15,9 @@ public struct ObjectInstance : IObjectInstance
 		Location = location;
 		Value = value;
 	}
+
+	public override string ToString()
+	{
+		return $"{ActualTypeSymbol.Match(t1 => t1.ToString(), t2 => t2.ToString())} {Value}";
+	}
 }
