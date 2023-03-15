@@ -83,7 +83,7 @@ public class InvocationExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
     {
         if (node is ITypeDeclarationSyntaxAbstraction classNodeAbstraction)
         {
-            if (classNodeAbstraction.Symbol!.Equals(targetTypeSymbol))
+            if (SymbolEqualityComparer.Default.Equals(classNodeAbstraction.Symbol, targetTypeSymbol))
             {
                 classNodeAbstractionOrNull = classNodeAbstraction;
                 return true;
@@ -110,7 +110,7 @@ public class InvocationExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
     {
         if (node is IMethodDeclarationSyntaxAbstraction methodNodeAbstraction)
         {
-            if (methodNodeAbstraction.Symbol!.Equals(targetMethodSymbol))
+            if (SymbolEqualityComparer.Default.Equals(methodNodeAbstraction.Symbol, targetMethodSymbol))
             {
                 methodNodeAbstractionOrNull = methodNodeAbstraction;
                 return true;
@@ -272,7 +272,26 @@ public class InvocationExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
                 return methodResultOrFailure.T2Value;
             }
             
-            results.AddRange(methodResultOrFailure.T1Value);
+            var methodResults = methodResultOrFailure.T1Value;
+            var modifiedResults = new List<(IObjectInstance? returned, IAnalysisState state)>();
+            foreach (var (returnedObject, methodResultState) in methodResults)
+            {
+                if (methodResultState.CurrentException != null)
+                {
+                    var newException = methodResultState.CurrentException.AddInvocationLocation(Location, methodResultState.CurrentMethod);
+                    var newResultStateOrFailure = methodResultState.ReviseException(newException);
+                    if (!newResultStateOrFailure.IsT1)
+                    {
+                        return newResultStateOrFailure.T2Value;
+                    }
+                    modifiedResults.Add((returnedObject, newResultStateOrFailure.T1Value));
+                }
+                else
+                {
+                    modifiedResults.Add((returnedObject, methodResultState));
+                }
+            }
+            results.AddRange(modifiedResults);
         }
         
         if (results.Count > 0)

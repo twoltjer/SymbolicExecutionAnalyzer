@@ -25,4 +25,6 @@ public interface IAnalysisState
 		Location location
 		);
 	TaggedUnion<IAnalysisState, AnalysisFailure> SetReturnValue(IObjectInstance? value, Location location);
+	TaggedUnion<IAnalysisState, AnalysisFailure> ReviseException(IExceptionThrownState newException);
+	IMethodSymbol CurrentMethod { get; }
 }

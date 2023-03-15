@@ -56,9 +56,22 @@ class TestClass
     }}
 }}
 ";
-        var expected = VerifyCS.Diagnostic(descriptor: MayOverflowDiagnosticDescriptor.DiagnosticDescriptor)
-            .WithLocation(45, 22)
-            .WithMessage("This expression may overflow");
+        var expected = new[]
+        {
+            VerifyCS.Diagnostic(descriptor: MayOverflowDiagnosticDescriptor.DiagnosticDescriptor)
+                .WithLocation(45, 22)
+                .WithMessage("This expression may overflow"),
+            VerifyCS.Diagnostic(descriptor: MayOverflowDiagnosticDescriptor.DiagnosticDescriptor)
+                .WithLocation(41, 27)
+                .WithMessage("This expression may overflow"),
+            VerifyCS.Diagnostic(descriptor: MayOverflowDiagnosticDescriptor.DiagnosticDescriptor)
+                .WithLocation(29, 44)
+                .WithMessage("This expression may overflow"),
+            VerifyCS.Diagnostic(descriptor: MayOverflowDiagnosticDescriptor.DiagnosticDescriptor)
+                .WithLocation(24, 9)
+                .WithMessage("This expression may overflow")
+        };
+
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 }

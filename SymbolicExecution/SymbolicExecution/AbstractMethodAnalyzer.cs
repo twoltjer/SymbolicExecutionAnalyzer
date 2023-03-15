@@ -38,7 +38,8 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 			.ToList();
 		var unhandledExceptions = exceptionThrownStates
 			.Distinct()
-			.Select(ConvertToResultException)
+			.SelectMany(ConvertToResultException)
+			.Distinct()
 			.ToImmutableArray();
 		return new SymbolicExecutionResult(
 			unhandledExceptions,
@@ -46,8 +47,11 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 			);
 	}
 
-	private ISymbolicExecutionException ConvertToResultException(IExceptionThrownState exceptionState)
+	private IEnumerable<ISymbolicExecutionException> ConvertToResultException(IExceptionThrownState exceptionState)
 	{
-		return new SymbolicExecutionException(exceptionState.Location, exceptionState.Exception.ActualTypeSymbol, exceptionState.MethodSymbol);
+		yield return new SymbolicExecutionException(exceptionState.Location, exceptionState.Exception.ActualTypeSymbol, exceptionState.MethodSymbol);
+		
+		foreach (var invocationLocation in exceptionState.InvocationLocations)
+			yield return new SymbolicExecutionException(invocationLocation.location, exceptionState.Exception.ActualTypeSymbol, invocationLocation.methodSymbol);
 	}
 }

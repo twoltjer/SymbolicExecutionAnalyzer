@@ -7,11 +7,25 @@ public readonly struct ExceptionThrownState : IEquatable<ExceptionThrownState>, 
 		Exception = exception;
 		Location = location;
 		MethodSymbol = methodSymbol;
+		InvocationLocations = ImmutableArray<(Location, IMethodSymbol)>.Empty;
+	}
+
+	private ExceptionThrownState(IObjectInstance exception, Location location, IMethodSymbol methodSymbol, ImmutableArray<(Location, IMethodSymbol)> invocationLocations)
+	{
+		Exception = exception;
+		Location = location;
+		MethodSymbol = methodSymbol;
+		InvocationLocations = invocationLocations;
 	}
 
 	public IObjectInstance Exception { get; }
 	public Location Location { get; }
+	public ImmutableArray<(Location, IMethodSymbol)> InvocationLocations { get; }
 	public IMethodSymbol MethodSymbol { get; }
+	public IExceptionThrownState AddInvocationLocation(Location location, IMethodSymbol methodSymbol)
+	{
+		return new ExceptionThrownState(Exception, Location, MethodSymbol, InvocationLocations.Add((location, methodSymbol)));
+	}
 
 	public bool Equals(ExceptionThrownState other)
 	{

@@ -70,7 +70,7 @@ public class AbstractMethodAnalyzerTests
 			MockBehavior.Strict
 			);
 		var exceptionLocation = Mock.Of<Location>(
-			loc => loc.ToString() == "MyLocation" && loc.Equals(It.Is<Location>(l => ReferenceEquals(l, loc))),
+			loc => loc.ToString() == "MyLocation" && loc.GetHashCode() == 123 && loc.Equals(It.Is<Location>(l => ReferenceEquals(l, loc))),
 			MockBehavior.Strict
 			);
 		var exceptionTypeSymbol = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
@@ -89,6 +89,9 @@ public class AbstractMethodAnalyzerTests
 		Mock.Get(exceptionState)
 			.Setup(state => state.MethodSymbol)
 			.Returns(methodSymbol);
+		Mock.Get(exceptionState)
+			.Setup(state => state.InvocationLocations)
+			.Returns(ImmutableArray<(Location location, IMethodSymbol methodSymbol)>.Empty);
 		IAnalysisState resultState;
 		if (analyzeFoundUnhandledException)
 		{

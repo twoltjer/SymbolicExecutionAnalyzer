@@ -22,7 +22,7 @@ public class SymbolicExecutionState : IAnalysisState
 		LocalsStack = localsStack;
 		ParametersStack = parametersStack;
 		MethodStack = methodStack;
-		_currentMethod = currentMethod;
+		CurrentMethod = currentMethod;
 		ReturningValue = returningValue;
 		IsReturning = isReturning;
 	}
@@ -46,14 +46,14 @@ public class SymbolicExecutionState : IAnalysisState
 
 	public IAnalysisState ThrowException(IObjectInstance exception, Location location)
 	{
-		var exceptionThrownState = new ExceptionThrownState(exception, location, _currentMethod);
-		return new SymbolicExecutionState(exceptionThrownState, LocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod, ReturningValue, IsReturning);
+		var exceptionThrownState = new ExceptionThrownState(exception, location, CurrentMethod);
+		return new SymbolicExecutionState(exceptionThrownState, LocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, CurrentMethod, ReturningValue, IsReturning);
 	}
 
 	public IAnalysisState AddLocalVariable(ILocalSymbol symbol)
 	{
 		var newLocalVariables = LocalVariables.Add(symbol, null);
-		return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod, ReturningValue, IsReturning);
+		return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, CurrentMethod, ReturningValue, IsReturning);
 	}
 
 	public TaggedUnion<IAnalysisState, AnalysisFailure> SetSymbolValue(ISymbol symbol, IObjectInstance value, Location location)
@@ -64,7 +64,7 @@ public class SymbolicExecutionState : IAnalysisState
 		if (LocalVariables.ContainsKey(localSymbol))
 		{
 			var newLocalVariables = LocalVariables.SetItem(localSymbol, value);
-			return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod, ReturningValue, IsReturning);
+			return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, CurrentMethod, ReturningValue, IsReturning);
 		}
 		else
 		{
@@ -105,8 +105,8 @@ public class SymbolicExecutionState : IAnalysisState
 			return new AnalysisFailure("Cannot find symbol", location);
 		}
 	}
-	
-	private readonly IMethodSymbol _currentMethod;
+
+	public IMethodSymbol CurrentMethod { get; }
 
 	public IAnalysisState PushStackFrame(
 		ImmutableArray<(IParameterSymbol symbol, IObjectInstance value)> parameterValues,
@@ -118,7 +118,7 @@ public class SymbolicExecutionState : IAnalysisState
 		var newLocalVariables = ImmutableDictionary<ILocalSymbol, IObjectInstance?>.Empty;
 		var newParameterVariables = ImmutableDictionary<IParameterSymbol, IObjectInstance?>.Empty;
 		var newMethodStack = MethodStack;
-		newMethodStack = newMethodStack.Push(_currentMethod);
+		newMethodStack = newMethodStack.Push(CurrentMethod);
 
 		foreach (var (symbol, value) in parameterValues)
 		{
@@ -189,13 +189,21 @@ public class SymbolicExecutionState : IAnalysisState
 	{
 		if (ReturningValue != null)
 			return new AnalysisFailure("Cannot set the return value of a method that has already returned", location);
-		return new SymbolicExecutionState(CurrentException, LocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod, returningValue: value, isReturning: true);
+		return new SymbolicExecutionState(CurrentException, LocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, CurrentMethod, returningValue: value, isReturning: true);
+	}
+
+	public TaggedUnion<IAnalysisState, AnalysisFailure> ReviseException(IExceptionThrownState newException)
+	{
+		if (CurrentException == null)
+			return new AnalysisFailure("Cannot revise the exception of a method that has not thrown an exception", newException.Location);
+		
+		return new SymbolicExecutionState(newException, LocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, CurrentMethod, ReturningValue, IsReturning);
 	}
 
 	public override string ToString()
 	{
 		var sb = new StringBuilder();
-		sb.AppendLine("Current method: " + _currentMethod.Name);
+		sb.AppendLine("Current method: " + CurrentMethod.Name);
 		sb.AppendLine("Current exception: " + CurrentException);
 		sb.AppendLine("Local variables:");
 		foreach (var (symbol, value) in LocalVariables.Select(x => (x.Key, x.Value)))

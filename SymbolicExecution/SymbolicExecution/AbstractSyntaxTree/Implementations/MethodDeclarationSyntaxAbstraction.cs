@@ -79,7 +79,7 @@ public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbs
 			return methodBodyResult.T2Value;
 		}
 		
-		var methodBodyResults = methodBodyResult.T1Value;
+		var methodBodyResults = methodBodyResult.T1Value.ToList();
 		foreach (var result in methodBodyResults)
 		{
 			var resultCount = result.ParametersStack.Count();
