@@ -135,6 +135,29 @@ public class SymbolicExecutionState : IAnalysisState
 		return new SymbolicExecutionState(CurrentException, newLocalVariables, newParameterVariables, newLocalsStack, newParametersStack, newMethodStack, newCurrentMethod);
 	}
 
+	public TaggedUnion<IAnalysisState, AnalysisFailure> SetArrayElementValue(ILocalSymbol symbol, IObjectInstance value, int index, Location location)
+	{
+		var arrayInstanceOrFailure = GetSymbolValueOrFailure(symbol, location);
+
+		if (!arrayInstanceOrFailure.IsT1)
+			return arrayInstanceOrFailure.T2Value;
+		
+		var arrayInstance = arrayInstanceOrFailure.T1Value;
+		if (arrayInstance.Value is not IntArrayValueScope arrayValueScope)
+			return new AnalysisFailure("Cannot set the value of a non-array symbol", location);
+		
+		var constantValueScope = value.Value as ConstantValueScope;
+		if (constantValueScope == null)
+			return new AnalysisFailure("Cannot set the value of an array element to a non-constant value", location);
+
+		if (constantValueScope.Value is not int intValue)
+			return new AnalysisFailure("Cannot set the value of an array element to a non-integer value", location);
+		
+		var newArrayValueScope = arrayValueScope.SetElementValue(index, intValue);
+		var newArrayInstance = new ObjectInstance(arrayInstance.ActualTypeSymbol, arrayInstance.ConvertedTypeSymbol, arrayInstance.Location, newArrayValueScope);
+		return SetSymbolValue(symbol, newArrayInstance);
+	}
+
 	public override string ToString()
 	{
 		var sb = new StringBuilder();

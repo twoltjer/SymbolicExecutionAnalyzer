@@ -15,4 +15,10 @@ public interface IAnalysisState
 		IMethodSymbol? methodSymbol
 		);
 	IAnalysisState PopStackFrame();
+	TaggedUnion<IAnalysisState, AnalysisFailure> SetArrayElementValue(
+		ILocalSymbol symbol,
+		IObjectInstance value,
+		int index,
+		Location location
+		);
 }

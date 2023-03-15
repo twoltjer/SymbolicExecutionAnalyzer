@@ -56,65 +56,100 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
                 
                 if (leftValue is not int leftValueInt)
                     return new AnalysisFailure("Binary expressions must have integer values on the left", Location);
-                
+
                 if (rightValue is not int rightValueInt)
-                    return new AnalysisFailure("Binary expressions must have integer values on the right", Location);
-                
+                    return new AnalysisFailure(
+                        "Binary expressions must have integer values on the right",
+                        Location
+                        );
+
                 var leftBig = new BigInteger(leftValueInt);
                 var rightBig = new BigInteger(rightValueInt);
-
-                var resultOrAnalysisFailure = _syntaxKind switch
-                {
-                    SyntaxKind.AddExpression => leftBig + rightBig,
-                    SyntaxKind.SubtractExpression => leftBig - rightBig,
-                    SyntaxKind.MultiplyExpression => leftBig * rightBig,
-                    SyntaxKind.DivideExpression => leftBig / rightBig,
-                    SyntaxKind.ModuloExpression => leftBig % rightBig,
-                    _ => new TaggedUnion<BigInteger, AnalysisFailure>(new AnalysisFailure("Expression kind not a supported binary expression", Location))
-                }; 
                 
-                if (!resultOrAnalysisFailure.IsT1)
-                    return resultOrAnalysisFailure.T2Value;
-                
-                var result = resultOrAnalysisFailure.T1Value;
+                if (new[] { SyntaxKind.AddExpression, SyntaxKind.SubtractExpression, SyntaxKind.MultiplyExpression, SyntaxKind.DivideExpression, SyntaxKind.ModuloExpression }.Contains(_syntaxKind))
+                {
+                    var resultOrAnalysisFailure = _syntaxKind switch
+                    {
+                        SyntaxKind.AddExpression => leftBig + rightBig,
+                        SyntaxKind.SubtractExpression => leftBig - rightBig,
+                        SyntaxKind.MultiplyExpression => leftBig * rightBig,
+                        SyntaxKind.DivideExpression => leftBig / rightBig,
+                        SyntaxKind.ModuloExpression => leftBig % rightBig,
+                        _ => new TaggedUnion<BigInteger, AnalysisFailure>(
+                            new AnalysisFailure("Expression kind not a supported binary expression", Location)
+                            )
+                    };
 
-                if (result > int.MaxValue)
-                {
-                    // Overflow, create and throw an exception
-                    var exception = new ObjectInstance(
-                        typeof(OverflowException),
-                        typeof(OverflowException),
-                        Location,
-                        new ReferenceTypeScope(typeof(OverflowException))
-                    );
-                    var returnState = rightState.ThrowException(exception, Location);
-                    results.Add((null, returnState)!);
+                    if (!resultOrAnalysisFailure.IsT1)
+                        return resultOrAnalysisFailure.T2Value;
+
+                    var result = resultOrAnalysisFailure.T1Value;
+
+                    if (result > int.MaxValue)
+                    {
+                        // Overflow, create and throw an exception
+                        var exception = new ObjectInstance(
+                            typeof(OverflowException),
+                            typeof(OverflowException),
+                            Location,
+                            new ReferenceTypeScope(typeof(OverflowException))
+                            );
+                        var returnState = rightState.ThrowException(exception, Location);
+                        results.Add((null, returnState)!);
+                    }
+                    else if (result < int.MinValue)
+                    {
+                        // Overflow, create and throw an exception
+                        var exception = new ObjectInstance(
+                            typeof(OverflowException),
+                            typeof(OverflowException),
+                            Location,
+                            new ReferenceTypeScope(typeof(OverflowException))
+                            );
+                        var returnState = rightState.ThrowException(exception, Location);
+                        results.Add((null, returnState)!);
+                    }
+                    else
+                    {
+                        var intValue = (int)result;
+                        // Ensure that the result is an integer
+                        Debug.Assert(new BigInteger(intValue) == result);
+                        var resultObject = new ObjectInstance(
+                            typeof(int),
+                            typeof(int),
+                            Location,
+                            new ConstantValueScope(intValue, typeof(int))
+                            );
+
+                        results.Add((resultObject, rightState));
+                    }
                 }
-                else if (result < int.MinValue)
+                else if (new[] { SyntaxKind.LessThanOrEqualExpression }.Contains(_syntaxKind))
                 {
-                    // Overflow, create and throw an exception
-                    var exception = new ObjectInstance(
-                        typeof(OverflowException),
-                        typeof(OverflowException),
-                        Location,
-                        new ReferenceTypeScope(typeof(OverflowException))
-                    );
-                    var returnState = rightState.ThrowException(exception, Location);
-                    results.Add((null, returnState)!);
-                }
-                else
-                {
-                    var intValue = (int)result;
-                    // Ensure that the result is an integer
-                    Debug.Assert(new BigInteger(intValue) == result);
+                    var resultOrAnalysisFailure = _syntaxKind switch
+                    {
+                        SyntaxKind.LessThanOrEqualExpression => leftBig <= rightBig,
+                        _ => new TaggedUnion<bool, AnalysisFailure>(
+                            new AnalysisFailure("Expression kind not a supported binary expression", Location)
+                            )
+                    };
+                    
+                    if (!resultOrAnalysisFailure.IsT1)
+                        return resultOrAnalysisFailure.T2Value;
+                    
+                    var result = resultOrAnalysisFailure.T1Value;
                     var resultObject = new ObjectInstance(
-                        typeof(int),
-                        typeof(int),
+                        typeof(bool),
+                        typeof(bool),
                         Location,
-                        new ConstantValueScope(intValue, typeof(int))
+                        new ConstantValueScope(result, typeof(bool))
                         );
                     
                     results.Add((resultObject, rightState));
+                }
+                else
+                {
+                    return new AnalysisFailure("Expression kind not a supported binary expression", Location);
                 }
             }
         }
