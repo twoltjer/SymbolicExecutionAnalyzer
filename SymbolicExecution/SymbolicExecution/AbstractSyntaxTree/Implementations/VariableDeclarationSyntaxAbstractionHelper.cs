@@ -44,7 +44,7 @@ public class VariableDeclarationSyntaxAbstractionHelper : IVariableDeclarationSy
 		foreach (var (value, state) in valueResults)
 		{
 			var stateWithVar = state.AddLocalVariable(localSymbol);
-			var result = stateWithVar.SetSymbolValue(localSymbol, value);
+			var result = stateWithVar.SetSymbolValue(localSymbol, value, _location);
 			if (result.IsT1)
 				returnStates.Add(result.T1Value);
 			else

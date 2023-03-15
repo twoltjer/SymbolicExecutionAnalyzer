@@ -20,8 +20,11 @@ public class ForStatementSyntaxAbstraction : StatementSyntaxAbstraction
         var previousStates = new List<IAnalysisState>(initializationResults);
         var incomplete = new List<IAnalysisState>();
         var complete = new List<IAnalysisState>();
-        while (previousStates.Any())
+        const int maxIterations = 20_000;
+        for (var i = 0; previousStates.Any(); i++)
         {
+            if (i >= maxIterations)
+                return new AnalysisFailure("For statement has too many iterations", Location);
             foreach (var previousState in previousStates)
             {
                 var conditionResultsOrFailure = Children[1].GetExpressionResults(previousState);
@@ -47,11 +50,18 @@ public class ForStatementSyntaxAbstraction : StatementSyntaxAbstraction
                         var blockResults = blockResultsOrFailure.T1Value;
                         foreach (var blockResult in blockResults)
                         {
-                            var incrementResultsOrFailure = Children[2].AnalyzeNode(blockResult);
-                            if (!incrementResultsOrFailure.IsT1)
-                                return incrementResultsOrFailure.T2Value;
+                            if (blockResult.IsReturning || blockResult.CurrentException != null)
+                            {
+                                complete.Add(blockResult);
+                            }
+                            else
+                            {
+                                var incrementResultsOrFailure = Children[2].AnalyzeNode(blockResult);
+                                if (!incrementResultsOrFailure.IsT1)
+                                    return incrementResultsOrFailure.T2Value;
 
-                            incomplete.AddRange(incrementResultsOrFailure.T1Value);
+                                incomplete.AddRange(incrementResultsOrFailure.T1Value);
+                            }
                         }
                     }
                     else
@@ -62,6 +72,7 @@ public class ForStatementSyntaxAbstraction : StatementSyntaxAbstraction
             }
             
             previousStates = incomplete;
+            incomplete = new List<IAnalysisState>();
         }
         
         return complete;

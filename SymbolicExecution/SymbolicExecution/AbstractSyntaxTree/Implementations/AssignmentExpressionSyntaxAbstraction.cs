@@ -14,7 +14,7 @@ public class AssignmentExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
 		Func<IAnalysisState, IObjectInstance, TaggedUnion<IAnalysisState, AnalysisFailure>> setValueOnState;
 		if (Children[0] is IIdentifierNameSyntaxAbstraction identifier && identifier.Symbol is ILocalSymbol localSymbol)
 		{
-			setValueOnState = (state, value) => state.SetSymbolValue(localSymbol, value);
+			setValueOnState = (state, value) => state.SetSymbolValue(localSymbol, value, Location);
 		}
 		else if (Children[0] is ElementAccessExpressionSyntaxAbstraction elementAccess)
 		{
@@ -76,11 +76,18 @@ public class AssignmentExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
 		for (var i = 0; i < results.Length; i++)
 		{
 			var (value, state) = results[i];
-			var modifiedStateOrFailure = setValueOnState(state, value);
-			if (!modifiedStateOrFailure.IsT1)
-				return modifiedStateOrFailure.T2Value;
+			if (state.IsReturning || state.CurrentException != null)
+			{
+				returnStates[i] = state;
+			}
+			else
+			{
+				var modifiedStateOrFailure = setValueOnState(state, value);
+				if (!modifiedStateOrFailure.IsT1)
+					return modifiedStateOrFailure.T2Value;
 
-			returnStates[i] = modifiedStateOrFailure.T1Value;
+				returnStates[i] = modifiedStateOrFailure.T1Value;
+			}
 		}
 
 		return returnStates;

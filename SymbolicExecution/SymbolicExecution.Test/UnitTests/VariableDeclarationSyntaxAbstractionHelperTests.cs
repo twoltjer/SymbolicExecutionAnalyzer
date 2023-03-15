@@ -94,8 +94,8 @@ public class VariableDeclarationSyntaxAbstractionHelperTests
 		Mock.Get(equalsValueClauseSyntaxAbstraction).Setup(x => x.Children).Returns(new[] { equalsValueChild }.ToImmutableArray());
 		Mock.Get(modifiedState1).Setup(x => x.AddLocalVariable(localSymbol)).Returns(localVariableState1);
 		Mock.Get(modifiedState2).Setup(x => x.AddLocalVariable(localSymbol)).Returns(localVariableState2);
-		Mock.Get(localVariableState1).Setup(x => x.SetSymbolValue(localSymbol, objectInstance1)).Returns(new TaggedUnion<IAnalysisState, AnalysisFailure>(localVariableAssignedState1));
-		Mock.Get(localVariableState2).Setup(x => x.SetSymbolValue(localSymbol, objectInstance2)).Returns(new TaggedUnion<IAnalysisState, AnalysisFailure>(localVariableAssignedState2));
+		Mock.Get(localVariableState1).Setup(x => x.SetSymbolValue(localSymbol, objectInstance1, It.IsAny<Location>())).Returns(new TaggedUnion<IAnalysisState, AnalysisFailure>(localVariableAssignedState1));
+		Mock.Get(localVariableState2).Setup(x => x.SetSymbolValue(localSymbol, objectInstance2, It.IsAny<Location>())).Returns(new TaggedUnion<IAnalysisState, AnalysisFailure>(localVariableAssignedState2));
 		var result = subject.AnalyzeNodeWithOneDeclaratorChild(previousState, localSymbol, equalsValueClauseSyntaxAbstraction);
 		result.IsT1.Should().BeTrue();
 		result.T1Value.Should().BeEquivalentTo(new[] { localVariableAssignedState1, localVariableAssignedState2 });
@@ -123,7 +123,7 @@ public class VariableDeclarationSyntaxAbstractionHelperTests
 		Mock.Get(equalsValueClauseSyntaxAbstraction).Setup(x => x.Children).Returns(new[] { equalsValueChild }.ToImmutableArray());
 		Mock.Get(modifiedState1).Setup(x => x.AddLocalVariable(localSymbol)).Returns(localVariableState1);
 		Mock.Get(modifiedState2).Setup(x => x.AddLocalVariable(localSymbol)).Returns(localVariableState2);
-		Mock.Get(localVariableState1).Setup(x => x.SetSymbolValue(localSymbol, objectInstance1)).Returns(new TaggedUnion<IAnalysisState, AnalysisFailure>(setFailure));
+		Mock.Get(localVariableState1).Setup(x => x.SetSymbolValue(localSymbol, objectInstance1, It.IsAny<Location>())).Returns(new TaggedUnion<IAnalysisState, AnalysisFailure>(setFailure));
 		var result = subject.AnalyzeNodeWithOneDeclaratorChild(previousState, localSymbol, equalsValueClauseSyntaxAbstraction);
 		result.IsT1.Should().BeFalse();
 		result.T2Value.Reason.Should().Be("Set failure");

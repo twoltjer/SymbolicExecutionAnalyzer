@@ -163,6 +163,7 @@ public class InvocationExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
                     }
                 }
                 previousStates = currentResults;
+                currentResults = new List<IAnalysisState>();
             }
             return previousStates.Select(x => (default(IObjectInstance?), x)).ToImmutableArray()!;
         }

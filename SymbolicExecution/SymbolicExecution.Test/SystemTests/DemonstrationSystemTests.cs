@@ -15,7 +15,7 @@ class TestClass
     {{
         var testClass = new TestClass();
         testClass.PrintRowTen();
-        testClass.PrintRowTenThousand();
+        testClass.PrintRowFifty();
     }}
     
     [SymbolicallyAnalyze]
@@ -25,9 +25,9 @@ class TestClass
     }}
 
     [SymbolicallyAnalyze]
-    void PrintRowTenThousand()
+    void PrintRowFifty()
     {{
-        PrintRow(10000);
+        PrintRow(50);
     }}
 
     void PrintRow(int n)

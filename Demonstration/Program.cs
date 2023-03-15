@@ -14,7 +14,7 @@
 
     void PrintRowTenThousand()
     {
-        PrintRow(10000);
+        PrintRow(50);
     }
 
     void PrintRow(int n)

@@ -196,12 +196,13 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 				actualTypeSymbol,
 				convertedTypeSymbol
 				),
-			PostfixUnaryExpressionSyntax => new PostfixUnaryExpressionSyntaxAbstraction(
+			PostfixUnaryExpressionSyntax postfixUnaryExpressionSyntax => new PostfixUnaryExpressionSyntaxAbstraction(
 				children,
 				symbol,
 				location,
 				actualTypeSymbol,
-				convertedTypeSymbol
+				convertedTypeSymbol,
+				postfixUnaryExpressionSyntax.Kind()
 				),
 			ForStatementSyntax => new ForStatementSyntaxAbstraction(
 				children,

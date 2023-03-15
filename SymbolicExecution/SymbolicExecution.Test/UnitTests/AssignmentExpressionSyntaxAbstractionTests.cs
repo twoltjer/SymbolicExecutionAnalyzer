@@ -160,7 +160,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
         
         var failureLocation = Mock.Of<Location>(MockBehavior.Strict);
         var failure = new AnalysisFailure("Reason", failureLocation);
-        Mock.Get(expressionResultState1).Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult1)).Returns(failure);
+        Mock.Get(expressionResultState1).Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult1, It.IsAny<Location>())).Returns(failure);
         
         Mock.Get(expression).Setup(x => x.GetExpressionResults(initialState)).Returns(expressionResults);
         var children = new ISyntaxNodeAbstraction[]
@@ -201,11 +201,11 @@ public class AssignmentExpressionSyntaxAbstractionTests
         }.ToImmutableArray();
 
         Mock.Get(expressionResultState1)
-            .Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult1))
+            .Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult1, It.IsAny<Location>()))
             .Returns(new TaggedUnion<IAnalysisState, AnalysisFailure>(expressionResultModifiedState1));
         
         Mock.Get(expressionResultState2)
-            .Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult2))
+            .Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult2, It.IsAny<Location>()))
             .Returns(new TaggedUnion<IAnalysisState, AnalysisFailure>(expressionResultModifiedState2));
         
         Mock.Get(expression).Setup(x => x.GetExpressionResults(initialState)).Returns(expressionResults);

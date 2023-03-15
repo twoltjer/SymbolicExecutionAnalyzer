@@ -10,7 +10,7 @@ public interface IAnalysisState
 	bool IsReturning { get; }
 	IAnalysisState ThrowException(IObjectInstance exception, Location location);
 	IAnalysisState AddLocalVariable(ILocalSymbol symbol);
-	TaggedUnion<IAnalysisState, AnalysisFailure> SetSymbolValue(ISymbol symbol, IObjectInstance value);
+	TaggedUnion<IAnalysisState, AnalysisFailure> SetSymbolValue(ISymbol symbol, IObjectInstance value, Location location);
 	TaggedUnion<IObjectInstance, AnalysisFailure> GetSymbolValueOrFailure(ISymbol symbol, Location location);
 	IAnalysisState PushStackFrame(
 		ImmutableArray<(IParameterSymbol symbol, IObjectInstance value)> toImmutableArray,

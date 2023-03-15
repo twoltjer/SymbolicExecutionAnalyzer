@@ -56,10 +56,10 @@ public class SymbolicExecutionState : IAnalysisState
 		return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod, ReturningValue, IsReturning);
 	}
 
-	public TaggedUnion<IAnalysisState, AnalysisFailure> SetSymbolValue(ISymbol symbol, IObjectInstance value)
+	public TaggedUnion<IAnalysisState, AnalysisFailure> SetSymbolValue(ISymbol symbol, IObjectInstance value, Location location)
 	{
 		if (symbol is not ILocalSymbol localSymbol)
-			return new AnalysisFailure("Cannot set the value of a non-local symbol", Location.None);
+			return new AnalysisFailure("Cannot set the value of a non-local symbol", location);
 
 		if (LocalVariables.ContainsKey(localSymbol))
 		{
@@ -68,7 +68,7 @@ public class SymbolicExecutionState : IAnalysisState
 		}
 		else
 		{
-			return new AnalysisFailure("Symbol missing from list of local variables", Location.None);
+			return new AnalysisFailure("Symbol missing from list of local variables", location);
 		}
 	}
 
@@ -182,7 +182,7 @@ public class SymbolicExecutionState : IAnalysisState
 		
 		var newArrayValueScope = arrayValueScope.SetElementValue(index, intValue);
 		var newArrayInstance = new ObjectInstance(arrayInstance.ActualTypeSymbol, arrayInstance.ConvertedTypeSymbol, arrayInstance.Location, newArrayValueScope);
-		return SetSymbolValue(symbol, newArrayInstance);
+		return SetSymbolValue(symbol, newArrayInstance, location);
 	}
 
 	public TaggedUnion<IAnalysisState, AnalysisFailure> SetReturnValue(IObjectInstance? value, Location location)
