@@ -39,4 +39,9 @@ public class IntArrayValueScope : IValueScope
 		newValues[index] = value;
 		return new IntArrayValueScope(newValues);
 	}
+	
+	public override string ToString()
+	{
+		return $"[{string.Join(", ", Values)}]";
+	}
 }

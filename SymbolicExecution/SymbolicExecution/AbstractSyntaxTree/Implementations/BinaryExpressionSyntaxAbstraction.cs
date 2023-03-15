@@ -35,6 +35,14 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
         var leftValues = left.GetExpressionResults(state); 
         if (!leftValues.IsT1)
             return leftValues.T2Value;
+        
+        var twoIntToIntSyntaxKinds = new[]
+        {
+            SyntaxKind.AddExpression, SyntaxKind.SubtractExpression, SyntaxKind.MultiplyExpression,
+            SyntaxKind.DivideExpression, SyntaxKind.ModuloExpression
+        };
+        var twoIntToBoolSyntaxKinds = new[]
+            { SyntaxKind.LessThanOrEqualExpression, SyntaxKind.LessThanExpression };
 
         var results = ImmutableArray.CreateBuilder<(IObjectInstance, IAnalysisState)>();
         foreach (var (leftValueObject, leftState) in leftValues.T1Value)
@@ -65,8 +73,8 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
 
                 var leftBig = new BigInteger(leftValueInt);
                 var rightBig = new BigInteger(rightValueInt);
-                
-                if (new[] { SyntaxKind.AddExpression, SyntaxKind.SubtractExpression, SyntaxKind.MultiplyExpression, SyntaxKind.DivideExpression, SyntaxKind.ModuloExpression }.Contains(_syntaxKind))
+
+                if (twoIntToIntSyntaxKinds.Contains(_syntaxKind))
                 {
                     var resultOrAnalysisFailure = _syntaxKind switch
                     {
@@ -124,11 +132,12 @@ public class BinaryExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction
                         results.Add((resultObject, rightState));
                     }
                 }
-                else if (new[] { SyntaxKind.LessThanOrEqualExpression }.Contains(_syntaxKind))
+                else if (twoIntToBoolSyntaxKinds.Contains(_syntaxKind))
                 {
                     var resultOrAnalysisFailure = _syntaxKind switch
                     {
                         SyntaxKind.LessThanOrEqualExpression => leftBig <= rightBig,
+                        SyntaxKind.LessThanExpression => leftBig < rightBig,
                         _ => new TaggedUnion<bool, AnalysisFailure>(
                             new AnalysisFailure("Expression kind not a supported binary expression", Location)
                             )
