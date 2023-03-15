@@ -5,7 +5,7 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <AssemblyVersion>0.0.3.2</AssemblyVersion>
+        <AssemblyVersion>0.0.3.3</AssemblyVersion>
         <Version>$(AssemblyVersion)</Version>
     </PropertyGroup>
 
