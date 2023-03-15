@@ -22,6 +22,10 @@ public class BlockSyntaxAbstraction : StatementSyntaxAbstraction, IBlockSyntaxAb
 				{
 					nextIteration.Add(state);
 				}
+				else if (state.IsReturning)
+				{
+					nextIteration.Add(state);
+				}
 				else
 				{
 					var results = child.AnalyzeNode(state);
@@ -38,8 +42,8 @@ public class BlockSyntaxAbstraction : StatementSyntaxAbstraction, IBlockSyntaxAb
 		return new TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure>(current);
 	}
 
-	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
+	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState previous)
 	{
-		throw new NotImplementedException();
+		return new AnalysisFailure("Blocks do not have expression results", Location);
 	}
 }

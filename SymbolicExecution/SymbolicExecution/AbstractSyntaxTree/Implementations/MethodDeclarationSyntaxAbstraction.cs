@@ -56,7 +56,12 @@ public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbs
 
 		var paramsTuples = paramSymbols.Zip(parameters, (symbol, value) => (symbol, value)).ToImmutableArray();
 		var initialStackCount = priorState.ParametersStack.Count();
-		var methodState = priorState.PushStackFrame(paramsTuples, Symbol as IMethodSymbol);
+		var methodSymbol = Symbol as IMethodSymbol;
+		if (methodSymbol is null)
+		{
+			return new AnalysisFailure("Method declaration had no symbol", Location);
+		}
+		var methodState = priorState.PushStackFrame(paramsTuples, methodSymbol);
 		
 		var methodBody = Children.OfType<IBlockSyntaxAbstraction>().ToList();
 		
@@ -82,7 +87,7 @@ public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbs
 		}
 
 		var resultStates = methodBodyResults.Select(x => x.PopStackFrame()).ToList();
-		foreach (var resultState in resultStates)
+		foreach (var (resultState, _) in resultStates)
 		{
 			var resultCount = resultState.ParametersStack.Count();
 			Debug.Assert(resultCount == initialStackCount);
@@ -91,7 +96,7 @@ public class MethodDeclarationSyntaxAbstraction : BaseMethodDeclarationSyntaxAbs
 		{
 			return new AnalysisFailure("Method body did not return any results", Location);
 		}
-		
-		return resultStates.Select(x => (default(IObjectInstance), x)).ToImmutableArray();
+
+		return resultStates.Select(x => (x.returnValue, x.state)).ToImmutableArray();
 	}
 }

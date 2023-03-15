@@ -12,7 +12,16 @@ public class AbstractMethodAnalyzer : IAbstractMethodAnalyzer
 				);
 		}
 
-		var symbolicExecutionState = SymbolicExecutionState.CreateInitialState(method.Symbol as IMethodSymbol);
+		var methodSymbol = method.Symbol as IMethodSymbol;
+		if (methodSymbol is null)
+		{
+			return new SymbolicExecutionResult(
+				ImmutableArray<ISymbolicExecutionException>.Empty,
+				new[] { new AnalysisFailure($"Could not get an {nameof(IMethodSymbol)} from the method {method}", method.Location) }.ToImmutableArray()
+				);
+		}
+
+		var symbolicExecutionState = SymbolicExecutionState.CreateInitialState(methodSymbol);
 		
 		var resultStates = blockSyntaxAbstraction.AnalyzeNode(symbolicExecutionState);
 

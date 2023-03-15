@@ -10,8 +10,10 @@ public class SymbolicExecutionState : IAnalysisState
 		IImmutableDictionary<IParameterSymbol, IObjectInstance?> parameterVariables,
 		IImmutableStack<IImmutableDictionary<ILocalSymbol, IObjectInstance?>> localsStack,
 		IImmutableStack<IImmutableDictionary<IParameterSymbol, IObjectInstance?>> parametersStack,
-		IImmutableStack<IMethodSymbol?> methodStack,
-		IMethodSymbol currentMethod
+		IImmutableStack<IMethodSymbol> methodStack,
+		IMethodSymbol currentMethod, 
+		IObjectInstance? returningValue,
+		bool isReturning
 		)
 	{
 		CurrentException = currentException;
@@ -21,6 +23,8 @@ public class SymbolicExecutionState : IAnalysisState
 		ParametersStack = parametersStack;
 		MethodStack = methodStack;
 		_currentMethod = currentMethod;
+		ReturningValue = returningValue;
+		IsReturning = isReturning;
 	}
 
 	public IExceptionThrownState? CurrentException { get; }
@@ -33,20 +37,23 @@ public class SymbolicExecutionState : IAnalysisState
 
 	public IImmutableStack<IImmutableDictionary<IParameterSymbol, IObjectInstance?>> ParametersStack { get; }
 	
-	public IImmutableStack<IMethodSymbol?> MethodStack { get; }
+	public IImmutableStack<IMethodSymbol> MethodStack { get; }
+	
+	public IObjectInstance? ReturningValue { get; }
+	public bool IsReturning { get; }
 
 	public bool IsReachable => true;
 
 	public IAnalysisState ThrowException(IObjectInstance exception, Location location)
 	{
 		var exceptionThrownState = new ExceptionThrownState(exception, location);
-		return new SymbolicExecutionState(exceptionThrownState, LocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod);
+		return new SymbolicExecutionState(exceptionThrownState, LocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod, ReturningValue, IsReturning);
 	}
 
 	public IAnalysisState AddLocalVariable(ILocalSymbol symbol)
 	{
 		var newLocalVariables = LocalVariables.Add(symbol, null);
-		return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod);
+		return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod, ReturningValue, IsReturning);
 	}
 
 	public TaggedUnion<IAnalysisState, AnalysisFailure> SetSymbolValue(ISymbol symbol, IObjectInstance value)
@@ -57,7 +64,7 @@ public class SymbolicExecutionState : IAnalysisState
 		if (LocalVariables.ContainsKey(localSymbol))
 		{
 			var newLocalVariables = LocalVariables.SetItem(localSymbol, value);
-			return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod);
+			return new SymbolicExecutionState(CurrentException, newLocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod, ReturningValue, IsReturning);
 		}
 		else
 		{
@@ -103,7 +110,7 @@ public class SymbolicExecutionState : IAnalysisState
 
 	public IAnalysisState PushStackFrame(
 		ImmutableArray<(IParameterSymbol symbol, IObjectInstance value)> parameterValues,
-		IMethodSymbol? methodSymbol
+		IMethodSymbol methodSymbol
 		)
 	{
 		var newLocalsStack = LocalsStack.Push(LocalVariables);
@@ -113,18 +120,25 @@ public class SymbolicExecutionState : IAnalysisState
 		var newMethodStack = MethodStack;
 		newMethodStack = newMethodStack.Push(_currentMethod);
 
-		if (methodSymbol == null)
-		{
-			Debug.Fail("Method symbol should not be null");
-		}
 		foreach (var (symbol, value) in parameterValues)
 		{
 			newParameterVariables = newParameterVariables.Add(symbol, value);
 		}
-		return new SymbolicExecutionState(CurrentException, newLocalVariables, newParameterVariables, newLocalsStack, newParametersStack, newMethodStack, methodSymbol);
+
+		return new SymbolicExecutionState(
+			CurrentException,
+			newLocalVariables,
+			newParameterVariables,
+			newLocalsStack,
+			newParametersStack,
+			newMethodStack,
+			methodSymbol,
+			returningValue: null,
+			isReturning: false
+			);
 	}
 	
-	public IAnalysisState PopStackFrame()
+	public (IAnalysisState state, IObjectInstance? returnValue) PopStackFrame()
 	{
 		var newLocalsStack = LocalsStack.Pop();
 		var newParametersStack = ParametersStack.Pop();
@@ -132,7 +146,20 @@ public class SymbolicExecutionState : IAnalysisState
 		var newParameterVariables = ParametersStack.Peek();
 		var newMethodStack = MethodStack.Pop();
 		var newCurrentMethod = MethodStack.Peek();
-		return new SymbolicExecutionState(CurrentException, newLocalVariables, newParameterVariables, newLocalsStack, newParametersStack, newMethodStack, newCurrentMethod);
+		return (
+			new SymbolicExecutionState(
+				CurrentException,
+				newLocalVariables,
+				newParameterVariables,
+				newLocalsStack,
+				newParametersStack,
+				newMethodStack,
+				newCurrentMethod,
+				returningValue: null,
+				isReturning: false
+				),
+			ReturningValue
+			);
 	}
 
 	public TaggedUnion<IAnalysisState, AnalysisFailure> SetArrayElementValue(ILocalSymbol symbol, IObjectInstance value, int index, Location location)
@@ -158,6 +185,13 @@ public class SymbolicExecutionState : IAnalysisState
 		return SetSymbolValue(symbol, newArrayInstance);
 	}
 
+	public TaggedUnion<IAnalysisState, AnalysisFailure> SetReturnValue(IObjectInstance? value, Location location)
+	{
+		if (ReturningValue != null)
+			return new AnalysisFailure("Cannot set the return value of a method that has already returned", location);
+		return new SymbolicExecutionState(CurrentException, LocalVariables, ParameterVariables, LocalsStack, ParametersStack, MethodStack, _currentMethod, returningValue: value, isReturning: true);
+	}
+
 	public override string ToString()
 	{
 		var sb = new StringBuilder();
@@ -177,18 +211,18 @@ public class SymbolicExecutionState : IAnalysisState
 		return str;
 	}
 
-	public static IAnalysisState CreateInitialState(IMethodSymbol? methodSymbol)
+	public static IAnalysisState CreateInitialState(IMethodSymbol methodSymbol)
 	{
-		if (methodSymbol == null)
-			Debug.Fail("Method symbol should not be null");
 		return new SymbolicExecutionState(
 			currentException: null,
 			localVariables: ImmutableDictionary<ILocalSymbol, IObjectInstance?>.Empty,
 			parameterVariables: ImmutableDictionary<IParameterSymbol, IObjectInstance?>.Empty,
 			localsStack: ImmutableStack<IImmutableDictionary<ILocalSymbol, IObjectInstance?>>.Empty,
 			parametersStack: ImmutableStack<IImmutableDictionary<IParameterSymbol, IObjectInstance?>>.Empty,
-			methodStack: ImmutableStack<IMethodSymbol?>.Empty,
-			currentMethod: methodSymbol
+			methodStack: ImmutableStack<IMethodSymbol>.Empty,
+			currentMethod: methodSymbol,
+			returningValue: null,
+			isReturning: false
 			);
 	}
 }
