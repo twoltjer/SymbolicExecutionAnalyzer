@@ -1,6 +1,6 @@
 namespace SymbolicExecution;
 
-public interface IObjectInstance : IEquatable<IObjectInstance>
+public interface IObjectInstance
 {
 	TaggedUnion<ITypeSymbol, Type> ActualTypeSymbol { get; }
 	TaggedUnion<ITypeSymbol, Type> ConvertedTypeSymbol { get; }

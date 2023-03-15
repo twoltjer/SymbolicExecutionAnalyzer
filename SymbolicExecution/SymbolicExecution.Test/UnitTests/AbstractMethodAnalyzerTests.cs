@@ -43,7 +43,9 @@ public class AbstractMethodAnalyzerTests
 			.Setup(node => node.AnalyzeNode(It.IsAny<IAnalysisState>()))
 			.Returns(new TaggedUnion<IEnumerable<IAnalysisState>, AnalysisFailure>(failure));
 		var methodDeclaration = Mock.Of<IMethodDeclarationSyntaxAbstraction>(
-			node => node.Children == new ISyntaxNodeAbstraction[] { methodBlock }.ToImmutableArray(),
+#pragma warning disable RS1024
+			node => node.Children == new ISyntaxNodeAbstraction[] { methodBlock }.ToImmutableArray() && node.Symbol == Mock.Of<IMethodSymbol>(MockBehavior.Strict),
+#pragma warning restore RS1024
 			MockBehavior.Strict
 			);
 		var subject = new AbstractMethodAnalyzer();
@@ -62,7 +64,9 @@ public class AbstractMethodAnalyzerTests
 	{
 		var methodBlock = Mock.Of<IBlockSyntaxAbstraction>(MockBehavior.Strict);
 		var methodDeclaration = Mock.Of<IMethodDeclarationSyntaxAbstraction>(
-			node => node.Children == new ISyntaxNodeAbstraction[] { methodBlock }.ToImmutableArray(),
+#pragma warning disable RS1024
+			node => node.Children == new ISyntaxNodeAbstraction[] { methodBlock }.ToImmutableArray() && node.Symbol == Mock.Of<IMethodSymbol>(MockBehavior.Strict),
+#pragma warning restore RS1024
 			MockBehavior.Strict
 			);
 		var exceptionLocation = Mock.Of<Location>(
@@ -70,12 +74,13 @@ public class AbstractMethodAnalyzerTests
 			MockBehavior.Strict
 			);
 		var exceptionTypeSymbol = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
+		var exceptionTypeUnion = new TaggedUnion<ITypeSymbol, Type>(exceptionTypeSymbol);
 		var exceptionObject = Mock.Of<IObjectInstance>(
-#pragma warning disable RS1024 // Compare symbols correctly
-			obj => obj.ActualTypeSymbol.T1Value == exceptionTypeSymbol,
-#pragma warning restore RS1024
 			MockBehavior.Strict
 			);
+		Mock.Get(exceptionObject)
+			.Setup(obj => obj.ActualTypeSymbol)
+			.Returns(exceptionTypeUnion);
 		var exceptionState = Mock.Of<IExceptionThrownState>(exception => exception.Location == exceptionLocation, MockBehavior.Strict);
 		Mock.Get(exceptionState)
 			.Setup(state => state.Exception)

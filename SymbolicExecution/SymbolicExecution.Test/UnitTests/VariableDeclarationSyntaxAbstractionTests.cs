@@ -37,7 +37,7 @@ public class VariableDeclarationSyntaxAbstractionTests
 		var previous = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var result = subject.AnalyzeNode(previous);
 		result.IsT1.Should().BeFalse();
-		result.T2Value.Reason.Should().Be("Local declaration statement must have a predefined type as its first child");
+		result.T2Value.Reason.Should().Be("Local declaration statement must have a predefined type as its first child or an identifier name with a type symbol");
 		result.T2Value.Location.Should().BeSameAs(location);
 	}
 

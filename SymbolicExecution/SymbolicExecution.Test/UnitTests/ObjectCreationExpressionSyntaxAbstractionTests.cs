@@ -121,8 +121,8 @@ public class ObjectCreationExpressionSyntaxAbstractionTests
 		results.IsT1.Should().BeTrue();
 		var (resultValue, resultState) = results.T1Value.Single();
 		resultValue.Location.Should().BeSameAs(location);
-		resultValue.ActualTypeSymbol.Should().BeSameAs(actualTypeSymbol);
-		resultValue.ConvertedTypeSymbol.Should().BeSameAs(convertedTypeSymbol);
+		resultValue.ActualTypeSymbol.T1Value.Should().BeSameAs(actualTypeSymbol);
+		resultValue.ConvertedTypeSymbol.T1Value.Should().BeSameAs(convertedTypeSymbol);
 		resultState.Should().BeSameAs(state);
 	}
 

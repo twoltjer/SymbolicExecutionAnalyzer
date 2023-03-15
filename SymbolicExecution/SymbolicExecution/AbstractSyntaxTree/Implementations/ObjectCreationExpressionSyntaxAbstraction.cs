@@ -44,12 +44,13 @@ public class ObjectCreationExpressionSyntaxAbstraction : BaseObjectCreationExpre
 			return new AnalysisFailure("Expected object creation syntax to have a converted type symbol", Location);
 		}
 
-		var typeUnion = new TaggedUnion<ITypeSymbol, Type>(_actualTypeSymbol);
+		var actualTypeUnion = new TaggedUnion<ITypeSymbol, Type>(_actualTypeSymbol);
+		var convertedTypeUnion = new TaggedUnion<ITypeSymbol, Type>(_convertedTypeSymbol);
 		var objectInstance = new ObjectInstance(
-			typeUnion,
-			typeUnion,
+			actualTypeUnion,
+			convertedTypeUnion,
 			Location,
-			new ReferenceTypeScope(typeUnion)
+			new ReferenceTypeScope(actualTypeUnion)
 			);
 		return ImmutableArray.Create((objectInstance as IObjectInstance, state));
 	}
