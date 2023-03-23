@@ -1,5 +1,8 @@
 namespace SymbolicExecution.Diagnostics;
 
+/// <summary>
+/// A diagnostic descriptor for the "MayOverflow" diagnostic. This is used to report a possible overflow in an expression.
+/// </summary>
 public static class MayOverflowDiagnosticDescriptor
 {
     private const string DiagnosticId = "SE0003";

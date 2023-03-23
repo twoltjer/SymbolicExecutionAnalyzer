@@ -109,7 +109,3 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 			: $"{containingNamespaceName}.{symbol.Name}";
 	}
 }
-
-public interface IAbstractMethodAnalyzer
-{
-}

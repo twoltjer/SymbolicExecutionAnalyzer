@@ -1,5 +1,8 @@
 namespace SymbolicExecution.Diagnostics;
 
+/// <summary>
+/// A diagnostic descriptor for analysis failures. This is used to report a failure in the analysis engine.
+/// </summary>
 public static class AnalysisFailureDiagnosticDescriptor
 {
 	private const string DiagnosticId = "SE0002";

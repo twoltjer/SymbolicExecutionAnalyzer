@@ -1,5 +1,8 @@
 namespace SymbolicExecution.Diagnostics;
 
+/// <summary>
+/// A diagnostic descriptor for statements that may throw unhandled exceptions.
+/// </summary>
 public static class MayThrowDiagnosticDescriptor
 {
 	private const string DiagnosticId = "SE0001";

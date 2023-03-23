@@ -1,5 +1,8 @@
 namespace SymbolicExecution;
 
+/// <summary>
+/// Represents a constant value for an object/primitive, such as "5" or "null"
+/// </summary>
 public class ConstantValueScope : IValueScope
 {
 	public object? Value { get; }

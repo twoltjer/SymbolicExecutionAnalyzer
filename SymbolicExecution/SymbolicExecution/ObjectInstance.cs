@@ -1,6 +1,9 @@
 namespace SymbolicExecution;
 
-public struct ObjectInstance : IObjectInstance
+/// <summary>
+/// Represents an instance of an object or value type
+/// </summary>
+public readonly struct ObjectInstance : IObjectInstance
 {
 	public TaggedUnion<ITypeSymbol, Type> ActualTypeSymbol { get; }
 	public TaggedUnion<ITypeSymbol, Type> ConvertedTypeSymbol { get; }

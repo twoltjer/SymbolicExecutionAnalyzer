@@ -1,5 +1,8 @@
 namespace SymbolicExecution;
 
+/// <summary>
+/// Abstracts a compiler-provided syntax tree into a simpler syntax tree that is easier to work with and has mockable interfaces
+/// </summary>
 public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 {
 	private readonly SemanticModel _semanticModel;
@@ -10,17 +13,33 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 	private readonly Dictionary<ISyntaxNodeAbstraction, SyntaxNode> _syntaxNodeCache =
 		new Dictionary<ISyntaxNodeAbstraction, SyntaxNode>();
 
+	/// <summary>
+	/// Creates a new abstracted syntax tree object, without actually converting a syntax tree. Holds on to a semantic
+	/// model that will be used in converting syntax nodes and extracting relevant information for symbolic execution.
+	/// </summary>
+	/// <param name="semanticModel">A semantic model</param>
 	public AbstractedSyntaxTree(SemanticModel semanticModel)
 	{
 		_semanticModel = semanticModel;
 	}
 	
+	/// <summary>
+	/// Tries to get the abstracted syntax node for a given syntax node. Returns true if the syntax node was found,
+	/// false otherwise.
+	/// </summary>
+	/// <param name="syntaxNode">A syntax node</param>
+	/// <param name="abstraction">The corresponding syntax node abstraction</param>
+	/// <returns>True if the syntax node was found, false otherwise</returns>
 	public bool TryGetAbstractedSyntaxNode(SyntaxNode syntaxNode, out ISyntaxNodeAbstraction abstraction)
 	{
-		abstraction = _abstractionCache[syntaxNode];
-		return abstraction != null;
+		return _abstractionCache.TryGetValue(syntaxNode, out abstraction);
 	}
 
+	/// <summary>
+	/// Finds the root syntax node abstraction for the syntax tree. Returns an analysis failure if the root node
+	/// cannot be determined.
+	/// </summary>
+	/// <returns>The root syntax node abstraction</returns>
 	public TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure> GetRoot()
 	{
 		if (_abstraction == null)
@@ -38,6 +57,13 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 		return new TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure>(_abstraction);
 	}
 
+	/// <summary>
+	/// Produces an abstraction for a given syntax node and (recursively) all of its children. Returns an analysis
+	/// failure if an abstraction couldn't be produced (probably due to an unsupported syntax node type).
+	/// </summary>
+	/// <param name="node">A syntax node</param>
+	/// <param name="resolveNodeParent">A function that resolves the parent syntax node abstraction</param>
+	/// <returns>The syntax node abstraction</returns>
 	public TaggedUnion<ISyntaxNodeAbstraction, AnalysisFailure> ProduceAbstraction(SyntaxNode node, Func<ISyntaxNodeAbstraction>? resolveNodeParent)
 	{
 		var childrenOrFailures = node.ChildNodes()
@@ -237,7 +263,7 @@ public class AbstractedSyntaxTree : IAbstractedSyntaxTree
 
 		if (result == null)
 		{
-			// Internal types
+			// Internal types that are not public in Roslyn, so we check by name
 			var nodeTypeName = node.GetType().Name;
 			if (nodeTypeName == "OmittedArraySizeExpressionSyntax")
 			{
