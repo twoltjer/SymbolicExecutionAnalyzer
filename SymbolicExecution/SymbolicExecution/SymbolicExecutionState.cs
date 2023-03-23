@@ -42,8 +42,6 @@ public class SymbolicExecutionState : IAnalysisState
 	public IObjectInstance? ReturningValue { get; }
 	public bool IsReturning { get; }
 
-	public bool IsReachable => true;
-
 	public IAnalysisState ThrowException(IObjectInstance exception, Location location)
 	{
 		var exceptionThrownState = new ExceptionThrownState(exception, location, CurrentMethod);

@@ -1,9 +1,14 @@
 namespace SymbolicExecution;
 
+/// <summary>
+/// Represents the current state of symbolic execution for a single branch of logic
+/// </summary>
 public interface IAnalysisState
 {
+	/// <summary>
+	/// Set to the exception state if this state is in the midst of throwing an exception
+	/// </summary>
 	IExceptionThrownState? CurrentException { get; }
-	bool IsReachable { get; }
 	IImmutableStack<IImmutableDictionary<IParameterSymbol, IObjectInstance?>> ParametersStack { get; }
 	IImmutableStack<IImmutableDictionary<ILocalSymbol, IObjectInstance?>> LocalsStack { get; }
 	IObjectInstance? ReturningValue { get; }

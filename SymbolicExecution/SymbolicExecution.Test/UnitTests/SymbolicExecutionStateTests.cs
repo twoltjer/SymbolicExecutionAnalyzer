@@ -80,7 +80,6 @@ public class SymbolicExecutionStateTests
 		{
 			state.CurrentException.Should().BeNull();
 		}
-		state.IsReachable.Should().BeTrue();
 		foreach (var (symbol, value) in symbolsAndValues)
 		{
 			var location = Mock.Of<Location>(MockBehavior.Strict);
