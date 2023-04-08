@@ -17,6 +17,9 @@ public class ArgumentSyntaxAbstraction : CSharpSyntaxNodeAbstraction, IArgumentS
 
 	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)
 	{
-		return new AnalysisFailure("Cannot analyze argument expressions", Location);
+		if (Children.Length != 1)
+			return new AnalysisFailure("ArgumentSyntaxAbstraction must have exactly one child", Location);
+		
+		return Children[0].GetExpressionResults(state);
 	}
 }

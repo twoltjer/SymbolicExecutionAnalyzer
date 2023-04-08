@@ -59,7 +59,9 @@
               : using a System.ComponentModel.TypeConverter
               : and then encoded with base64 encoding.
       -->
-    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root" xmlns="">
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
+        xmlns="">
         <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
         <xsd:element name="root" msdata:IsDataSet="true">
             <xsd:complexType>
@@ -118,21 +120,24 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="AnalyzerDescription" xml:space="preserve">
-    <value>Analyzer description</value>
-  </data>
-    <data name="AnalyzerMessageFormat" xml:space="preserve">
+        <value>Analyzer description</value>
+    </data>
+    <data name="AnalyzerMayThrowMessageFormat" xml:space="preserve">
         <value>The exception '{0}' may be thrown here and not caught</value>
     </data>
+    <data name="AnalyzerMayOverflowMessageFormat" xml:space="preserve">
+        <value>This expression may overflow</value>
+    </data>
     <data name="AnalyzerTitle" xml:space="preserve">
-    <value>Analyzer Title</value>
-  </data>
+        <value>Analyzer Title</value>
+    </data>
     <data name="AnalysisTimedOut" xml:space="preserve">
-    <value>Analysis timed out</value>
+        <value>Analysis timed out</value>
     </data>
     <data name="OperationSuccessful" xml:space="preserve">
-    <value>Operation successful</value>
+        <value>Operation successful</value>
     </data>
     <data name="UnhandledSyntax" xml:space="preserve">
-    <value>Unhandled syntax: {0}</value>
+        <value>Unhandled syntax: {0}</value>
     </data>
 </root>

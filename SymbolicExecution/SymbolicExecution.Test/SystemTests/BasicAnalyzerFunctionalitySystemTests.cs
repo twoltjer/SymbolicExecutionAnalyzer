@@ -97,8 +97,8 @@ public class Program
 }}";
 
 		var expected = VerifyCS.Diagnostic(descriptor: AnalysisFailureDiagnosticDescriptor.DiagnosticDescriptor)
-			.WithLocation(9, 23)
-			.WithMessage("Symbolic Execution Failed: No abstraction for OmittedArraySizeExpressionSyntax");
+			.WithLocation(9, 25)
+			.WithMessage("Symbolic Execution Failed: No abstraction for InitializerExpressionSyntax");
 		await CSharpAnalyzerVerifier<SymbolicExecutionAnalyzer>.VerifyAnalyzerAsync(source, expected);
 	}
 

@@ -6,7 +6,7 @@ public class IfStatementSyntaxAbstractionTests
 	[Trait("Category", "Unit")]
 	public void TestAnalyzeNode_WithNoElseAlwaysTrueCase_AnalyzesConditional()
 	{
-		var state = Mock.Of<IAnalysisState>(s => s.IsReachable == true, MockBehavior.Strict);
+		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var modifiedState = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var condition = Mock.Of<IExpressionSyntaxAbstraction>(MockBehavior.Strict);
 		var conditional = Mock.Of<IStatementSyntaxAbstraction>(MockBehavior.Strict);
@@ -41,7 +41,7 @@ public class IfStatementSyntaxAbstractionTests
 	[Trait("Category", "Unit")]
 	public void TestAnalyzeNode_WithNoElseAlwaysFalseCase_DoesNotAnalyzeConditional()
 	{
-		var state = Mock.Of<IAnalysisState>(s => s.IsReachable == true, MockBehavior.Strict);
+		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var condition = Mock.Of<IExpressionSyntaxAbstraction>(MockBehavior.Strict);
 		var conditional = Mock.Of<IStatementSyntaxAbstraction>(MockBehavior.Strict);
 		Mock.Get(conditional)
@@ -74,7 +74,7 @@ public class IfStatementSyntaxAbstractionTests
 	[Trait("Category", "Unit")]
 	public void TestAnalyzeNode_WhenConditionExpressionReturnsFailure_ReturnsFailure()
 	{
-		var state = Mock.Of<IAnalysisState>(s => s.IsReachable == true, MockBehavior.Strict);
+		var state = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var condition = Mock.Of<IExpressionSyntaxAbstraction>(MockBehavior.Strict);
 		var conditional = Mock.Of<IStatementSyntaxAbstraction>(MockBehavior.Strict);
 		var failureLocation = Mock.Of<Location>(MockBehavior.Strict);
@@ -102,57 +102,12 @@ public class IfStatementSyntaxAbstractionTests
 		result.T2Value.Reason.Should().Be("Test failure");
 	}
 
-	[Fact]
-	[Trait("Category", "Unit")]
-	public void TestAnalyzeNode_WithUnreachableBranches_SkipsThem()
-	{
-		var condition = Mock.Of<IExpressionSyntaxAbstraction>(MockBehavior.Strict);
-		var trueStatement = Mock.Of<IStatementSyntaxAbstraction>(MockBehavior.Strict);
-		var falseStatement = Mock.Of<IStatementSyntaxAbstraction>(MockBehavior.Strict);
-		var children = new ISyntaxNodeAbstraction[] { condition, trueStatement, falseStatement }.ToImmutableArray();
-		var ifLocation = Mock.Of<Location>(MockBehavior.Strict);
-		var initialState = Mock.Of<IAnalysisState>(s => s.IsReachable == true, MockBehavior.Strict);
-		var conditionReachableState = Mock.Of<IAnalysisState>(s => s.IsReachable == true, MockBehavior.Strict);
-		var conditionUnreachableState = Mock.Of<IAnalysisState>(s => s.IsReachable == false, MockBehavior.Strict);
-		var conditionReachableModifiedState = Mock.Of<IAnalysisState>(s => s.IsReachable == true, MockBehavior.Strict);
-		var conditionReachableResultObject = Mock.Of<IObjectInstance>(MockBehavior.Strict);
-		var objectValue = Mock.Of<IValueScope>(MockBehavior.Strict);
-		Mock.Get(objectValue).Setup(value => value.CanBe(true)).Returns(true);
-		Mock.Get(objectValue).Setup(value => value.CanBe(false)).Returns(false);
-		Mock.Get(conditionReachableResultObject).Setup(result => result.Value).Returns(objectValue);
-		Mock.Get(conditionReachableResultObject).Setup(result => result.IsExactType(typeof(bool))).Returns(true);
-		var conditionUnreachableResultObject = Mock.Of<IObjectInstance>(MockBehavior.Strict);
-		Mock.Get(trueStatement)
-			.Setup(node => node.AnalyzeNode(conditionReachableState))
-			.Returns(new[] { conditionReachableModifiedState });
-		var conditionResults = new[]
-		{
-			(conditionReachableResultObject, conditionReachableState),
-			(conditionUnreachableResultObject, conditionUnreachableState)
-		}.ToImmutableArray();
-		Mock.Get(condition)
-			.Setup(node => node.GetExpressionResults(initialState))
-			.Returns(conditionResults);
-
-		var subject = new IfStatementSyntaxAbstraction(
-			condition,
-			trueStatement,
-			falseStatement,
-			children,
-			null,
-			ifLocation
-			);
-		var results = subject.AnalyzeNode(initialState);
-
-		results.IsT1.Should().BeTrue();
-		results.T1Value.Should().BeEquivalentTo(new[] { conditionReachableModifiedState });
-	}
 
 	[Fact]
 	[Trait("Category", "Unit")]
 	public void TestAnalyzeNode_WhenConditionReturnsNonBool_ReturnsFailure()
 	{
-		var initialState = Mock.Of<IAnalysisState>(state => state.IsReachable == true, MockBehavior.Strict);
+		var initialState = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var conditionResultObject = Mock.Of<IObjectInstance>(MockBehavior.Strict);
 		Mock.Get(conditionResultObject).Setup(result => result.IsExactType(typeof(bool))).Returns(false);
 		var condition = Mock.Of<IExpressionSyntaxAbstraction>(MockBehavior.Strict);
@@ -182,7 +137,7 @@ public class IfStatementSyntaxAbstractionTests
 	[Trait("Category", "Unit")]
 	public void TestAnalyzeNode_WhenConditionalReturnsAnalysisFailure_ReturnsFailure()
 	{
-		var initialState = Mock.Of<IAnalysisState>(state => state.IsReachable == true, MockBehavior.Strict);
+		var initialState = Mock.Of<IAnalysisState>(MockBehavior.Strict);
 		var valueScope = Mock.Of<IValueScope>(MockBehavior.Strict);
 		Mock.Get(valueScope).Setup(scope => scope.CanBe(true)).Returns(true);
 		var objectInstance = Mock.Of<IObjectInstance>(MockBehavior.Strict);

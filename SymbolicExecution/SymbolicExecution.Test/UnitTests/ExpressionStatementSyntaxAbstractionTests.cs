@@ -37,7 +37,7 @@ public class ExpressionStatementSyntaxAbstractionTests
 			);
 		var result = subject.AnalyzeNode(Mock.Of<IAnalysisState>(MockBehavior.Strict));
 		result.IsT1.Should().BeFalse();
-		result.T2Value.Reason.Should().Be("Expression statement must have an assignment expression as its child");
+		result.T2Value.Reason.Should().Be("Expression statement must have an assignment expression or invocation as its child");
 		result.T2Value.Location.Should().BeSameAs(location);
 	}
 

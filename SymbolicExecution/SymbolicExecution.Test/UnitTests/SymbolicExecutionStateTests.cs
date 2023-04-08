@@ -4,7 +4,7 @@ public class SymbolicExecutionStateTests
 {
 	public static IEnumerable<object[]> GetInitialStates()
 	{
-		var emptyState = SymbolicExecutionState.CreateInitialState();
+		var emptyState = SymbolicExecutionState.CreateInitialState(Mock.Of<IMethodSymbol>(MockBehavior.Strict));
 		yield return new object[]
 		{
 			emptyState,
@@ -29,7 +29,7 @@ public class SymbolicExecutionStateTests
 			new Optional<(IObjectInstance, Location)>()
 		};
 		var localValue1 = Mock.Of<IObjectInstance>(MockBehavior.Strict);
-		var stateWithDefinedLocalVariable = stateWithUndefinedLocalVariable.SetSymbolValue(localVariable1, localValue1).T1Value;
+		var stateWithDefinedLocalVariable = stateWithUndefinedLocalVariable.SetSymbolValue(localVariable1, localValue1, Location.None).T1Value;
 		yield return new object[]
 		{
 			stateWithDefinedLocalVariable,
@@ -45,7 +45,7 @@ public class SymbolicExecutionStateTests
 			new Optional<(IObjectInstance, Location)>()
 		};
 		var localValue2 = Mock.Of<IObjectInstance>(MockBehavior.Strict);
-		var stateWithTwoDefinedLocalVariables = stateWithTwoLocalVariables.SetSymbolValue(localVariable2, localValue2).T1Value;
+		var stateWithTwoDefinedLocalVariables = stateWithTwoLocalVariables.SetSymbolValue(localVariable2, localValue2, Location.None).T1Value;
 		yield return new object[]
 		{
 			stateWithTwoDefinedLocalVariables,
@@ -80,7 +80,6 @@ public class SymbolicExecutionStateTests
 		{
 			state.CurrentException.Should().BeNull();
 		}
-		state.IsReachable.Should().BeTrue();
 		foreach (var (symbol, value) in symbolsAndValues)
 		{
 			var location = Mock.Of<Location>(MockBehavior.Strict);
@@ -113,7 +112,7 @@ public class SymbolicExecutionStateTests
 		// Try to set the value of a non-local symbol
 		var nonLocalSymbol = Mock.Of<ISymbol>(MockBehavior.Strict);
 		var nonLocalSymbolValue = Mock.Of<IObjectInstance>(MockBehavior.Strict);
-		failure = state.SetSymbolValue(nonLocalSymbol, nonLocalSymbolValue).T2Value;
+		failure = state.SetSymbolValue(nonLocalSymbol, nonLocalSymbolValue, Location.None).T2Value;
 		failure.Should().NotBeNull();
 		failure.Location.Should().BeSameAs(Location.None);
 		failure.Reason.Should().Be("Cannot set the value of a non-local symbol");
@@ -121,7 +120,7 @@ public class SymbolicExecutionStateTests
 		// Try to set the value of an undeclared local variable
 		var undeclaredLocalVariable = Mock.Of<ILocalSymbol>(MockBehavior.Strict);
 		var undeclaredLocalVariableValue = Mock.Of<IObjectInstance>(MockBehavior.Strict);
-		failure = state.SetSymbolValue(undeclaredLocalVariable, undeclaredLocalVariableValue).T2Value;
+		failure = state.SetSymbolValue(undeclaredLocalVariable, undeclaredLocalVariableValue, Location.None).T2Value;
 		failure.Should().NotBeNull();
 		failure.Location.Should().BeSameAs(Location.None);
 		failure.Reason.Should().Be("Symbol missing from list of local variables");

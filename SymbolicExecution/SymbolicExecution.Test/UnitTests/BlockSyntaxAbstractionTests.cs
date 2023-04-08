@@ -20,13 +20,13 @@ public class BlockSyntaxAbstractionTests
 	[Trait("Category", "Unit")]
 	public void TestAnalyzeNode_WithChildren_IteratesThroughEach()
 	{
-		var initialState = Mock.Of<IAnalysisState>(state => state.CurrentException == null, MockBehavior.Strict);
+		var initialState = Mock.Of<IAnalysisState>(state => state.CurrentException == null && state.IsReturning == false, MockBehavior.Strict);
 		var child1 = Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict);
-		var secondState = Mock.Of<IAnalysisState>(state => state.CurrentException == null, MockBehavior.Strict);
+		var secondState = Mock.Of<IAnalysisState>(state => state.CurrentException == null && state.IsReturning == false, MockBehavior.Strict);
 		var child2 = Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict);
-		var thirdState = Mock.Of<IAnalysisState>(state => state.CurrentException == null, MockBehavior.Strict);
+		var thirdState = Mock.Of<IAnalysisState>(state => state.CurrentException == null && state.IsReturning == false, MockBehavior.Strict);
 		var child3 = Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict);
-		var fourthState = Mock.Of<IAnalysisState>(state => state.CurrentException == null, MockBehavior.Strict);
+		var fourthState = Mock.Of<IAnalysisState>(state => state.CurrentException == null && state.IsReturning == false, MockBehavior.Strict);
 		Mock.Get(child1)
 			.Setup(node => node.AnalyzeNode(initialState))
 			.Returns(new[] { secondState });
@@ -52,10 +52,10 @@ public class BlockSyntaxAbstractionTests
 	[Trait("Category", "Unit")]
 	public void TestAnalyzeNode_WhenExceptionThrown_ShortcutsFutureChildren()
 	{
-		var initialState = Mock.Of<IAnalysisState>(state => state.CurrentException == null, MockBehavior.Strict);
+		var initialState = Mock.Of<IAnalysisState>(state => state.CurrentException == null && state.IsReturning == false, MockBehavior.Strict);
 		var child1 = Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict);
 		var exceptionThrownState = Mock.Of<IExceptionThrownState>(MockBehavior.Strict);
-		var secondState = Mock.Of<IAnalysisState>(state => state.CurrentException == exceptionThrownState, MockBehavior.Strict);
+		var secondState = Mock.Of<IAnalysisState>(state => state.CurrentException == exceptionThrownState && state.IsReturning == false, MockBehavior.Strict);
 		var child2 = Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict);
 		var child3 = Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict);
 		Mock.Get(child1)
@@ -77,9 +77,9 @@ public class BlockSyntaxAbstractionTests
 	[Trait("Category", "Unit")]
 	public void TestAnalyzeNode_ChildNodeFailure_IsForwarded()
 	{
-		var initialState = Mock.Of<IAnalysisState>(state => state.CurrentException == null, MockBehavior.Strict);
+		var initialState = Mock.Of<IAnalysisState>(state => state.CurrentException == null && state.IsReturning == false, MockBehavior.Strict);
 		var child1 = Mock.Of<ISyntaxNodeAbstraction>(MockBehavior.Strict);
-		var secondState = Mock.Of<IAnalysisState>(state => state.CurrentException == null, MockBehavior.Strict);
+		var secondState = Mock.Of<IAnalysisState>(state => state.CurrentException == null && state.IsReturning == false, MockBehavior.Strict);
 		Mock.Get(child1)
 			.Setup(node => node.AnalyzeNode(initialState))
 			.Returns(new[] { secondState });

@@ -6,7 +6,8 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 {
 	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
 		MayThrowDiagnosticDescriptor.DiagnosticDescriptor,
-		AnalysisFailureDiagnosticDescriptor.DiagnosticDescriptor
+		AnalysisFailureDiagnosticDescriptor.DiagnosticDescriptor,
+		MayOverflowDiagnosticDescriptor.DiagnosticDescriptor
 		);
 
 	public SyntaxNodeHandler[] SyntaxNodeHandlers => Array.Empty<SyntaxNodeHandler>();
@@ -58,13 +59,36 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 				context.ReportDiagnostic(failure);
 				return;
 			}
+
+			if (model.GetDeclaredSymbol(context.CodeBlock) is not IMethodSymbol methodSymbol)
+			{
+				var failure = new AnalysisFailure(
+					$"Analyzing method without a symbol is not supported",
+					method.Location);
+				context.ReportDiagnostic(failure);
+				return;
+			}
+
 			foreach (var failure in methodAnalysis.AnalysisFailures)
 				context.ReportDiagnostic(failure);
 			foreach (var exception in methodAnalysis.UnhandledExceptions)
 			{
-				// Report a diagnostic if a reachable throw statement was found.
-				var diagnostic = Diagnostic.Create(MayThrowDiagnosticDescriptor.DiagnosticDescriptor, exception.Location, exception.Type.Name);
-				context.ReportDiagnostic(diagnostic);
+				// Report a diagnostic if a reachable throw statement was found or an overflow occurred.
+				var exceptionTypeName = exception.Type.Match(t1 => t1.Name, t2 => t2.Name);
+				var diagnosticDescriptor = exceptionTypeName switch
+				{
+					nameof(OverflowException) => MayOverflowDiagnosticDescriptor.DiagnosticDescriptor,
+					_ => MayThrowDiagnosticDescriptor.DiagnosticDescriptor
+				};
+				if (SymbolEqualityComparer.Default.Equals(methodSymbol, exception.MethodSymbol))
+				{
+					var diagnostic = Diagnostic.Create(
+						diagnosticDescriptor,
+						exception.Location,
+						exceptionTypeName
+						);
+					context.ReportDiagnostic(diagnostic);
+				}
 			}
 		}
 	}
@@ -84,8 +108,4 @@ public class SymbolicExecutionAnalyzer : DiagnosticAnalyzer
 			? symbol.Name
 			: $"{containingNamespaceName}.{symbol.Name}";
 	}
-}
-
-public interface IAbstractMethodAnalyzer
-{
 }

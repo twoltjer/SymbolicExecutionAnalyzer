@@ -40,7 +40,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
         var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType, convertedType);
         var result = subject.AnalyzeNode(Mock.Of<IAnalysisState>(MockBehavior.Strict));
         result.IsT1.Should().BeFalse();
-        result.T2Value.Reason.Should().Be("Assignment expression must have an identifier as its first child");
+        result.T2Value.Reason.Should().Be("Cannot assign to a non-identifier expression");
         result.T2Value.Location.Should().BeSameAs(location);
     }
     
@@ -63,7 +63,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
         var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType, convertedType);
         var result = subject.AnalyzeNode(Mock.Of<IAnalysisState>(MockBehavior.Strict));
         result.IsT1.Should().BeFalse();
-        result.T2Value.Reason.Should().Be("Assignment expression must have a local variable as its first child");
+        result.T2Value.Reason.Should().Be("Cannot assign to a non-identifier expression");
         result.T2Value.Location.Should().BeSameAs(location);
     }
     
@@ -86,7 +86,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
         var subject = new AssignmentExpressionSyntaxAbstraction(children, symbol, location, actualType, convertedType);
         var result = subject.AnalyzeNode(Mock.Of<IAnalysisState>(MockBehavior.Strict));
         result.IsT1.Should().BeFalse();
-        result.T2Value.Reason.Should().Be("Assignment expression must have a local variable as its first child");
+        result.T2Value.Reason.Should().Be("Cannot assign to a non-identifier expression");
         result.T2Value.Location.Should().BeSameAs(location);
     }
 
@@ -150,7 +150,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
         var expression = Mock.Of<IExpressionSyntaxAbstraction>(MockBehavior.Strict);
         var expressionResult1 = Mock.Of<IObjectInstance>(MockBehavior.Strict);
         var expressionResult2 = Mock.Of<IObjectInstance>(MockBehavior.Strict);
-        var expressionResultState1 = Mock.Of<IAnalysisState>(MockBehavior.Strict);
+        var expressionResultState1 = Mock.Of<IAnalysisState>(x => x.IsReturning == false && x.CurrentException == null, MockBehavior.Strict);
         var expressionResultState2 = Mock.Of<IAnalysisState>(MockBehavior.Strict);
         var expressionResults = new[]
         {
@@ -160,7 +160,7 @@ public class AssignmentExpressionSyntaxAbstractionTests
         
         var failureLocation = Mock.Of<Location>(MockBehavior.Strict);
         var failure = new AnalysisFailure("Reason", failureLocation);
-        Mock.Get(expressionResultState1).Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult1)).Returns(failure);
+        Mock.Get(expressionResultState1).Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult1, It.IsAny<Location>())).Returns(failure);
         
         Mock.Get(expression).Setup(x => x.GetExpressionResults(initialState)).Returns(expressionResults);
         var children = new ISyntaxNodeAbstraction[]
@@ -190,8 +190,8 @@ public class AssignmentExpressionSyntaxAbstractionTests
         var expression = Mock.Of<IExpressionSyntaxAbstraction>(MockBehavior.Strict);
         var expressionResult1 = Mock.Of<IObjectInstance>(MockBehavior.Strict);
         var expressionResult2 = Mock.Of<IObjectInstance>(MockBehavior.Strict);
-        var expressionResultState1 = Mock.Of<IAnalysisState>(MockBehavior.Strict);
-        var expressionResultState2 = Mock.Of<IAnalysisState>(MockBehavior.Strict);
+        var expressionResultState1 = Mock.Of<IAnalysisState>(x => x.IsReturning == false && x.CurrentException == null, MockBehavior.Strict);
+        var expressionResultState2 = Mock.Of<IAnalysisState>(x => x.IsReturning == false && x.CurrentException == null, MockBehavior.Strict);
         var expressionResultModifiedState1 = Mock.Of<IAnalysisState>(MockBehavior.Strict);
         var expressionResultModifiedState2 = Mock.Of<IAnalysisState>(MockBehavior.Strict);
         var expressionResults = new[]
@@ -201,11 +201,11 @@ public class AssignmentExpressionSyntaxAbstractionTests
         }.ToImmutableArray();
 
         Mock.Get(expressionResultState1)
-            .Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult1))
+            .Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult1, It.IsAny<Location>()))
             .Returns(new TaggedUnion<IAnalysisState, AnalysisFailure>(expressionResultModifiedState1));
         
         Mock.Get(expressionResultState2)
-            .Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult2))
+            .Setup(x => x.SetSymbolValue(identifierName.Symbol, expressionResult2, It.IsAny<Location>()))
             .Returns(new TaggedUnion<IAnalysisState, AnalysisFailure>(expressionResultModifiedState2));
         
         Mock.Get(expression).Setup(x => x.GetExpressionResults(initialState)).Returns(expressionResults);

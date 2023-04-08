@@ -1,5 +1,8 @@
 namespace SymbolicExecution;
 
+/// <summary>
+/// Helpers for working with <see cref="IEnumerable{T}"/>
+/// </summary>
 public static class EnumerableExtensions
 {
 	public static bool TryGetSingle<T>(this IEnumerable<T> enumerable, out T single)

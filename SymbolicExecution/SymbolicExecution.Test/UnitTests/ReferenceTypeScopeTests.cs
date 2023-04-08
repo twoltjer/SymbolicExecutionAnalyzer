@@ -13,7 +13,7 @@ public class ReferenceTypeScopeTests
 	public void TestCanBe_Always_ReturnsFalse(object input)
 	{
 		var typeSymbol = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var subject = new ReferenceTypeScope(typeSymbol);
+		var subject = new ReferenceTypeScope(new TaggedUnion<ITypeSymbol, Type>(typeSymbol));
 		subject.CanBe(input).Should().BeFalse();
 	}
 
@@ -28,7 +28,7 @@ public class ReferenceTypeScopeTests
 		Mock.Get(typeSymbol)
 			.Setup(x => x.ContainingNamespace.ToString())
 			.Returns("System");
-		var subject = new ReferenceTypeScope(typeSymbol);
+		var subject = new ReferenceTypeScope(new TaggedUnion<ITypeSymbol, Type>(typeSymbol));
 		subject.IsExactType(typeof(string)).Should().BeTrue();
 	}
 
@@ -43,7 +43,7 @@ public class ReferenceTypeScopeTests
 		Mock.Get(typeSymbol)
 			.Setup(x => x.ContainingNamespace.ToString())
 			.Returns("System");
-		var subject = new ReferenceTypeScope(typeSymbol);
+		var subject = new ReferenceTypeScope(new TaggedUnion<ITypeSymbol, Type>(typeSymbol));
 		subject.IsExactType(typeof(int)).Should().BeFalse();
 	}
 
@@ -58,7 +58,7 @@ public class ReferenceTypeScopeTests
 		Mock.Get(typeSymbol)
 			.Setup(x => x.ContainingNamespace.ToString())
 			.Returns("System.Collections");
-		var subject = new ReferenceTypeScope(typeSymbol);
+		var subject = new ReferenceTypeScope(new TaggedUnion<ITypeSymbol, Type>(typeSymbol));
 		subject.IsExactType(typeof(string)).Should().BeFalse();
 	}
 
@@ -73,7 +73,7 @@ public class ReferenceTypeScopeTests
 		Mock.Get(typeSymbol)
 			.Setup(x => x.ContainingNamespace.ToString())
 			.Returns("System");
-		var subject = new ReferenceTypeScope(typeSymbol);
+		var subject = new ReferenceTypeScope(new TaggedUnion<ITypeSymbol, Type>(typeSymbol));
 		subject.IsExactType(typeof(int)).Should().BeFalse();
 	}
 
@@ -88,7 +88,7 @@ public class ReferenceTypeScopeTests
 	public void TestIsAlways_Always_ReturnsFalse(object input)
 	{
 		var typeSymbol = Mock.Of<ITypeSymbol>(MockBehavior.Strict);
-		var subject = new ReferenceTypeScope(typeSymbol);
+		var subject = new ReferenceTypeScope(new TaggedUnion<ITypeSymbol, Type>(typeSymbol));
 		subject.IsAlways(input).Should().BeFalse();
 	}
 }

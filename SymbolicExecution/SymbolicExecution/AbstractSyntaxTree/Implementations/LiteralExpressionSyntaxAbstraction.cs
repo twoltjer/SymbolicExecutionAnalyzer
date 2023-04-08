@@ -32,7 +32,12 @@ public class LiteralExpressionSyntaxAbstraction : ExpressionSyntaxAbstraction, I
 		if (_convertedTypeSymbol == null)
 			return new AnalysisFailure("Cannot analyze literal expressions without converted type symbols", Location);
 
-		var result = new ObjectInstance(_actualTypeSymbol, _convertedTypeSymbol, Location, new ConstantValueScope(_constantValue.Value, _actualTypeSymbol));
+		var result = new ObjectInstance(
+			new TaggedUnion<ITypeSymbol, Type>(_actualTypeSymbol),
+			new TaggedUnion<ITypeSymbol, Type>(_convertedTypeSymbol),
+			Location,
+			new ConstantValueScope(_constantValue.Value, new TaggedUnion<ITypeSymbol, Type>(_actualTypeSymbol))
+			);
 		return ImmutableArray.Create((result as IObjectInstance, state));
 	}
 }

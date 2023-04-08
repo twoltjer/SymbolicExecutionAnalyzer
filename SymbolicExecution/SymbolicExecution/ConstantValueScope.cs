@@ -1,33 +1,42 @@
 namespace SymbolicExecution;
 
+/// <summary>
+/// Represents a constant value for an object/primitive, such as "5" or "null"
+/// </summary>
 public class ConstantValueScope : IValueScope
 {
-	private readonly object? _value;
-	private readonly ITypeSymbol _type;
+	public object? Value { get; }
 
-	public ConstantValueScope(object? value, ITypeSymbol type)
+	public TaggedUnion<ITypeSymbol, Type> Type { get; }
+
+	public ConstantValueScope(object? value, TaggedUnion<ITypeSymbol, Type> type)
 	{
-		_value = value;
-		_type = type;
+		Value = value;
+		Type = type;
 	}
 
 	public bool CanBe(object? value)
 	{
-		if (_value == null)
+		if (Value == null)
 		{
 			return value == null;
 		}
 
-		return _value.Equals(value);
+		return Value.Equals(value);
 	}
 
 	public bool IsExactType(Type type)
 	{
-		return _type.Name == type.Name && _type.ContainingNamespace.ToString() == type.Namespace;
+		return Type.Match(t1 => t1.Name, t2 => t2.Name) == type.Name && Type.Match(t1 => t1.ContainingNamespace.ToString(), t2 => t2.Namespace) == type.Namespace;
 	}
 
 	public bool IsAlways(object? value)
 	{
 		return CanBe(value);
+	}
+	
+	public override string ToString()
+	{
+		return Value?.ToString() ?? "null";
 	}
 }

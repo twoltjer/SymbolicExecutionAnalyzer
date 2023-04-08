@@ -78,11 +78,20 @@ namespace SymbolicExecution {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This expression may overflow.
+        /// </summary>
+        public static string AnalyzerMayOverflowMessageFormat {
+            get {
+                return ResourceManager.GetString("AnalyzerMayOverflowMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The exception &apos;{0}&apos; may be thrown here and not caught.
         /// </summary>
-        public static string AnalyzerMessageFormat {
+        public static string AnalyzerMayThrowMessageFormat {
             get {
-                return ResourceManager.GetString("AnalyzerMessageFormat", resourceCulture);
+                return ResourceManager.GetString("AnalyzerMayThrowMessageFormat", resourceCulture);
             }
         }
         

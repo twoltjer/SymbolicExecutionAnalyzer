@@ -1,7 +1,8 @@
 namespace SymbolicExecution;
 
-public interface ISymbolicExecutionException
+public interface ISymbolicExecutionException : IEquatable<ISymbolicExecutionException>
 {
     Location Location { get; }
-    ITypeSymbol Type { get; }
+    TaggedUnion<ITypeSymbol, Type> Type { get; }
+    IMethodSymbol MethodSymbol { get; }
 }

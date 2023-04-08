@@ -11,10 +11,12 @@ public class ExpressionStatementSyntaxAbstraction : StatementSyntaxAbstraction, 
 		if (Children.Length != 1)
 			return new AnalysisFailure("Expression statement must have exactly one child", Location);
 
-		if (Children[0] is not IAssignmentExpressionSyntaxAbstraction assignment)
-			return new AnalysisFailure("Expression statement must have an assignment expression as its child", Location);
-
-		return assignment.AnalyzeNode(previous);
+		return Children[0] switch
+		{
+			IAssignmentExpressionSyntaxAbstraction assignment => assignment.AnalyzeNode(previous),
+			InvocationExpressionSyntaxAbstraction invocation => invocation.AnalyzeNode(previous),
+			_ => new AnalysisFailure("Expression statement must have an assignment expression or invocation as its child", Location)
+		};
 	}
 
 	public override TaggedUnion<ImmutableArray<(IObjectInstance, IAnalysisState)>, AnalysisFailure> GetExpressionResults(IAnalysisState state)

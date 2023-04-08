@@ -30,9 +30,6 @@ public class IfStatementSyntaxAbstraction : StatementSyntaxAbstraction, IIfState
 		var modifiedStates = new List<IAnalysisState>();
 		foreach (var (conditionResult, stateAfterExpression) in conditionResults)
 		{
-			if (!stateAfterExpression.IsReachable)
-				continue;
-
 			if (!conditionResult.IsExactType(typeof(bool)))
 				return new AnalysisFailure("Condition must be a boolean", Location);
 

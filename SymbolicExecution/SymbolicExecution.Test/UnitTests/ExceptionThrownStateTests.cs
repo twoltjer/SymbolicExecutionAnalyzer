@@ -12,7 +12,8 @@ public class ExceptionThrownStateTests
 			new TextSpan(0, 10),
 			new LinePositionSpan(new LinePosition(10, 10), new LinePosition(10, 12))
 			);
-		var subject = new ExceptionThrownState(exception, location);
+		var symbol = Mock.Of<IMethodSymbol>(MockBehavior.Strict);
+		var subject = new ExceptionThrownState(exception, location, symbol);
 		subject.Equals(subject).Should().BeTrue();
 		subject.Equals(subject as object).Should().BeTrue();
 		subject.GetHashCode().Should().Be(subject.GetHashCode());
@@ -28,8 +29,9 @@ public class ExceptionThrownStateTests
 			new TextSpan(0, 10),
 			new LinePositionSpan(new LinePosition(10, 10), new LinePosition(10, 12))
 			);
-		var subject = new ExceptionThrownState(exception, location);
-		var other = new ExceptionThrownState(exception, location);
+		var symbol = Mock.Of<IMethodSymbol>(MockBehavior.Strict);
+		var subject = new ExceptionThrownState(exception, location, symbol);
+		var other = new ExceptionThrownState(exception, location, symbol);
 		subject.Equals(other).Should().BeTrue();
 		subject.Equals(other as object).Should().BeTrue();
 		subject.GetHashCode().Should().Be(other.GetHashCode());
@@ -45,13 +47,14 @@ public class ExceptionThrownStateTests
 			new TextSpan(0, 10),
 			new LinePositionSpan(new LinePosition(10, 10), new LinePosition(10, 12))
 			);
-		var subject = new ExceptionThrownState(exception, location);
+		var symbol = Mock.Of<IMethodSymbol>(MockBehavior.Strict);
+		var subject = new ExceptionThrownState(exception, location, symbol);
 		var differentLocation = Location.Create(
 			"TestFile.cs",
 			new TextSpan(0, 10),
 			new LinePositionSpan(new LinePosition(10, 10), new LinePosition(10, 13))
 			);
-		var other = new ExceptionThrownState(exception, differentLocation);
+		var other = new ExceptionThrownState(exception, differentLocation, symbol);
 		subject.Equals(other).Should().BeFalse();
 		subject.Equals(other as object).Should().BeFalse();
 		subject.GetHashCode().Should().NotBe(other.GetHashCode());
@@ -63,13 +66,14 @@ public class ExceptionThrownStateTests
 	{
 		var exception = Mock.Of<IObjectInstance>(MockBehavior.Strict);
 		var differentException = Mock.Of<IObjectInstance>(MockBehavior.Strict);
+		var symbol = Mock.Of<IMethodSymbol>(MockBehavior.Strict);
 		var location = Location.Create(
 			"TestFile.cs",
 			new TextSpan(0, 10),
 			new LinePositionSpan(new LinePosition(10, 10), new LinePosition(10, 12))
 			);
-		var subject = new ExceptionThrownState(exception, location);
-		var other = new ExceptionThrownState(differentException, location);
+		var subject = new ExceptionThrownState(exception, location, symbol);
+		var other = new ExceptionThrownState(differentException, location, symbol);
 		subject.Equals(other).Should().BeFalse();
 		subject.Equals(other as object).Should().BeFalse();
 		subject.GetHashCode().Should().NotBe(other.GetHashCode());
@@ -80,12 +84,13 @@ public class ExceptionThrownStateTests
 	public void TestEquals_WithDifferentObjectType_ReturnsFalse()
 	{
 		var exception = Mock.Of<IObjectInstance>(MockBehavior.Strict);
+		var symbol = Mock.Of<IMethodSymbol>(MockBehavior.Strict);
 		var location = Location.Create(
 			"TestFile.cs",
 			new TextSpan(0, 10),
 			new LinePositionSpan(new LinePosition(10, 10), new LinePosition(10, 12))
 			);
-		var subject = new ExceptionThrownState(exception, location);
+		var subject = new ExceptionThrownState(exception, location, symbol);
 		subject.Equals(new object()).Should().BeFalse();
 	}
 }
