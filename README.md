@@ -6,6 +6,8 @@ A C# analyzer which performs symbolic execution on users' code and determines if
 
 ![Screenshot](screenshot.png)
 
+_Note: "Build, test, and analyze" check is failing because of less than 95% code coverage. Building and manually running tests should still work._
+
 # Usage Walkthrough
 
 ## Method 1: NuGet Package (recommended)
