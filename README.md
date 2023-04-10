@@ -6,8 +6,6 @@ A C# analyzer which performs symbolic execution on users' code and determines if
 
 ![Screenshot](screenshot.png)
 
-_Note: "Sonarcloud analysis" check is failing because of less than 80% code coverage._
-
 # Usage Walkthrough
 
 ## Method 1: NuGet Package (recommended)
